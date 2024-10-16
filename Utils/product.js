@@ -1,5 +1,4 @@
 const { ProductModal } = require("../Models/ProductModal");
-const cloudinary = require('../cloudinaryConfig.js'); 
 
 module.exports = {
   postProductData: async (req, res) => {
