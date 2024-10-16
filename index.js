@@ -12,7 +12,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  console.log(req.query)
+  console.log("hello world")
   res.send("Hello from the backend");
 });
 
