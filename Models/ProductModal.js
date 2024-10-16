@@ -30,7 +30,7 @@ const productSchema = new Schema({
       message: (props) => `${props.value} is not a valid URL!`,
     },
   },
-  collection: { type: String, required: true },
+  collectionName: { type: String, required: true },
   type: { type: String, required: true },
   size: { type: Number, required: true },
 });

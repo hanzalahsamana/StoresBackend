@@ -15,7 +15,7 @@ module.exports = {
     try {
       if (collectionName) {
         const productData = await ProductModal.find({
-          collection: collectionName,
+          collectionName: collectionName,
         });
         return res.status(200).json(productData);
       } else {
