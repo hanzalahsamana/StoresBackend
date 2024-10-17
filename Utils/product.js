@@ -1,28 +1,21 @@
-const { cloudinary } = require("../Config/cloudinaryConfig");
 const { ProductModal } = require("../Models/ProductModal");
 
 module.exports = {
   postProductData: async (req, res) => {
+    const productModel = new ProductModal(req.body);
     try {
-      // Collect image URLs from the uploaded files
-      const imageUrls = [];
-
-      // Upload each file to Cloudinary and collect the URL
-      for (let file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path); // Upload to Cloudinary
-        imageUrls.push(result.secure_url); // Save the secure URL from Cloudinary
+      const savedProduct = await productModel.save();
+      if (req.files.lenght > 0) {
+        let path = "";
+        req.files.forEach((file, index, arr) => {
+          path = path + files.path + ",";
+        });
+        path.substring(0, path.lastIndexOf(","))
+        productModel.images = path;
       }
-
-      // Create a new product with the form data and the image URLs
-      const productModel = new ProductModal({
-        ...req.body,
-        image: imageUrls, // Save the uploaded image URLs to the 'image' field
-      });
-
-      const savedProduct = await productModel.save(); // Save the product to the database
       return res.status(201).json(savedProduct);
     } catch (e) {
-      return res.status(500).json({ message: e.message });
+      return res.status(500).json({ message: Object.values(e.errors)[0] });
     }
   },
   getProductData: async (req, res) => {
@@ -30,7 +23,7 @@ module.exports = {
     try {
       if (collectionName) {
         const productData = await ProductModal.find({
-          collectionName: collectionName,
+          collection: collectionName,
         });
         return res.status(200).json(productData);
       } else {

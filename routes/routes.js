@@ -5,7 +5,7 @@ const express = require("express");
 
 const routes = express.Router();
 
-routes.post("/addProduct",upload, postProductData);
+routes.post("/addProduct",upload.array("images[]"), postProductData);
 routes.get("/getProducts", getProductData);
 
 
