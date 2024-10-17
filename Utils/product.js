@@ -6,15 +6,6 @@ module.exports = {
     const productModel = new ProductModal(req.body);
     try {
       const savedProduct = await productModel.save();
-      
-      if (req.files && req.files.length > 0) {
-        productModel.images = req.files.map(file => ({
-          url: file.path,
-          name: file.originalname,
-          size: file.size,
-          type: file.mimetype
-        }));
-      }
 
       await productModel.save();
       return res.status(201).json(savedProduct);

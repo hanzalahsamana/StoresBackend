@@ -6,7 +6,7 @@ const express = require("express");
 const routes = express.Router();
 
 // post apis
-routes.post("/addProduct", upload, postProductData);
+routes.post("/addProduct", postProductData);
 routes.post("/addCart", addCarts);
 
 // get apis

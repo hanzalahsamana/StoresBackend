@@ -8,17 +8,10 @@ const productSchema = new Schema({
   originalPrice: { type: Number, required: true },
   discountedPrice: { type: Number, required: true },
   discount: { type: Number, required: true },
-  images: [
-    file={
-      url: { type: String, required: true },
-      name: { type: String, required: true },
-      size: { type: Number, required: true },
-      type: { type: String, required: true },
-    },
-  ],
+  images: [String],
   collectionName: { type: String, required: true },
   status: { type: Boolean, required: true },
-  type: { type: String, required: false },
+  type: { type: String, required: true },
   size: { type: Number, required: true },
 });
 
