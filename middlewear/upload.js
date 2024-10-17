@@ -3,10 +3,10 @@ const multer = require("multer");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "upload/");
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    let ext = path.extname(req.originalname);
+    let ext = path.extname(file.originalname);
     cb(null, Date.now() + ext);
   },
 });
@@ -14,13 +14,8 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: (req, file, callback) => {
-    if (file.mimetype == "image/jpg" || file.mimetype == "image/png") {
-      callback(null, true);
-    } else {
-      console.log("only jpg and png files allowed!");
-      callback(null, false);
-    }
+    callback(null, true);
   },
 });
 
-module.exports = { upload };
+module.exports = { upload: upload.array("images", 10) };

@@ -1,3 +1,4 @@
+const { request } = require("express");
 const { ProductModal } = require("../Models/ProductModal");
 
 module.exports = {
@@ -5,14 +6,15 @@ module.exports = {
     const productModel = new ProductModal(req.body);
     try {
       const savedProduct = await productModel.save();
-      if (req.files.lenght > 0) {
-        let path = "";
-        req.files.forEach((file, index, arr) => {
-          path = path + files.path + ",";
-        });
-        path.substring(0, path.lastIndexOf(","))
-        productModel.images = path;
+      
+      // Check if files are uploaded
+      if (req.files && req.files.length > 0) {
+        // Map through the files to get their paths
+        const paths = req.files.map(file => file.path);
+        productModel.images = paths; // Assuming images is an array in your ProductModal
       }
+
+      await productModel.save(); // Save the updated product with image paths
       return res.status(201).json(savedProduct);
     } catch (e) {
       return res.status(500).json({ message: Object.values(e.errors)[0] });

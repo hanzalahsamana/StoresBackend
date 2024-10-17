@@ -11,7 +11,8 @@ const productSchema = new Schema({
   discountedPrice: { type: String, required: true },
   discount: { type: String, required: true },
   // Make 'image' an array of strings to store multiple image URLs
-  images: { type: String },
+  images: { type: [String], required: true }, // Array of image paths
+
   collectionName: { type: String, required: true },
   type: { type: String, required: true },
   size: { type: Number, required: true },
