@@ -10,7 +10,6 @@ const CartSchema = new Schema({
   },
   products: [
     {
-      // This will now store the full product data
       type: Object,
       required: true,
     },
@@ -23,6 +22,6 @@ const CartSchema = new Schema({
   ],
 });
 
-const CartModal = mongoose.model("Cart", CartSchema);
+const CartModal = mongoose.model("carts", CartSchema);
 
 module.exports = { CartModal };

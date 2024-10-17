@@ -11,6 +11,7 @@ const productSchema = new Schema({
   images: { type: [String], required: true },
   collectionName: { type: String, required: true },
   type: { type: String, required: true },
+  status: { type: Boolean, required: true },
   size: { type: Number, required: true },
 });
 
