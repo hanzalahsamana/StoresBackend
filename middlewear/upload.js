@@ -14,7 +14,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "uploads",
-    allowed_formats: ["jpg", "png", "webp", "svg"],
+    allowed_formats: ["jpg","jpeg", "png", "webp", "svg"],
   },
 });
 
