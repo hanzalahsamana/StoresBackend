@@ -17,7 +17,7 @@ const productSchema = new Schema({
     },
   ],
   collectionName: { type: String, required: true },
-  type: { type: String, required: true },
+  type: { type: String, required: false },
   status: { type: Boolean, required: true },
   size: { type: Number, required: true },
 });
