@@ -7,6 +7,6 @@ const routes = express.Router();
 
 routes.post("/addProduct", upload, postProductData);
 routes.get("/getProducts", getProductData);
-routes.post("/addCarts", addCarts);
+routes.post("/addCart", addCarts);
 
 module.exports = routes;
