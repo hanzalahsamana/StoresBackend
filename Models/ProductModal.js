@@ -10,26 +10,8 @@ const productSchema = new Schema({
   originalPrice: { type: String, required: true },
   discountedPrice: { type: String, required: true },
   discount: { type: String, required: true },
-  imageUrl: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function (v) {
-        return urlRegex.test(v);
-      },
-      message: (props) => `${props.value} is not a valid URL!`,
-    },
-  },
-  imageUrl2: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function (v) {
-        return urlRegex.test(v);
-      },
-      message: (props) => `${props.value} is not a valid URL!`,
-    },
-  },
+  // Make 'image' an array of strings to store multiple image URLs
+  images: [{ type: String, match: urlRegex }],
   collectionName: { type: String, required: true },
   type: { type: String, required: true },
   size: { type: Number, required: true },

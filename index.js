@@ -7,23 +7,21 @@ require("./Config/Database");
 
 const app = express();
 
-// Middleware setup
 app.use(cors());
 app.use(
   cors({
     origin: "*",
   })
 );
+
 app.use(bodyParser.json());
 
-// Routes
 app.get("/", (req, res) => {
   res.send("Hello from the backend");
 });
 
 app.use("/api/v1", routes);
 
-// Conditionally listen to the port in local development
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () => {
@@ -31,5 +29,4 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// Export the app for Vercel deployment
 module.exports = app;
