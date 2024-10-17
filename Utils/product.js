@@ -8,8 +8,12 @@ module.exports = {
       const savedProduct = await productModel.save();
       
       if (req.files && req.files.length > 0) {
-        const paths = req.files.map(file => file.path);
-        productModel.images = paths;
+        productModel.images = req.files.map(file => ({
+          url: file.path,
+          name: file.originalname,
+          size: file.size,
+          type: file.mimetype
+        }));
       }
 
       await productModel.save();
