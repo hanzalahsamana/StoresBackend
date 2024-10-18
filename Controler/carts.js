@@ -54,11 +54,11 @@ const getCartData = async (req, res) => {
       return res.status(400).json({ message: "ID is required" });
     }
     const cartData = await CartModal.find({ cartId: id });
-
-    if (cartData) {
-      return res.status(200).json(cartData);
+    
+    if (cartData.length === 0) {
+      return res.status(400).json({ message: "Data not found" });
     }
-    res.status(200).json({ message: "Data not found" });
+    return res.status(200).json(cartData);
   } catch (err) {
     res.status(500).json({ message: err });
   }
