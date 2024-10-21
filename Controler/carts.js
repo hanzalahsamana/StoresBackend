@@ -40,7 +40,7 @@ const addCarts = async (req, res) => {
       (p) => p._id?.toString() === productId
     );
     if (productInCart) {
-      productInCart.quantity = quantity;
+      productInCart.quantity += quantity;
       cart.markModified("products");
       await cart.save();
     } else {
@@ -54,7 +54,8 @@ const addCarts = async (req, res) => {
       });
     }
     await cart.save();
-    res.status(200).json(cart);
+    const allCarts = await CartModel.find({cartId: id});
+    res.status(200).json(allCarts);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

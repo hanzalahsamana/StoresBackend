@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// The schema itself (not the model)
 const productSchema = new Schema({
   name: { type: String, required: true },
   alt: { type: String, required: true },
@@ -16,6 +15,5 @@ const productSchema = new Schema({
   size: { type: Number, required: true },
 });
 
-// Export the schema, not the model
 module.exports = { productSchema };
 
