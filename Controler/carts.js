@@ -96,17 +96,13 @@ const deleteCartProduct = async (req, res) => {
       CartSchema,
       type + "_Cart"
     );
-
-    const ProductModel = mongoose.model(
-      type + "_products",
-      productSchema,
-      type + "_products"
-    );
     if (!productId) {
       const cart = await CartModel.deleteOne({ cartId: id });
-      
+      if (cart.deletedCount === 0) {
+        return res.status(404).json({ message: "Cart not found" });
+      }
       return res.status(400).json({
-        message: "Cart data deleted"
+        message: "Deleted Successfully",
       });
     } else if (!id) {
       return res.status(400).json({ message: "ID is required" });
@@ -130,7 +126,9 @@ const deleteCartProduct = async (req, res) => {
 
     await cart.save();
 
-    return res.status(200).json(cart);
+    return res
+      .status(200)
+      .json({ message: "CartProduct deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
