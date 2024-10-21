@@ -1,11 +1,13 @@
-const { CartModal } = require("../Models/CartModal");
-const { ProductModal } = require("../Models/ProductModal");
+const { mongoose } = require("mongoose");
+const { CartSchema } = require("../Models/CartModal");
+const { productSchema } = require("../Models/ProductModal");
 
 // add cart data function
 const addCarts = async (req, res) => {
   const productId = req.query.productId;
   const id = req.query.id;
   const quantity = req.body.quantity;
+  const type = req.collectionType;
 
   if (!productId || !quantity) {
     return res.status(400).json({
@@ -15,12 +17,24 @@ const addCarts = async (req, res) => {
     });
   }
   try {
+    const CartModel = mongoose.model(
+      type + "_Cart",
+      CartSchema,
+      type + "_Cart"
+    );
+
+    const ProductModel = mongoose.model(
+      type + "_products",
+      productSchema,
+      type + "_products"
+    );
+
     let cart;
     if (id) {
-      cart = await CartModal.findOne({ cartId: id });
+      cart = await CartModel.findOne({ cartId: id });
     }
     if (!cart) {
-      cart = new CartModal();
+      cart = new CartModel();
     }
     const productInCart = cart.products.find(
       (p) => p._id?.toString() === productId
@@ -30,7 +44,7 @@ const addCarts = async (req, res) => {
       cart.markModified("products");
       await cart.save();
     } else {
-      const productData = await ProductModal.findById(productId);
+      const productData = await ProductModel.findById(productId);
       if (!productData) {
         return res.status(404).json({ message: "Product not found" });
       }
@@ -42,19 +56,25 @@ const addCarts = async (req, res) => {
     await cart.save();
     res.status(200).json(cart);
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 };
 
 // get cart data function
 const getCartData = async (req, res) => {
   const id = req.query.id;
+  const type = req.collectionType;
   try {
+    const CartModel = mongoose.model(
+      type + "_Cart",
+      CartSchema,
+      type + "_Cart"
+    );
     if (!id) {
       return res.status(400).json({ message: "ID is required" });
     }
-    const cartData = await CartModal.find({ cartId: id });
-    
+    const cartData = await CartModel.find({ cartId: id });
+
     if (cartData.length === 0) {
       return res.status(400).json({ message: "Data not found" });
     }
@@ -68,18 +88,31 @@ const getCartData = async (req, res) => {
 const deleteCartProduct = async (req, res) => {
   const productId = req.query.productId;
   const id = req.query.id;
+  const type = req.collectionType;
 
   try {
+    const CartModel = mongoose.model(
+      type + "_Cart",
+      CartSchema,
+      type + "_Cart"
+    );
+
+    const ProductModel = mongoose.model(
+      type + "_products",
+      productSchema,
+      type + "_products"
+    );
     if (!productId) {
-      const cart = await CartModal.deleteOne({ cartId: id });
+      const cart = await CartModel.deleteOne({ cartId: id });
+      
       return res.status(400).json({
-        message: `${cart && "Cart data deleted"}`,
+        message: "Cart data deleted"
       });
     } else if (!id) {
       return res.status(400).json({ message: "ID is required" });
     }
 
-    const cart = await CartModal.findOne({ cartId: id });
+    const cart = await CartModel.findOne({ cartId: id });
 
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });

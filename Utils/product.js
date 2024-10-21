@@ -1,17 +1,25 @@
-const { ProductModal } = require("../Models/ProductModal");
+const { productSchema } = require("../Models/ProductModal");
 const { mongoose } = require("mongoose");
 
 module.exports = {
   // add product
   postProductData: async (req, res) => {
-    const productModel = new ProductModal(req.body);
+    const type = req.collectionType;
+
+    const ProductModel = mongoose.model(
+      type + "_products",
+      productSchema,
+      type + "_products"
+    );
+
+    const newProduct = new ProductModel(req.body);
     try {
-      const savedProduct = await productModel.save();
+      const savedProduct = await newProduct.save();
       // if (req.files && req.files.length > 0) {
       //   const paths = req.files.map((file) => file.path);
       //   savedProduct.images = paths;
       // }
-      await productModel.save();
+      await newProduct.save();
       return res.status(201).json(savedProduct);
     } catch (e) {
       return res.status(500).json({ message: Object.values(e.errors)[0] });
@@ -21,14 +29,21 @@ module.exports = {
   // get product
   getProductData: async (req, res) => {
     const collectionName = req.query.collection;
+    const type = req.collectionType;
     try {
+      const ProductModel = mongoose.model(
+        type + "_products",
+        productSchema,
+        type + "_products"
+      );
       if (collectionName) {
-        const productData = await ProductModal.find({
-          collection: collectionName,
+        const productData = await ProductModel.find({
+          collectionName: collectionName,
         });
+        console.log(productData);
         return res.status(200).json(productData);
       } else {
-        const productData = await ProductModal.find();
+        const productData = await ProductModel.find();
         return res.status(200).json(productData);
       }
     } catch (e) {
@@ -41,6 +56,7 @@ module.exports = {
   // edit product
   editProduct: async (req, res) => {
     const productID = req.query.id;
+    const type = req.collectionType;
 
     if (!mongoose.isValidObjectId(productID) || !productID) {
       return res
@@ -49,7 +65,12 @@ module.exports = {
     }
 
     try {
-      const product = await ProductModal.findById(productID);
+      const ProductModel = mongoose.model(
+        type + "_products",
+        productSchema,
+        type + "_products"
+      );
+      const product = await ProductModel.findById(productID);
 
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -74,6 +95,7 @@ module.exports = {
   // delete product
   deleteProduct: async (req, res) => {
     const productID = req.query.id;
+    const type = req.collectionType;
 
     if (!mongoose.isValidObjectId(productID) || !productID) {
       return res
@@ -82,8 +104,13 @@ module.exports = {
     }
 
     try {
-      const product = await ProductModal.deleteOne({ _id: productID });
-      console.log(product);
+      const ProductModel = mongoose.model(
+        type + "_products",
+        productSchema,
+        type + "_products"
+      );
+
+      const product = await ProductModel.deleteOne({ _id: productID });
 
       if (product.deletedCount === 0) {
         return res.status(404).json({ message: "Product not found" });
@@ -91,8 +118,7 @@ module.exports = {
 
       res.status(200).json({ message: "Product Deleted Successfully" });
     } catch (error) {
-      console.error("Error updating product:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: error.message });
     }
   },
 };

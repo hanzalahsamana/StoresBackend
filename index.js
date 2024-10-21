@@ -20,7 +20,13 @@ app.get("/", (req, res) => {
   res.send("Hello from the backend");
 });
 
-app.use("/api/v1", routes);
+app.use("/api/v1/:type", (req, res, next) => {
+  const type = req.params.type;
+  req.collectionType = type;
+  next();
+});
+
+app.use("/api/v1/:type", routes);
 
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 8080;
