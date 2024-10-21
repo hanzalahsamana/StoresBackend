@@ -19,7 +19,6 @@ module.exports = {
       //   const paths = req.files.map((file) => file.path);
       //   savedProduct.images = paths;
       // }
-      await newProduct.save();
       return res.status(201).json(savedProduct);
     } catch (e) {
       return res.status(500).json({ message: Object.values(e.errors)[0] });
@@ -40,7 +39,6 @@ module.exports = {
         const productData = await ProductModel.find({
           collectionName: collectionName,
         });
-        console.log(productData);
         return res.status(200).json(productData);
       } else {
         const productData = await ProductModel.find();
