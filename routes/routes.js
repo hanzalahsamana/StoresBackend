@@ -12,6 +12,8 @@ const {
   deleteProduct,
 } = require("../Utils/product");
 const express = require("express");
+const { userRegisterValidate } = require("../Utils/userValidate");
+const { registerUser } = require("../Controler/user");
 
 const routes = express.Router();
 
@@ -19,6 +21,7 @@ const routes = express.Router();
 routes.post("/addProduct", postProductData);
 routes.post("/addCart", addCarts);
 routes.post("/addOrderData", addOrderData);
+routes.post("/register", userRegisterValidate, registerUser);
 
 // get apis
 routes.get("/getProducts", getProductData);

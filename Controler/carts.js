@@ -54,8 +54,8 @@ const addCarts = async (req, res) => {
       });
     }
     await cart.save();
-    const allCarts = await CartModel.find({cartId: id});
-    res.status(200).json(allCarts);
+    const allCarts = await CartModel.find({ cartId: id });
+    res.status(200).json(id ? allCarts : cart);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
