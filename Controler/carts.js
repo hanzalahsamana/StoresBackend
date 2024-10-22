@@ -41,6 +41,9 @@ const addCarts = async (req, res) => {
     );
     if (productInCart) {
       productInCart.quantity += quantity;
+      if (productInCart.quantity < 1) {
+        productInCart.quantity = 1;
+      }
       cart.markModified("products");
     } else {
       const productData = await ProductModel.findById(productId);
@@ -50,11 +53,8 @@ const addCarts = async (req, res) => {
 
       cart.products.push({
         ...productData.toObject(),
-        quantity: quantity,
+        quantity: quantity < 1 ? 1 : quantity,
       });
-    }
-    if (productInCart.quantity < 1) {
-      productInCart.quantity = 1;
     }
     await cart.save();
     const allCarts = await CartModel.find({ cartId: id });
