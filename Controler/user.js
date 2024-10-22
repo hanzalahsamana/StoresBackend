@@ -11,12 +11,16 @@ module.exports = {
   registerUser: async (req, res) => {
     const userModal = new UserModal(req.body);
     userModal.password = await bcrypt.hash(req.body.password, 10);
+    const userExists = await UserModal({ email: req.body.email });
+    if (userExists) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
     try {
       const savedUser = await userModal.save();
       savedUser.password = undefined;
       return res.status(201).json(savedUser);
     } catch (error) {
-      return res.status(500).json({ message: "User Exists", err: error });
+      return res.status(500).json({ message: error.message });
     }
   },
 
@@ -25,12 +29,12 @@ module.exports = {
     try {
       const { email, password } = req.body;
       const user = await UserModal.findOne({ email });
-
       if (!user) return res.status(401).json({ message: "User not found" });
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid)
+      if (!isPasswordValid) {
         return res.status(401).json({ message: "Invalid email/password" });
+      }
 
       const userToken = {
         _id: user._id,

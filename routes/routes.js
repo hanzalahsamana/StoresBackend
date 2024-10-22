@@ -12,8 +12,11 @@ const {
   deleteProduct,
 } = require("../Utils/product");
 const express = require("express");
-const { userRegisterValidate } = require("../Utils/userValidate");
-const { registerUser } = require("../Controler/user");
+const {
+  userRegisterValidate,
+  userLoginValidate,
+} = require("../Utils/userValidate");
+const { registerUser, loginUser } = require("../Controler/user");
 const { addReview, getReviews } = require("../Controler/reviews");
 
 const withParams = express.Router();
@@ -25,6 +28,7 @@ withParams.post("/addCart", addCarts);
 withParams.post("/addOrderData", addOrderData);
 withParams.post("/addReview", addReview);
 withoutParams.post("/register", userRegisterValidate, registerUser);
+withoutParams.post("/login", userLoginValidate, loginUser);
 
 // get apis
 withParams.get("/getProducts", getProductData);
