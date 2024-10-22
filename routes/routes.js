@@ -14,27 +14,29 @@ const {
 const express = require("express");
 const { userRegisterValidate } = require("../Utils/userValidate");
 const { registerUser } = require("../Controler/user");
-const { addReview } = require("../Controler/reviews");
+const { addReview, getReviews } = require("../Controler/reviews");
 
-const routes = express.Router();
+const withParams = express.Router();
+const withoutParams = express.Router();
 
 // post apis
-routes.post("/addProduct", postProductData);
-routes.post("/addCart", addCarts);
-routes.post("/addOrderData", addOrderData);
-routes.post("/register", userRegisterValidate, registerUser);
-routes.post("/addReview", addReview);
+withParams.post("/addProduct", postProductData);
+withParams.post("/addCart", addCarts);
+withParams.post("/addOrderData", addOrderData);
+withParams.post("/addReview", addReview);
+withoutParams.post("/register", userRegisterValidate, registerUser);
 
 // get apis
-routes.get("/getProducts", getProductData);
-routes.get("/getCartData", getCartData);
-routes.get("/getOrders", getOrders);
+withParams.get("/getProducts", getProductData);
+withParams.get("/getCartData", getCartData);
+withParams.get("/getOrders", getOrders);
+withParams.get("/getReviews", getReviews);
 
 // delete apis
-routes.delete("/deleteCartProduct", deleteCartProduct);
-routes.delete("/deleteProduct", deleteProduct);
+withParams.delete("/deleteCartProduct", deleteCartProduct);
+withParams.delete("/deleteProduct", deleteProduct);
 
 //  edit product
-routes.put("/editProduct", editProduct);
+withParams.put("/editProduct", editProduct);
 
-module.exports = routes;
+module.exports = { withParams, withoutParams };

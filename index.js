@@ -1,7 +1,7 @@
 const express = require("express");
-const routes = require("./routes/routes");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const { withParams, withoutParams } = require("./routes/routes");
 require("dotenv").config();
 require("./Config/Database");
 
@@ -26,7 +26,8 @@ app.use("/api/v1/:type", (req, res, next) => {
   next();
 });
 
-app.use("/api/v1/:type", routes);
+app.use("/api/v1/:type", withParams);
+app.use("/api/v1/", withoutParams);
 
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 8080;
