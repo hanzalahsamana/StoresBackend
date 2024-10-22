@@ -14,6 +14,7 @@ const {
 const express = require("express");
 const { userRegisterValidate } = require("../Utils/userValidate");
 const { registerUser } = require("../Controler/user");
+const { addReview } = require("../Controler/reviews");
 
 const routes = express.Router();
 
@@ -22,7 +23,7 @@ routes.post("/addProduct", postProductData);
 routes.post("/addCart", addCarts);
 routes.post("/addOrderData", addOrderData);
 routes.post("/register", userRegisterValidate, registerUser);
-routes.post("/addReviews", userRegisterValidate, registerUser);
+routes.post("/addReview", addReview);
 
 // get apis
 routes.get("/getProducts", getProductData);
