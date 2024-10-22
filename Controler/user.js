@@ -9,12 +9,12 @@ const { UserModal } = require("../Models/userModal");
 module.exports = {
   // register user function
   registerUser: async (req, res) => {
-    const userModal = new UserModal(req.body);
-    userModal.password = await bcrypt.hash(req.body.password, 10);
     const userExists = await UserModal({ email: req.body.email });
     if (userExists) {
       return res.status(409).json({ message: "Email already exists" });
     }
+    const userModal = new UserModal(req.body);
+    userModal.password = await bcrypt.hash(req.body.password, 10);
     try {
       const savedUser = await userModal.save();
       savedUser.password = undefined;

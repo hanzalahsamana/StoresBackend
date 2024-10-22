@@ -6,7 +6,7 @@ const userRegisterValidate = (req, res, next) => {
       "string.pattern.base": "brandName must not contain spaces",
     }),
     name: Joi.string().min(3).max(100).required().regex(/^\S+$/).messages({
-      "string.pattern.base": "adminName must not contain spaces",
+      "string.pattern.base": "Name must not contain spaces",
     }),
     email: Joi.string().email().required().regex(/^\S+$/).messages({
       "string.pattern.base": "email must not contain spaces",
