@@ -22,6 +22,7 @@ routes.post("/addProduct", postProductData);
 routes.post("/addCart", addCarts);
 routes.post("/addOrderData", addOrderData);
 routes.post("/register", userRegisterValidate, registerUser);
+routes.post("/addReviews", userRegisterValidate, registerUser);
 
 // get apis
 routes.get("/getProducts", getProductData);

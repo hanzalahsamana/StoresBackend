@@ -40,7 +40,11 @@ const addCarts = async (req, res) => {
       (p) => p._id?.toString() === productId
     );
     if (productInCart) {
-      productInCart.quantity += quantity;
+      if (quantity < 1) {
+        productInCart.quantity = 1;
+      } else {
+        productInCart.quantity += quantity;
+      }
       cart.markModified("products");
       await cart.save();
     } else {
@@ -48,9 +52,10 @@ const addCarts = async (req, res) => {
       if (!productData) {
         return res.status(404).json({ message: "Product not found" });
       }
+
       cart.products.push({
         ...productData.toObject(),
-        quantity: quantity,
+        quantity: quantity < 1 ? 1 : quantity,
       });
     }
     await cart.save();
