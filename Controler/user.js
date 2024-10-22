@@ -9,8 +9,9 @@ const { UserModal } = require("../Models/userModal");
 module.exports = {
   // register user function
   registerUser: async (req, res) => {
-    const userExists = await UserModal({ email: req.body.email });
-    if (userExists) {
+    const userExists = await UserModal.find({ email: req.body.email });
+    console.log(userExists)
+    if (userExists.length > 0) {
       return res.status(409).json({ message: "Email already exists" });
     }
     const userModal = new UserModal(req.body);
