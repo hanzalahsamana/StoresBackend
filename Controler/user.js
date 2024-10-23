@@ -29,6 +29,7 @@ module.exports = {
   loginUser: async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log(req.body)
       const user = await UserModal.findOne({ email });
       if (!user) return res.status(401).json({ message: "User not found" });
 
@@ -51,7 +52,7 @@ module.exports = {
 
       return res.status(200).json({ jwtToken, userToken });
     } catch (error) {
-      return res.status(500).json({ message: "error", err: error });
+      return res.status(500).json({ message: error.message });
     }
   },
 };
