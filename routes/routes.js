@@ -28,7 +28,7 @@ withParams.post("/addCart", addCarts);
 withParams.post("/addOrderData", addOrderData);
 withParams.post("/addReview", addReview);
 withoutParams.post("/register", userRegisterValidate, registerUser);
-withoutParams.post("/loginUser", userLoginValidate, loginUser);
+withoutParams.post("/login", userLoginValidate, loginUser);
 
 // get apis
 withParams.get("/getProducts", getProductData);
