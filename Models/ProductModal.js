@@ -7,13 +7,12 @@ const productSchema = new Schema({
   brand: { type: String, required: true },
   originalPrice: { type: Number, required: true },
   discountedPrice: { type: Number, required: true },
-  discount: { type: Number, required: true },
+  discount: { type: Number },
   images: [String],
   collectionName: { type: String, required: true },
-  status: { type: Boolean, required: true },
-  type: { type: String, required: true },
-  size: { type: Number, required: true },
+  stock: { type: Number, required: true },
+  type: { type: String },
+  size: [String],
 });
 
 module.exports = { productSchema };
-

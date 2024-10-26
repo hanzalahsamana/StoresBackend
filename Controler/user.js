@@ -10,7 +10,7 @@ module.exports = {
   // register user function
   registerUser: async (req, res) => {
     const userExists = await UserModal.find({ email: req.body.email });
-    console.log(userExists)
+    console.log(userExists);
     if (userExists.length > 0) {
       return res.status(409).json({ message: "Email already exists" });
     }
@@ -29,7 +29,7 @@ module.exports = {
   loginUser: async (req, res) => {
     try {
       const { email, password } = req.body;
-      console.log(req.body)
+      console.log(req.body);
       const user = await UserModal.findOne({ email });
       if (!user) return res.status(401).json({ message: "User not found" });
 
