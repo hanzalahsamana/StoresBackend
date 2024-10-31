@@ -13,6 +13,7 @@ const productSchema = new Schema({
   stock: { type: Number, required: true },
   type: { type: String },
   size: [String],
+  discription: { type: String },
 });
 
 module.exports = { productSchema };
