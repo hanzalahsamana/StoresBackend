@@ -3,7 +3,11 @@ const {
   getCartData,
   deleteCartProduct,
 } = require("../Controler/carts");
-const { addOrderData, getOrders } = require("../Controler/Order");
+const {
+  addOrderData,
+  getOrders,
+  editOrderData,
+} = require("../Controler/Order");
 const { upload } = require("../middlewear/upload");
 const {
   postProductData,
@@ -42,5 +46,6 @@ withParams.delete("/deleteProduct", deleteProduct);
 
 //  edit product
 withParams.put("/editProduct", editProduct);
+withParams.put("/editOrder", editOrderData);
 
 module.exports = { withParams, withoutParams };
