@@ -13,7 +13,6 @@ const {
   GOOGLE_CLOUD_CLIENT_X509_CERT_URL,
   GOOGLE_CLOUD_UNIVERSE_DOMAIN,
 } = process.env;
-
 const analyticsDataClient = new BetaAnalyticsDataClient({
   credentials: {
     type: "service_account",
