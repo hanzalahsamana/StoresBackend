@@ -29,18 +29,19 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
   },
 });
 
-const today = new Date();
-const lastYear = new Date(today);
-lastYear.setFullYear(today.getFullYear() - 1); 
-const startDate = lastYear.toISOString().split('T')[0]; 
-const endDate = today.toISOString().split('T')[0];
-
 const getAnalyticsData = async (req, res) => {
     const propertyId = process.env.PROPERTY_ID;
+    const { dateFilter } = req.query;
 
-  if (!propertyId) {
-    return res.status(400).json({ message: 'Property ID is required' });
-  }
+    if (!propertyId) {
+      return res.status(400).json({ message: 'Property ID is required' });
+    }
+  
+    if (!dateFilter) {
+      return res.status(400).json({ message: 'Date filter is required' });
+    }
+
+    const { startDate, endDate } = calculateDateRange(dateFilter);
 
   try {
 
