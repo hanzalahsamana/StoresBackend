@@ -1,5 +1,7 @@
 const calculateDateRange = (filter) => {
     const today = new Date();
+    console.log(filter);
+    
     let startDate, endDate;
   
     switch (filter) {
@@ -28,7 +30,7 @@ const calculateDateRange = (filter) => {
         startDate = firstDayOfWeek.toISOString().split('T')[0];
         endDate = today.toISOString().split('T')[0];
         break;
-        
+
       case 'thisMonth':
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         startDate = firstDayOfMonth.toISOString().split('T')[0];
@@ -51,3 +53,5 @@ const calculateDateRange = (filter) => {
     return { startDate, endDate };
   };
   
+
+  module.exports = {calculateDateRange};

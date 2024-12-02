@@ -1,4 +1,5 @@
 const { BetaAnalyticsDataClient } = require('@google-analytics/data');
+const { calculateDateRange } = require('../Utils/CalculateDateRange');
 require('dotenv').config(); 
 
 const {
