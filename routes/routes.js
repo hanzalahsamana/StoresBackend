@@ -23,6 +23,7 @@ const {
 const { registerUser, loginUser } = require("../Controler/user");
 const { addReview, getReviews } = require("../Controler/reviews");
 const { getAnalyticsData } = require("../Controler/analytics");
+const { getPages } = require("../Controler/pages");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -41,6 +42,7 @@ withParams.get("/getCartData", getCartData);
 withParams.get("/getOrders", getOrders);
 withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
+withParams.get("/getPages", getPages);
 
 // delete apis
 withParams.delete("/deleteCartProduct", deleteCartProduct);

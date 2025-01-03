@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const pageSchema = new mongoose.Schema({
+const pageSchema = new Schema({
   title: { type: String, required: true },
   type: { type: String, required: true },
 
@@ -16,6 +17,6 @@ const pageSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const Page = mongoose.model("Page", pageSchema);
+// const PageModel = mongoose.model("Page", pageSchema);
 
-module.exports = Page;
+module.exports = {pageSchema} ;
