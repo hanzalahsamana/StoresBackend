@@ -3,8 +3,20 @@ const { pageSchema } = require("../Models/PagesModel");
 
 const defaultPages = [
   {
+    title: "Site Logo",
+    type: "Site Logo",
+  },
+  {
     title: "About Us",
     type: "About Us",
+  },
+  {
+    title: "Our Liberary",
+    type: "Our Liberary",
+  },
+  {
+    title: "Category About",
+    type: "Category About",
   },
   {
     title: "FAQ",
@@ -37,6 +49,7 @@ const SeedDefaultPages = async (type) => {
             type + "_pages"
           );
       let existingPage = await PageModel.findOne({ type: page.type });
+
       if (!existingPage) {
         const newPage = new PageModel(page);
         await newPage.save();
