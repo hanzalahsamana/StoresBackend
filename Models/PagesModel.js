@@ -7,7 +7,7 @@ const pageSchema = new Schema({
 
   text: { type: String, default: "" },
   buttonText: { type: String, default: "" },
-  image: { type: String, default: "" },
+  image: { type: String, default: "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp" },
   faqs: [{ Q: String, A: String }],
   video: { type: String, default: "" },
   email: { type: String, default: "" },

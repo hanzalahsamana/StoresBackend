@@ -11,12 +11,12 @@ const defaultPages = [
     type: "About Us",
   },
   {
-    title: "Our Liberary",
-    type: "Our Liberary",
+    title: "Our Quality",
+    type: "Our Quality",
   },
   {
-    title: "Category About",
-    type: "Category About",
+    title: "Manufacture Process",
+    type: "Manufacture Process",
   },
   {
     title: "FAQ",
@@ -42,12 +42,11 @@ const defaultPages = [
 const SeedDefaultPages = async (type) => {
   try {
     for (const page of defaultPages) {
-
-        const PageModel = mongoose.model(
-            type + "_pages",
-            pageSchema,
-            type + "_pages"
-          );
+      const PageModel = mongoose.model(
+        type + "_pages",
+        pageSchema,
+        type + "_pages"
+      );
       let existingPage = await PageModel.findOne({ type: page.type });
 
       if (!existingPage) {

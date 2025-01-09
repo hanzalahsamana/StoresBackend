@@ -23,7 +23,7 @@ const {
 const { registerUser, loginUser } = require("../Controler/user");
 const { addReview, getReviews } = require("../Controler/reviews");
 const { getAnalyticsData } = require("../Controler/analytics");
-const { getPages } = require("../Controler/pages");
+const { getPages, updatePage } = require("../Controler/pages");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -51,5 +51,6 @@ withParams.delete("/deleteProduct", deleteProduct);
 //  edit product
 withParams.put("/editProduct", editProduct);
 withParams.put("/editOrder", editOrderData);
+withParams.patch("/editPage", updatePage);
 
 module.exports = { withParams, withoutParams };
