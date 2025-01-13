@@ -7,6 +7,10 @@ const defaultPages = [
     type: "Site Logo",
   },
   {
+    title: "Hero Banner",
+    type: "Hero Banner",
+  },
+  {
     title: "About Us",
     type: "About Us",
   },
