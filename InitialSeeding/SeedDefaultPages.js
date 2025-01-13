@@ -34,6 +34,18 @@ const defaultPages = [
     type: "Privacy Policy",
   },
   {
+    title: "Return Policy",
+    type: "Return Policy",
+  },
+  {
+    title: "Fabric Remants",
+    type: "Fabric Remants",
+  },
+  {
+    title: "Shipping Policy",
+    type: "Shipping Policy",
+  },
+  {
     title: "Terms and Conditions",
     type: "Terms and Conditions",
   },
