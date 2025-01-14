@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const SeedDefaultPages = require("../InitialSeeding/SeedDefaultPages");
 const url = process.env.MONGO_URL;
 
 mongoose

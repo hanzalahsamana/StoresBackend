@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const { pageSchema } = require("../Models/PagesModel");
-const SeedDefaultPages = require("../InitialSeeding/SeedDefaultPages");
+const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 
 const getPages = async (req, res) => {
   const type = req.collectionType;
@@ -11,7 +11,7 @@ const getPages = async (req, res) => {
       type + "_pages"
     );
 
-    await SeedDefaultPages(type);
+    await SeedDefaultData(type);
 
     const pages = await PagesModel.find();
 
