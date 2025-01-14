@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 const Joi = require("joi");
 const { UserModal } = require("../Models/userModal");
-const SeedDefaultPages = require("../InitialSeeding/SeedDefaultPages");
+const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 
 module.exports = {
   // register user function
@@ -20,7 +20,7 @@ module.exports = {
     try {
       const savedUser = await userModal.save();
       savedUser.password = undefined;
-      await SeedDefaultPages(savedUser.brandName)
+      await SeedDefaultData(savedUser.brandName)
       return res.status(201).json(savedUser);
     } catch (error) {
       return res.status(500).json({ message: error.message });
