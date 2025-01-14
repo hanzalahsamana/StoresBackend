@@ -11,8 +11,6 @@ const getPages = async (req, res) => {
       type + "_pages"
     );
 
-    await SeedDefaultData(type);
-
     const pages = await PagesModel.find();
 
     return res.status(200).json(pages);

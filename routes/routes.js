@@ -14,7 +14,7 @@ const {
   getProductData,
   editProduct,
   deleteProduct,
-} = require("../Utils/product");
+} = require("../Controler/product");
 const express = require("express");
 const {
   userRegisterValidate,
