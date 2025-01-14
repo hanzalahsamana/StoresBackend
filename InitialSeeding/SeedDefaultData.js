@@ -14,7 +14,7 @@ const defaultPages = [
     title: "Hero Banner",
     type: "Hero Banner",
     image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736859354/zbivxqza889cpnp7nssr.png",
+      "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
   },
   {
     title: "About Us",
@@ -78,7 +78,7 @@ const defaultPages = [
     title: "Fabric Remants",
     type: "Fabric Remants",
     image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/ublbx3lzwywswnjc8ojf.jpg",
+      "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
     text: "At [Your Company Name], we are committed to offering only the highest quality products. We use the best materials and adhere to rigorous manufacturing standards to ensure that every item we sell is durable, reliable, and performs as expected. Our products undergo thorough testing to guarantee quality, and we stand behind everything we sell. If you are not satisfied with the quality of your purchase, please contact us, and we will work to resolve any issues promptly.",
   },
   {
@@ -105,8 +105,9 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
+    stock: 100,
+    size: 4,
     collectionName: "Collection-1",
-    status: true,
     type: "Unstiched",
   },
   {
@@ -121,8 +122,9 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
     collectionName: "Collection-1",
-    status: true,
-    type: "Unstiched",
+    stock: 100,
+    size: 4,
+    type: "Unstiched", 
   },
   {
     name: "Product 3",
@@ -136,7 +138,8 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
     collectionName: "Collection-2",
-    status: true,
+    stock: 100,
+    size: 4,
     type: "stiched",
   },
   {
@@ -151,7 +154,8 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
     collectionName: "Collection-2",
-    status: true,
+    stock: 100,
+    size: 4,
     type: "stiched",
   },
 ];

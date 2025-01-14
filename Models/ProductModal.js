@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -12,7 +13,7 @@ const productSchema = new Schema({
   collectionName: { type: String, required: true },
   stock: { type: Number, required: true },
   type: { type: String },
-  size: [String],
+  size: {type: String , required:true },
   discription: { type: String },
 });
 
