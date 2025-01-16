@@ -2,6 +2,7 @@ const {
   addCarts,
   getCartData,
   deleteCartProduct,
+  UpdateCart,
 } = require("../Controler/carts");
 const {
   addOrderData,
@@ -55,6 +56,7 @@ withParams.delete("/deleteProduct", deleteProduct);
 //  edit product
 withParams.put("/editProduct", editProduct);
 withParams.put("/editCategory", editCategory);
+// withParams.put("/updateCart/:cartId", UpdateCart);
 withParams.put("/editOrder", editOrderData);
 withParams.patch("/editPage", updatePage);
 
