@@ -26,6 +26,7 @@ const { addReview, getReviews } = require("../Controler/reviews");
 const { getAnalyticsData } = require("../Controler/analytics");
 const { getPages, updatePage } = require("../Controler/pages");
 const { postCategory, getCategory, deleteCategory, editCategory } = require("../Controler/category");
+const { postConatctForm } = require("../Controler/Contact");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -36,6 +37,7 @@ withParams.post("/addCategory", postCategory);
 withParams.post("/addCart", addCarts);
 withParams.post("/addOrderData", addOrderData);
 withParams.post("/addReview", addReview);
+withParams.post("/postContact", postConatctForm);
 withoutParams.post("/register", userRegisterValidate, registerUser);
 withoutParams.post("/login", userLoginValidate, loginUser);
 

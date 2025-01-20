@@ -1,5 +1,10 @@
 const { mongoose } = require("mongoose");
 const orderSchema = require("../Models/OrderModal");
+const {
+  customerOrderDetail,
+  adminOrderDetail,
+} = require("../Utils/EmailsToSend");
+const { UserModal } = require("../Models/userModal");
 
 const addOrderData = async (req, res) => {
   const type = req.collectionType;
@@ -8,12 +13,28 @@ const addOrderData = async (req, res) => {
     orderSchema,
     type + "_Orders"
   );
-  const newOrder = new OrderModel(req.body);
   try {
-    const savedOrderData = await newOrder.save();
-    return res.status(201).json(savedOrderData);
+    const admin = await UserModal.findOne({ brandName: type });
+    const newOrder = new OrderModel(req.body);
+    await newOrder.save();
+
+    console.log("newOrder: ",newOrder , "admin: ",admin );
+    
+    await customerOrderDetail(
+      { ...admin.toObject(), logo: newOrder?.to },
+      newOrder?.customerInfo?.email,
+      newOrder
+    );
+    await adminOrderDetail(
+      { ...admin.toObject(), logo: newOrder?.to },
+      admin.email,
+      newOrder
+    );
+    return res.status(201).json(newOrder);
   } catch (e) {
-    return res.status(500).json({ message: Object.values(e.errors)[0] });
+    console.log(e);
+    
+    return res.status(500).json({ message: e.message });
   }
 };
 
