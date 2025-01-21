@@ -2,14 +2,12 @@ const {
   addCarts,
   getCartData,
   deleteCartProduct,
-  UpdateCart,
 } = require("../Controler/carts");
 const {
   addOrderData,
   getOrders,
   editOrderData,
 } = require("../Controler/Order");
-const { upload } = require("../middlewear/upload");
 const {
   postProductData,
   getProductData,
@@ -18,14 +16,22 @@ const {
 } = require("../Controler/product");
 const express = require("express");
 const {
-  userRegisterValidate,
   userLoginValidate,
 } = require("../Utils/userValidate");
-const { registerUser, loginUser } = require("../Controler/user");
+const {
+  loginUser,
+  sendOtp,
+  verifyOtp,
+} = require("../Controler/user");
 const { addReview, getReviews } = require("../Controler/reviews");
 const { getAnalyticsData } = require("../Controler/analytics");
 const { getPages, updatePage } = require("../Controler/pages");
-const { postCategory, getCategory, deleteCategory, editCategory } = require("../Controler/category");
+const {
+  postCategory,
+  getCategory,
+  deleteCategory,
+  editCategory,
+} = require("../Controler/category");
 const { postConatctForm } = require("../Controler/Contact");
 
 const withParams = express.Router();
@@ -38,8 +44,9 @@ withParams.post("/addCart", addCarts);
 withParams.post("/addOrderData", addOrderData);
 withParams.post("/addReview", addReview);
 withParams.post("/postContact", postConatctForm);
-withoutParams.post("/register", userRegisterValidate, registerUser);
 withoutParams.post("/login", userLoginValidate, loginUser);
+withoutParams.post("/sendOtp", sendOtp);
+withoutParams.post("/verifyOtp", verifyOtp);
 
 // get apis
 withParams.get("/getProducts", getProductData);
@@ -58,7 +65,6 @@ withParams.delete("/deleteProduct", deleteProduct);
 //  edit product
 withParams.put("/editProduct", editProduct);
 withParams.put("/editCategory", editCategory);
-// withParams.put("/updateCart/:cartId", UpdateCart);
 withParams.put("/editOrder", editOrderData);
 withParams.patch("/editPage", updatePage);
 

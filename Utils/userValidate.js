@@ -1,12 +1,15 @@
 const Joi = require("joi");
 
-const userRegisterValidate = (req, res, next) => {
+const userRegisterValidate = (req, res) => {
   const schema = Joi.object({
     brandName: Joi.string().min(3).max(100).required().regex(/^\S+$/).messages({
       "string.pattern.base": "brandName must not contain spaces",
     }),
     name: Joi.string().min(3).max(100).required().regex(/^\S+$/).messages({
       "string.pattern.base": "Name must not contain spaces",
+    }),
+    isResend: Joi.boolean().messages({
+      "string.pattern.base": "IsResend should be boolean",
     }),
     email: Joi.string().email().required().regex(/^\S+$/).messages({
       "string.pattern.base": "email must not contain spaces",
@@ -26,10 +29,11 @@ const userRegisterValidate = (req, res, next) => {
   if (error) {
     const errorMessages = error.details.map((err) => err.message);
     return res.status(400).json({
-      message: errorMessages[0],
+      message: errorMessages[0], // Return the first error message
     });
   }
-  next();
+
+  return null; // If no error, return null
 };
 
 const userLoginValidate = (req, res, next) => {
@@ -46,6 +50,5 @@ const userLoginValidate = (req, res, next) => {
   }
   next();
 };
-
 
 module.exports = { userRegisterValidate, userLoginValidate };

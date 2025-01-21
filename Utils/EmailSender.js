@@ -11,10 +11,8 @@ const createTransporter = () => {
 };
 
 const sendEmail = async (from, to, subject, html) => {
-  console.log(from , to , subject , "hello");
-  
   const mailOptions = {
-    from,
+    from: `${from.brandName} <${from.email}>`,
     to,
     subject,
     html,
