@@ -33,6 +33,7 @@ const {
   editCategory,
 } = require("../Controler/category");
 const { postConatctForm } = require("../Controler/Contact");
+const { verifyDomain } = require("../Controler/domain");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -49,6 +50,7 @@ withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
 
 // get apis
+withParams.get("/verifyDomain", verifyDomain);
 withParams.get("/getProducts", getProductData);
 withParams.get("/getCategory", getCategory);
 withParams.get("/getCartData", getCartData);

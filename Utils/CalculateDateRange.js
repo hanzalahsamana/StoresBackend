@@ -18,12 +18,12 @@ const calculateDateRange = (filter) => {
         startDate = sevenDaysAgo.toISOString().split('T')[0];
         endDate = today.toISOString().split('T')[0];
         break;
-  
+
       case 'today':
         startDate = today.toISOString().split('T')[0];
         endDate = today.toISOString().split('T')[0];
         break;
-  
+
       case 'thisWeek':
         const firstDayOfWeek = new Date(today);
         firstDayOfWeek.setDate(today.getDate() - today.getDay()); // Set to Sunday (first day of the week)
@@ -36,7 +36,7 @@ const calculateDateRange = (filter) => {
         startDate = firstDayOfMonth.toISOString().split('T')[0];
         endDate = today.toISOString().split('T')[0];
         break;
-  
+
       case 'last30days':
         const thirtyDaysAgo = new Date(today);
         thirtyDaysAgo.setDate(today.getDate() - 30);

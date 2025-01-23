@@ -10,6 +10,8 @@ const createTransporter = () => {
   });
 };
 
+// VNhqswlhWjCF2wJrvxtVnmVu vercel token
+
 const sendEmail = async (from, to, subject, html) => {
   const mailOptions = {
     from: `${from.brandName} <${from.email}>`,
