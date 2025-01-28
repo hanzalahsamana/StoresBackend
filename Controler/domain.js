@@ -2,6 +2,8 @@ const dns = require("dns");
 
 const verifyDomain = async (req, res) => {
   const { domain } = req.query;
+  console.log(domain);
+  
 
   if (!domain) {
     return res.status(400).json({ message: "Domain is required" });
