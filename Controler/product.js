@@ -3,6 +3,7 @@ const { mongoose } = require("mongoose");
 
 module.exports = {
   // add product
+  
   postProductData: async (req, res) => {
     const type = req.collectionType;
 
