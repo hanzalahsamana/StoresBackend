@@ -16,6 +16,7 @@ const verifyDomain = async (req, res) => {
         .json({ message: `Error verifying domain ${domain}: ${err.message}` });
     }
 
+
     if (addresses.includes("stores-admin-panel.vercel.app")) {
       return res.status(200).json({
         success: true,
