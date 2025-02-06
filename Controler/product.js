@@ -13,6 +13,7 @@ module.exports = {
       type + "_products"
     );
 
+    
     const newProduct = new ProductModel(req.body);
     try {
       const savedProduct = await newProduct.save();
