@@ -39,7 +39,7 @@ const userRegisterValidate = (req, res) => {
 const userLoginValidate = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().min(2).alphanum().required(),
+    password: Joi.string().min(2).required(),
   });
   const { error, value } = schema.validate(req.body);
   if (error) {

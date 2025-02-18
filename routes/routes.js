@@ -15,14 +15,8 @@ const {
   deleteProduct,
 } = require("../Controler/product");
 const express = require("express");
-const {
-  userLoginValidate,
-} = require("../Utils/userValidate");
-const {
-  loginUser,
-  sendOtp,
-  verifyOtp,
-} = require("../Controler/user");
+const { userLoginValidate } = require("../Utils/userValidate");
+const { loginUser, sendOtp, verifyOtp } = require("../Controler/user");
 const { addReview, getReviews } = require("../Controler/reviews");
 const { getAnalyticsData } = require("../Controler/analytics");
 const { getPages, updatePage } = require("../Controler/pages");
@@ -33,7 +27,9 @@ const {
   editCategory,
 } = require("../Controler/category");
 const { postConatctForm } = require("../Controler/Contact");
-const { verifyDomain } = require("../Controler/domain");
+const { handleDomainRequest, addDomain } = require("../Controler/domain");
+const { uploadSingle, uploadMultiple } = require("../Controler/imageUpload");
+const { uploadSingleImage, uploadMultipleImages } = require("../Utils/ImageUpload");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -45,12 +41,17 @@ withParams.post("/addCart", addCarts);
 withParams.post("/addOrderData", addOrderData);
 withParams.post("/addReview", addReview);
 withParams.post("/postContact", postConatctForm);
+withParams.post("/uploadSingle", uploadSingle, uploadSingleImage);
+withParams.post("/uploadMultiple", uploadMultiple, uploadMultipleImages);
+withParams.post("/addDomain", addDomain);
+withParams.post("/addDomainDns", handleDomainRequest);
+
 withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
 
 // get apis
-withParams.get("/verifyDomain", verifyDomain);
+// withParams.get("/verifyDomain", verifyDomain);
 withParams.get("/getProducts", getProductData);
 withParams.get("/getCategory", getCategory);
 withParams.get("/getCartData", getCartData);
