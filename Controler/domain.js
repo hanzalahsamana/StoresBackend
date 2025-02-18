@@ -141,21 +141,21 @@ const { exec } = require("child_process");
 
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS; // Your server's IP
 
-
-const checkDomainDNS = async (domain) => {
-  try {
+const checkDomainDNS = (domain) => {
+  return new Promise((resolve, reject) => {
     const resolver = new dns.Resolver();
     resolver.setServers(["8.8.8.8"]); // Use Google's DNS server
-    
-    const addresses = await resolver.resolve4(domain);
-    console.log(addresses);
-    return addresses;
-  } catch (err) {
-    console.error(`Error resolving DNS for domain ${domain}:`, err);
-    throw new Error("Unable to resolve DNS for the domain");
-  }
-};
 
+    resolver.resolve4(domain, (err, addresses) => {
+      if (err) {
+        console.error(`Error resolving DNS for domain ${domain}:`, err);
+        return reject(new Error("Unable to resolve DNS for the domain"));
+      }
+      resolve(addresses);
+      console.log(addresses);
+    });
+  });
+};
 
 const handleDomainRequest = async (req, res) => {
   const { domain } = req.body;
