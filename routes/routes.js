@@ -27,7 +27,7 @@ const {
   editCategory,
 } = require("../Controler/category");
 const { postConatctForm } = require("../Controler/Contact");
-const { handleDomainRequest, addDomain } = require("../Controler/domain");
+const { handleDomainRequest, addSSl } = require("../Controler/domain");
 const { uploadSingle, uploadMultiple } = require("../Controler/imageUpload");
 const { uploadSingleImage, uploadMultipleImages } = require("../Utils/ImageUpload");
 
@@ -43,7 +43,7 @@ withParams.post("/addReview", addReview);
 withParams.post("/postContact", postConatctForm);
 withParams.post("/uploadSingle", uploadSingle, uploadSingleImage);
 withParams.post("/uploadMultiple", uploadMultiple, uploadMultipleImages);
-withParams.post("/addDomain", addDomain);
+withParams.post("/addDomainSSl", addSSl);
 withParams.post("/addDomainDns", handleDomainRequest);
 
 withoutParams.post("/login", userLoginValidate, loginUser);

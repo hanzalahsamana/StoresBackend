@@ -139,7 +139,7 @@
 const dns = require("dns");
 const { exec } = require("child_process");
 
-const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS; // Your server's IP
+const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 
 const checkDomainDNS = (domain) => {
   return new Promise((resolve, reject) => {
@@ -203,7 +203,7 @@ const generateSSLForDomain = (domain) => {
   });
 };
 
-const addDomain = async (req, res) => {
+const addSSl = async (req, res) => {
   const { domain } = req.body;
   try {
     console.log("hello world");
@@ -217,4 +217,4 @@ const addDomain = async (req, res) => {
   }
 };
 
-module.exports = { handleDomainRequest, addDomain };
+module.exports = { handleDomainRequest, addSSl };
