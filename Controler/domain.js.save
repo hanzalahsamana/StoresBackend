@@ -191,7 +191,7 @@ const handleDomainRequest = async (req, res) => {
 const generateSSLForDomain = (domain) => {
   return new Promise((resolve, reject) => {
     exec(
-      `ssh -i saasweb.pem ubuntu@ec2-13-61-204-32.eu-north-1.compute.amazonaws.com 'sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com'`,
+      `ssh -i C:\Users\saasweb.pem ubuntu@13.61.204.32 "sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com`,
       (error, stdout, stderr) => {
         if (error) {
           reject(`Error generating SSL for ${domain}: ${stderr}`);
