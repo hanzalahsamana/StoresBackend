@@ -244,10 +244,8 @@ function automateDomainSetup(userDomain, serverIP) {
         server {
           server_name ${userDomain};
 
-          root /path/to/your/frontend;
-
           location / {
-            proxy_pass http://localhost:3000;  # Your app's backend
+            proxy_pass http://localhost:8081;  # Your app's backend
           }
 
           listen 443 ssl;  # Enable SSL
