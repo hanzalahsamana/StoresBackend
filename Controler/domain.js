@@ -138,81 +138,81 @@
 
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 
-// const checkDomainDNS = (domain) => {
-//   return new Promise((resolve, reject) => {
-//     const resolver = new dns.Resolver();
-//     resolver.setServers(["8.8.8.8"]); // Use Google's DNS server
+const checkDomainDNS = (domain) => {
+  return new Promise((resolve, reject) => {
+    const resolver = new dns.Resolver();
+    resolver.setServers(["8.8.8.8"]); // Use Google's DNS server
 
-//     resolver.resolve4(domain, (err, addresses) => {
-//       if (err) {
-//         console.error(`Error resolving DNS for domain ${domain}:`, err);
-//         return reject(new Error("Unable to resolve DNS for the domain"));
-//       }
-//       resolve(addresses);
-//       console.log(addresses);
-//     });
-//   });
-// };
+    resolver.resolve4(domain, (err, addresses) => {
+      if (err) {
+        console.error(`Error resolving DNS for domain ${domain}:`, err);
+        return reject(new Error("Unable to resolve DNS for the domain"));
+      }
+      resolve(addresses);
+      console.log(addresses);
+    });
+  });
+};
 
-// const handleDomainRequest = async (req, res) => {
-//   const { domain } = req.body;
+const handleDomainRequest = async (req, res) => {
+  const { domain } = req.body;
 
-//   try {
-//     console.log(`Checking DNS records for domain: ${domain}`);
-//     const dnsRecords = await checkDomainDNS(domain);
-//     const isDomainLive = dnsRecords.includes(WEBSITE_IP_ADDRESS);
+  try {
+    console.log(`Checking DNS records for domain: ${domain}`);
+    const dnsRecords = await checkDomainDNS(domain);
+    const isDomainLive = dnsRecords.includes(WEBSITE_IP_ADDRESS);
 
-//     if (isDomainLive) {
-//       return res.status(200).json({ message: "✅ Your domain is live!" });
-//     } else if (dnsRecords.length === 0) {
-//       return res.status(400).json({
-//         message: "⚠️ Your domain has no valid A record.",
-//         instructions: `Please add an A record for ${domain} pointing to ${WEBSITE_IP_ADDRESS}.`,
-//       });
-//     } else {
-//       return res.status(400).json({
-//         message: "❌ Your domain is pointing to the wrong IP.",
-//         current_ip: dnsRecords,
-//         instructions: `Update your A record to point to ${WEBSITE_IP_ADDRESS}.`,
-//       });
-//     }
-//   } catch (error) {
-//     console.error("Error handling domain request:", error);
-//     res.status(500).json({
-//       message: "❌ Failed to process domain.",
-//       error: error.message,
-//     });
-//   }
-// };
+    if (isDomainLive) {
+      return res.status(200).json({ message: "✅ Your domain is live!" });
+    } else if (dnsRecords.length === 0) {
+      return res.status(400).json({
+        message: "⚠️ Your domain has no valid A record.",
+        instructions: `Please add an A record for ${domain} pointing to ${WEBSITE_IP_ADDRESS}.`,
+      });
+    } else {
+      return res.status(400).json({
+        message: "❌ Your domain is pointing to the wrong IP.",
+        current_ip: dnsRecords,
+        instructions: `Update your A record to point to ${WEBSITE_IP_ADDRESS}.`,
+      });
+    }
+  } catch (error) {
+    console.error("Error handling domain request:", error);
+    res.status(500).json({
+      message: "❌ Failed to process domain.",
+      error: error.message,
+    });
+  }
+};
 
-// const generateSSLForDomain = (domain) => {
-//   return new Promise((resolve, reject) => {
-//     exec(
-//       `ssh -i saasweb.pem ubuntu@ec2-13-61-204-32.eu-north-1.compute.amazonaws.com 'sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com'`,
-//       (error, stdout, stderr) => {
-//         if (error) {
-//           reject(`Error generating SSL for ${domain}: ${stderr}`);
-//         } else {
-//           resolve(`SSL certificate generated successfully for ${domain}`);
-//         }
-//       }
-//     );
-//   });
-// };
+const generateSSLForDomain = (domain) => {
+  return new Promise((resolve, reject) => {
+    exec(
+      `ssh -i saasweb.pem ubuntu@ec2-13-61-204-32.eu-north-1.compute.amazonaws.com 'sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com'`,
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(`Error generating SSL for ${domain}: ${stderr}`);
+        } else {
+          resolve(`SSL certificate generated successfully for ${domain}`);
+        }
+      }
+    );
+  });
+};
 
-// const addSSl = async (req, res) => {
-//   const { domain } = req.body;
-//   try {
-//     console.log("hello world");
+const addSSl = async (req, res) => {
+  const { domain } = req.body;
+  try {
+    console.log("hello world");
 
-//     const message = await generateSSLForDomain(domain);
-//     console.log("hello world");
-//     res.send({ message });
-//   } catch (err) {
-//     console.log("hello world");
-//     res.status(500).send({ message: err });
-//   }
-// };
+    const message = await generateSSLForDomain(domain);
+    console.log("hello world");
+    res.send({ message });
+  } catch (err) {
+    console.log("hello world");
+    res.status(500).send({ message: err });
+  }
+};
 
 const { exec } = require("child_process");
 const dns = require("dns");
