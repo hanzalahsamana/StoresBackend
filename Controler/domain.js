@@ -245,7 +245,7 @@ function automateDomainSetup(userDomain, serverIP) {
           server_name ${userDomain};
 
           location / {
-            proxy_pass http://localhost:8081;  # Your app's backend
+            proxy_pass http://localhost:3000;  # Your app's backend
           }
 
           listen 443 ssl;  # Enable SSL
@@ -276,6 +276,6 @@ function automateDomainSetup(userDomain, serverIP) {
 }
 
 // Call the function with user-provided domain and server IP
-automateDomainSetup("hannanfabrics.com", "13.51.93.22");
+automateDomainSetup("xperiode.com", "13.61.204.32");
 
 module.exports = { handleDomainRequest, addSSl };
