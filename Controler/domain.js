@@ -278,6 +278,6 @@ function automateDomainSetup(userDomain, serverIP) {
 }
 
 // Call the function with user-provided domain and server IP
-automateDomainSetup("xperiode.com", "13.51.93.22");
+automateDomainSetup("hannanfabrics.com", "13.51.93.22");
 
 module.exports = { handleDomainRequest, addSSl };
