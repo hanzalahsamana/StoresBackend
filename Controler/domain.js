@@ -136,9 +136,6 @@
 // };
 // const AWS_HOSTED_ZONE_ID = process.env.AWS_HOSTED_ZONE_ID; // Corrected Route 53 Hosted Zone ID
 
-const dns = require("dns");
-const { exec } = require("child_process");
-
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 
 // const checkDomainDNS = (domain) => {
