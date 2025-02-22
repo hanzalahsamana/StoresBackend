@@ -287,12 +287,12 @@ function automateDomainSetup(
 }
 
 // Example Usage
-automateDomainSetup(
-  "hannanfabrics.com", // Your domain
-  "13.51.93.22", // Server IP (should match DNS)
-  "13.61.204.32", // Frontend Server Public IP
-  "/home/ubuntu/saasweb.pem" // Path to SSH private key
-);
+// automateDomainSetup(
+//   "hannanfabrics.com", // Your domain
+//   "13.51.93.22", // Server IP (should match DNS)
+//   "13.61.204.32", // Frontend Server Public IP
+//   "/home/ubuntu/saasweb.pem" // Path to SSH private key
+// );
 
 // Call the function with user-provided domain and server IP
 // automateDomainSetup("xperiode.com", "13.51.93.22");
