@@ -188,7 +188,7 @@ const handleDomainRequest = async (req, res) => {
 const generateSSLForDomain = (domain) => {
   return new Promise((resolve, reject) => {
     exec(
-      `ssh -i saasweb.pem ubuntu@ec2-13-61-204-32.eu-north-1.compute.amazonaws.com 'sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com'`,
+      `ssh -i "/home/ubuntu/saasweb.pem" ubuntu@ec2-13-61-204-32.eu-north-1.compute.amazonaws.com 'sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com'`,
       (error, stdout, stderr) => {
         if (error) {
           reject(`Error generating SSL for ${domain}: ${stderr}`);
@@ -218,64 +218,72 @@ const { exec } = require("child_process");
 const dns = require("dns");
 const fs = require("fs");
 
-function automateDomainSetup(userDomain, serverIP) {
+
+function automateDomainSetup(userDomain, serverIP, frontendIP, privateKeyPath, frontendUser = "ubuntu") {
   console.log(`Verifying domain: ${userDomain}...`);
 
   // Step 1: Verify if the domain points to the correct IP
   dns.lookup(userDomain, (err, address) => {
-    if (err || address !== serverIP) {
-      console.error(`Domain verification failed. ${userDomain} is not pointing to ${serverIP}`);
+    if (err || address !== frontendIP) {
+      console.error(`❌ Domain verification failed: ${userDomain} is not pointing to ${frontendIP}`);
       return;
     }
+       // # Install Certbot if not installed
+        // sudo apt update && sudo apt install -y certbot python3-certbot-nginx
+    console.log(`✅ Domain ${userDomain} is verified! Proceeding with SSL setup...`);
 
-    console.log(`Domain ${userDomain} is verified! Proceeding with SSL setup...`);
+    // Step 2: Run SSL setup on the frontend server via SSH
+    const command = `
+      ssh -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'EOF'
+        echo "🔹 Connected to frontend server..."
 
-    // Step 2: Request SSL Certificate using Certbot
-    exec(`sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com`, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error issuing SSL certificate: ${stderr}`);
-        return;
-      }
-
-      console.log(`SSL certificate issued successfully for ${userDomain}`);
-
-      // Step 3: Create Nginx configuration
-      const nginxConfig = `
+ 
+        
+        # Issue SSL Certificate
+        sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com
+        
+        # Configure Nginx
+        sudo bash -c 'cat > /etc/nginx/sites-available/${userDomain}' << EOL
         server {
           server_name ${userDomain};
-
+          
           location / {
-            proxy_pass http://localhost:8080;  # Your app's backend
+            proxy_pass http://localhost:3000;  # Your app's backend
           }
-
-          listen 443 ssl;  # Enable SSL
+          
+          listen 443 ssl;
           ssl_certificate /etc/letsencrypt/live/${userDomain}/fullchain.pem;
           ssl_certificate_key /etc/letsencrypt/live/${userDomain}/privkey.pem;
         }
-      `;
+        EOL
+        
+        # Enable site & reload Nginx
+        sudo ln -sf /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/
+        sudo systemctl reload nginx
 
-      // Write Nginx configuration
-      fs.writeFile(`/etc/nginx/sites-available/${userDomain}`, nginxConfig, (err) => {
-        if (err) {
-          console.error(`Error writing Nginx configuration: ${err.message}`);
-          return;
-        }
+        echo "✅ SSL setup complete for ${userDomain}!"
+      EOF
+    `;
 
-        // Enable the new Nginx site and reload Nginx
-        exec(`sudo ln -s /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/ && sudo systemctl reload nginx`, (error, stdout, stderr) => {
-          if (error) {
-            console.error(`Error reloading Nginx: ${stderr}`);
-            return;
-          }
-
-          console.log(`Nginx configuration for ${userDomain} is complete and active!`);
-        });
-      });
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`❌ Error issuing SSL certificate: ${stderr}`);
+        return;
+      }
+      console.log(`🎉 Success: ${stdout}`);
     });
   });
 }
 
+// Example Usage
+automateDomainSetup(
+  "hannanfabrics.com",              // Your domain
+  "13.51.93.22",                    // Server IP (should match DNS)
+  "13.61.204.32",                   // Frontend Server Public IP
+  "/home/ubuntu/saasweb.pem"         // Path to SSH private key
+);
+
 // Call the function with user-provided domain and server IP
-automateDomainSetup("xperiode.com", "13.51.93.22");
+// automateDomainSetup("xperiode.com", "13.51.93.22");
 
 module.exports = { handleDomainRequest, addSSl };
