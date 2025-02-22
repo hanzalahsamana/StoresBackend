@@ -218,52 +218,59 @@ const { exec } = require("child_process");
 const dns = require("dns");
 const fs = require("fs");
 
-
-function automateDomainSetup(userDomain, serverIP, frontendIP, privateKeyPath, frontendUser = "ubuntu") {
+function automateDomainSetup(
+  userDomain,
+  serverIP,
+  frontendIP,
+  privateKeyPath,
+  frontendUser = "ubuntu"
+) {
   console.log(`Verifying domain: ${userDomain}...`);
 
   // Step 1: Verify if the domain points to the correct IP
   dns.lookup(userDomain, (err, address) => {
     if (err || address !== frontendIP) {
-      console.error(`❌ Domain verification failed: ${userDomain} is not pointing to ${frontendIP}`);
+      console.error(
+        `❌ Domain verification failed: ${userDomain} is not pointing to ${frontendIP}`
+      );
       return;
     }
-       // # Install Certbot if not installed
-        // sudo apt update && sudo apt install -y certbot python3-certbot-nginx
-    console.log(`✅ Domain ${userDomain} is verified! Proceeding with SSL setup...`);
+    // # Install Certbot if not installed
+    // sudo apt update && sudo apt install -y certbot python3-certbot-nginx
+    console.log(
+      `✅ Domain ${userDomain} is verified! Proceeding with SSL setup...`
+    );
 
     // Step 2: Run SSL setup on the frontend server via SSH
     const command = `
-      ssh -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'EOF'
-        echo "🔹 Connected to frontend server..."
-
- 
-        
-        # Issue SSL Certificate
-        sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com
-        
-        # Configure Nginx
-        sudo bash -c 'cat > /etc/nginx/sites-available/${userDomain}' << EOL
-        server {
-          server_name ${userDomain};
-          
-          location / {
-            proxy_pass http://localhost:3000;  # Your app's backend
-          }
-          
-          listen 443 ssl;
-          ssl_certificate /etc/letsencrypt/live/${userDomain}/fullchain.pem;
-          ssl_certificate_key /etc/letsencrypt/live/${userDomain}/privkey.pem;
-        }
-        EOL
-        
-        # Enable site & reload Nginx
-        sudo ln -sf /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/
-        sudo systemctl reload nginx
-
-        echo "✅ SSL setup complete for ${userDomain}!"
-      EOF
-    `;
+    ssh -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'EOF'
+      echo "🔹 Connected to frontend server..."
+  
+      # Issue SSL Certificate
+      sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com
+  
+      # Configure Nginx
+      sudo bash -c 'cat > /etc/nginx/sites-available/${userDomain} << "EOL"
+  server {
+      server_name ${userDomain};
+  
+      location / {
+          proxy_pass http://localhost:3000;  # Your app's backend
+      }
+  
+      listen 443 ssl;
+      ssl_certificate /etc/letsencrypt/live/${userDomain}/fullchain.pem;
+      ssl_certificate_key /etc/letsencrypt/live/${userDomain}/privkey.pem;
+  }
+  EOL'
+  
+      # Enable site & reload Nginx
+      sudo ln -sf /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/
+      sudo systemctl reload nginx
+  
+      echo "✅ SSL setup complete for ${userDomain}!"
+    EOF
+  `;
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -277,10 +284,10 @@ function automateDomainSetup(userDomain, serverIP, frontendIP, privateKeyPath, f
 
 // Example Usage
 automateDomainSetup(
-  "hannanfabrics.com",              // Your domain
-  "13.51.93.22",                    // Server IP (should match DNS)
-  "13.61.204.32",                   // Frontend Server Public IP
-  "/home/ubuntu/saasweb.pem"         // Path to SSH private key
+  "hannanfabrics.com", // Your domain
+  "13.51.93.22", // Server IP (should match DNS)
+  "13.61.204.32", // Frontend Server Public IP
+  "/home/ubuntu/saasweb.pem" // Path to SSH private key
 );
 
 // Call the function with user-provided domain and server IP
