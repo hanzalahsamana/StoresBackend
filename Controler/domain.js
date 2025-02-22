@@ -243,35 +243,38 @@ function automateDomainSetup(
 
     // Step 2: Run SSL setup on the frontend server via SSH
     const command = `
-    ssh -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'EOF'
+    ssh -o StrictHostKeyChecking=no -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'EOF'
       echo "🔹 Connected to frontend server..."
-  
+      
+      # Install Certbot if not installed
+      sudo apt update && sudo apt install -y certbot python3-certbot-nginx
+      
       # Issue SSL Certificate
       sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com
-  
+      
       # Configure Nginx
-      sudo bash -c 'cat > /etc/nginx/sites-available/${userDomain} << "EOL"
-  server {
-      server_name ${userDomain};
-  
-      location / {
-          proxy_pass http://localhost:3000;  # Your app's backend
-      }
-  
-      listen 443 ssl;
-      ssl_certificate /etc/letsencrypt/live/${userDomain}/fullchain.pem;
-      ssl_certificate_key /etc/letsencrypt/live/${userDomain}/privkey.pem;
-  }
-  EOL'
-  
+      sudo bash -c 'cat <<EOL > /etc/nginx/sites-available/${userDomain}
+    server {
+        server_name ${userDomain};
+    
+        location / {
+            proxy_pass http://localhost:3000;
+        }
+    
+        listen 443 ssl;
+        ssl_certificate /etc/letsencrypt/live/${userDomain}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/${userDomain}/privkey.pem;
+    }
+    EOL'
+    
       # Enable site & reload Nginx
       sudo ln -sf /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/
       sudo systemctl reload nginx
-  
+    
       echo "✅ SSL setup complete for ${userDomain}!"
     EOF
-  `;
-
+    `;
+    
     exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error(`❌ Error issuing SSL certificate: ${stderr}`);
@@ -279,6 +282,7 @@ function automateDomainSetup(
       }
       console.log(`🎉 Success: ${stdout}`);
     });
+    
   });
 }
 
