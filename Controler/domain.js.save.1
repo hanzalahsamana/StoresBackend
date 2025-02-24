@@ -1,3 +1,4 @@
+
 // const { Route53Client, ChangeResourceRecordSetsCommand } = require('@aws-sdk/client-route-53');
 // const axios = require("axios");
 
@@ -136,6 +137,9 @@
 // };
 // const AWS_HOSTED_ZONE_ID = process.env.AWS_HOSTED_ZONE_ID; // Corrected Route 53 Hosted Zone ID
 
+const dns = require("dns");
+const { exec } = require("child_process");
+
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 
 const checkDomainDNS = (domain) => {
@@ -188,7 +192,7 @@ const handleDomainRequest = async (req, res) => {
 const generateSSLForDomain = (domain) => {
   return new Promise((resolve, reject) => {
     exec(
-      `ssh -i "/home/ubuntu/saasweb.pem" ubuntu@ec2-13-61-204-32.eu-north-1.compute.amazonaws.com 'sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com'`,
+      `ssh -i /c/Users/saasweb.pem ubuntu@ec2-13-61-204-32.eu-north-1.compute.amazonaws.com 'sudo certbot --nginx -d ${domain} --agree-tos --non-interactive --email hanzalahsamana789@gmail.com'`,
       (error, stdout, stderr) => {
         if (error) {
           reject(`Error generating SSL for ${domain}: ${stderr}`);
@@ -213,98 +217,5 @@ const addSSl = async (req, res) => {
     res.status(500).send({ message: err });
   }
 };
-
-const { exec } = require("child_process");
-const dns = require("dns");
-const fs = require("fs");
-
-function automateDomainSetup(
-  userDomain,
-  serverIP,
-  frontendIP,
-  privateKeyPath,
-  frontendUser = "ubuntu"
-) {
-  console.log(`Verifying domain: ${userDomain}...`);
-
-  dns.lookup(userDomain, (err, address) => {
-    if (err || address !== frontendIP) {
-      console.error(
-        `❌ Domain verification failed: ${userDomain} is not pointing to ${frontendIP}`
-      );
-      return;
-    }
-
-    console.log(`✅ Domain ${userDomain} is verified! Proceeding with SSL setup...`);
-
-
-  const command = `
-    ssh -T -o StrictHostKeyChecking=no -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'ENDSSH'
-      echo "🔹 Connected to frontend server..."
-      
-      # Install Certbot if not installed
-      sudo apt-get update && sudo apt-get install -y certbot python3-certbot-nginx
-      
-      # Issue SSL Certificate
-      sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com
-      
-      # Configure Nginx
-      sudo bash -c 'cat <<EOF_NGINX > /etc/nginx/sites-available/${userDomain}
-server {
-    listen 443 ssl;
-    server_name ${userDomain};
-
-    ssl_certificate /etc/letsencrypt/live/${userDomain}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${userDomain}/privkey.pem;
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-
-        proxy_set_header Host \\$host;
-        proxy_set_header X-Real-IP \\$remote_addr;
-        proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \\$scheme;
-
-        proxy_set_header Upgrade \\$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_cache_bypass \\$http_upgrade;
-    }
-}
-EOF_NGINX'
-    
-      # Enable site & reload Nginx
-      sudo ln -sf /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/
-      
-      # Test Nginx config
-      sudo nginx -t
-      
-      # Restart Nginx
-      sudo systemctl restart nginx
-    
-      echo "✅ SSL setup complete for ${userDomain}!"ENDSSH`;
-
-
-
-exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`❌ Error issuing SSL certificate: ${stderr}`);
-        return;
-      }
-      console.log(`🎉 Success: ${stdout}`);
-    });
-  });
-}
-
-
- automateDomainSetup(
-   "hannanfabrics.com", // Your domain
-  "13.51.93.22", // Server IP (should match DNS)
-   "13.61.204.32", // Frontend Server Public IP
-  "/home/ubuntu/saasweb.pem" // Path to SSH private key
-);
-
-// Call the function with user-provided domain and server IP
-// automateDomainSetup("xperiode.com", "13.51.93.22");
 
 module.exports = { handleDomainRequest, addSSl };
