@@ -30,7 +30,9 @@ const handleDomainRequest = async (req, res) => {
     const isDomainLive = dnsRecords.includes(WEBSITE_IP_ADDRESS);
 
     if (isDomainLive) {
-      return res.status(200).json({ message: "✅ Your domain is live!" });
+      return res
+        .status(200)
+        .json({ domain: domain, message: "✅ Your domain is live!" });
     } else if (dnsRecords.length === 0) {
       return res.status(400).json({
         message: "❌ Your domain has no valid A record.",
@@ -65,7 +67,7 @@ const handleDomainRequest = async (req, res) => {
     }
 
     return res.status(500).json({
-      message: "❌ Failed to check the domain. Please try again later.",
+      message: "❌ Failed to check the domain OR Domain might be Invalid.",
       StatusCode: "FailedToProcess",
       error: error.message,
     });
@@ -160,7 +162,6 @@ EOF_NGINX'
         output: stdout,
       });
     });
-
   } catch (error) {
     console.error("❌ Error processing request:", error);
     return res.status(500).json({
