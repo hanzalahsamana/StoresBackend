@@ -2,8 +2,8 @@ const Joi = require("joi");
 
 const userRegisterValidate = (req, res) => {
   const schema = Joi.object({
-    brandName: Joi.string().min(3).max(100).required().regex(/^\S+$/).messages({
-      "string.pattern.base": "brandName must not contain spaces",
+    brandName: Joi.string().min(3).max(100).required().messages({
+      "string.pattern.base": "brandName is required",
     }),
     name: Joi.string().min(3).max(100).required().regex(/^\S+$/).messages({
       "string.pattern.base": "Name must not contain spaces",

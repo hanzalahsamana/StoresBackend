@@ -1,18 +1,19 @@
 const express = require("express");
-const app = express();
-app.use(express.json());
-const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 const bcrypt = require("bcrypt");
+const app = express();
 const jwt = require("jsonwebtoken");
 const { UserModal } = require("../Models/userModal");
+const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 const { generateOtp } = require("../Utils/Otp");
 const { generateHash, compareHash } = require("../Utils/BCrypt");
 const { OTPVerification } = require("../Utils/EmailsToSend");
 const { userRegisterValidate } = require("../Utils/userValidate");
 
+app.use(express.json());
+
 module.exports = {
   sendOtp: async (req, res) => {
-    const { email, brandName, name, password, isResend } = req.body;
+    const { email, brandName, name, password, subDomain, isResend } = req.body;
 
     try {
       const otp = generateOtp();
@@ -70,6 +71,7 @@ module.exports = {
           password: await generateHash(password, 10),
           name,
           brandName,
+          subDomain,
           otp: hashedOtp,
           otpExpiration,
           lastOtpSentAt: new Date(),
