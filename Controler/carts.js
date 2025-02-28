@@ -7,19 +7,21 @@ const addCarts = async (req, res) => {
   const id = req.query.id;
   const type = req.collectionType;
   const { _id: productId, quantity, selectedSize } = req.body;
-
+  
+  
   if (!productId || !quantity || !selectedSize) {
     return res.status(400).json({
       message: `${
         !quantity
-          ? "Quantity is required"
+        ? "Quantity is required"
           : !productId
           ? "Product ID is required"
           : "Size is required"
       }`,
     });
   }
-
+  
+  console.log("okk");
   try {
     const CartModel = mongoose.model(
       type + "_Cart",

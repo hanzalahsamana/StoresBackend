@@ -26,6 +26,12 @@ const handleDomainRequest = async (req, res) => {
   const { domain } = req.body;
 
   try {
+    if(domain === "hannanfabrics.com"){
+      return res.status(400).json({
+        message: "❌ The domain is already in use.",
+        StatusCode: "InvalidDomain",
+      })
+    }
     const dnsRecords = await checkDomainDNS(domain);
     const isDomainLive = dnsRecords.includes(WEBSITE_IP_ADDRESS);
 

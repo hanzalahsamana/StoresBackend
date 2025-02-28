@@ -1,6 +1,16 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+// const pageSchema = new Schema(
+//   {
+//     title: { type: String, required: true }, // Page title (e.g., Home, About)
+//     slug: { type: String, required: true, unique: true }, // Unique identifier (e.g., "home", "about-us")
+//   },
+//   { timestamps: true }
+// );
+
+
+
 const pageSchema = new Schema({
   title: { type: String, required: true },
   type: { type: String, required: true },
@@ -19,4 +29,4 @@ const pageSchema = new Schema({
 
 // const PageModel = mongoose.model("Page", pageSchema);
 
-module.exports = {pageSchema} ;
+module.exports = { pageSchema };

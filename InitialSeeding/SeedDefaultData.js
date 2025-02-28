@@ -93,6 +93,10 @@ const defaultPages = [
   },
 ];
 
+// const defaultSections = [
+  
+// ]
+
 const defaultProducts = [
   {
     name: "Product 1",
