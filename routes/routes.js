@@ -16,7 +16,7 @@ const {
 } = require("../Controler/product");
 const express = require("express");
 const { userLoginValidate } = require("../Utils/userValidate");
-const { loginUser, sendOtp, verifyOtp } = require("../Controler/user");
+const { loginUser, sendOtp, verifyOtp, getUserFromToken } = require("../Controler/user");
 const { addReview, getReviews } = require("../Controler/reviews");
 const { getAnalyticsData } = require("../Controler/analytics");
 const { getPages, updatePage } = require("../Controler/pages");
@@ -59,6 +59,7 @@ withParams.get("/getOrders", getOrders);
 withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
+withParams.get("/getUserFromToken", getUserFromToken);
 
 // delete apis
 withParams.delete("/deleteCartProduct", deleteCartProduct);

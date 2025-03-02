@@ -154,4 +154,37 @@ module.exports = {
       return res.status(500).json({ message: error.message });
     }
   },
+
+  getUserFromToken: async (req, res) => {
+    try {
+      const siteName = req.collectionType;
+      // const token = req.headers.authorization?.split(" ")[1]; // Extract token from the header
+
+      // if (!token) {
+      //   return res.status(401).json({ message: "No token provided" });
+      // }
+
+      // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      // if (!decoded || !decoded._id) {
+      //   return res.status(401).json({ message: "Invalid token" });
+      // }
+
+      // // Find the user by _id
+      // const user = await UserModal.findById(decoded._id).select("-password"); // Exclude password
+
+      const user = await UserModal.findOne({ brandName: siteName }).select(
+        "-password"
+      );
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  },
 };

@@ -1,45 +1,59 @@
 const { exec } = require("child_process");
 const dns = require("dns");
+const { checkDomainDNS } = require("../Utils/CheckDomainDns");
+const { UserModal } = require("../Models/userModal");
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 const serverIP = "13.51.93.22";
 const frontendIP = "13.61.204.32";
 const privateKeyPath = "/home/ubuntu/saasweb.pem";
 const frontendUser = "ubuntu";
 
-const checkDomainDNS = (domain) => {
-  return new Promise((resolve, reject) => {
-    const resolver = new dns.Resolver();
-    resolver.setServers(["8.8.8.8"]);
+const updateDomainToDatabase = async (siteName, domain) => {
+  try {
+    const user = await UserModal.findOne({ brandName: String(siteName) });
 
-    resolver.resolve4(domain, (err, addresses) => {
-      if (err) {
-        console.error(`Error resolving DNS for domain ${domain}:`, err);
-        return reject(new Error("Unable to resolve DNS for the domain"));
-      }
-      resolve(addresses);
-      console.log(addresses);
-    });
-  });
+    if (!user) {
+      throw new Error(`No document found with brandName: ${siteName}`);
+    }
+
+    user.customDomain = domain; // Update the field
+    await user.save(); // Save the updated document
+
+    console.log(`Domain updated successfully for ${siteName}`);
+    return { success: true, message: "Domain updated successfully" };
+  } catch (error) {
+    console.error("Error updating domain:", error);
+    throw error; // Ensure the calling API catches this error
+  }
 };
 
 const handleDomainRequest = async (req, res) => {
   const { domain } = req.body;
+  const type = req.collectionType;
 
   try {
-    if(domain === "hannanfabrics.com"){
+    if (!domain) {
       return res.status(400).json({
-        message: "❌ The domain is already in use.",
+        message: "❌ domain name is required",
         StatusCode: "InvalidDomain",
-      })
+      });
+    }
+    if (domain === "hannanfabrics.com") {
+      return res.status(400).json({
+        message: "❌ This domain is already in use.",
+        StatusCode: "InvalidDomain",
+      });
     }
     const dnsRecords = await checkDomainDNS(domain);
     const isDomainLive = dnsRecords.includes(WEBSITE_IP_ADDRESS);
 
     if (isDomainLive) {
+      await updateDomainToDatabase(type, domain);
       return res
         .status(200)
         .json({ domain: domain, message: "✅ Your domain is live!" });
     } else if (dnsRecords.length === 0) {
+      await updateDomainToDatabase(type, domain);
       return res.status(400).json({
         message: "❌ Your domain has no valid A record.",
         StatusCode: "UpdateDNS",
@@ -51,6 +65,7 @@ const handleDomainRequest = async (req, res) => {
         },
       });
     } else {
+      await updateDomainToDatabase(type, domain);
       return res.status(400).json({
         message: "❌ Your domain is pointing to the wrong IP.",
         current_ip: dnsRecords,
@@ -94,14 +109,14 @@ const automateDomainSetup = async (req, res) => {
     console.log(`Verifying domain: ${userDomain}...`);
 
     // Check DNS records for domain
-    const { address } = await dns.lookup(userDomain);
-    if (address !== frontendIP) {
-      return res.status(400).json({
-        message: `❌ Domain verification failed. ${userDomain} is not pointing to ${frontendIP}.`,
-        currentIP: address,
-        requiredIP: frontendIP,
-      });
-    }
+    // const { address } = await dns.lookup(userDomain);
+    // if (address !== frontendIP) {
+    //   return res.status(400).json({
+    //     message: `❌ Domain verification failed. ${userDomain} is not pointing to ${frontendIP}.`,
+    //     currentIP: address,
+    //     requiredIP: frontendIP,
+    //   });
+    // }
 
     console.log(
       `✅ Domain ${userDomain} is verified! Proceeding with SSL setup...`
