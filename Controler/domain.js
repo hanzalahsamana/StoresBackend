@@ -192,4 +192,37 @@ EOF_NGINX'
   }
 };
 
-module.exports = { handleDomainRequest, automateDomainSetup };
+// Fetch site by domain or subdomain
+const fetchSiteByDomain = async (req, res) => {
+  try {
+    const { domain } = req.query;
+    if (!domain) {
+      
+      return res.status(400).json({ error: "Domain is required" });
+    }
+    
+    // Find the site where customDomain or subdomain matches the given domain
+    const site = await UserModal.findOne({
+      $or: [
+        { subDomain: { $regex: `^${domain}$`, $options: "i" } }, // Case-insensitive exact match
+        { customDomain: { $regex: `^${domain}.*$`, $options: "i" } }, // Matches domain.com, domain.net, etc.
+      ],
+    });
+    console.log(site);
+
+    if (!site) {
+      return res.status(404).json({ message: "Site not found" });
+    }
+
+    res.json({ siteName: site.brandName });
+  } catch (error) {
+    console.error("Error fetching site:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  handleDomainRequest,
+  automateDomainSetup,
+  fetchSiteByDomain,
+};

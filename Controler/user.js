@@ -143,6 +143,8 @@ module.exports = {
         email: user.email,
         name: user.name,
         brand_Id: user.brand_Id,
+        subDomain: user.subDomain,
+        customDomain: user.customDomain,
       };
 
       const secret = process.env.SECRET;

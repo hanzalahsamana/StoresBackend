@@ -16,7 +16,12 @@ const {
 } = require("../Controler/product");
 const express = require("express");
 const { userLoginValidate } = require("../Utils/userValidate");
-const { loginUser, sendOtp, verifyOtp, getUserFromToken } = require("../Controler/user");
+const {
+  loginUser,
+  sendOtp,
+  verifyOtp,
+  getUserFromToken,
+} = require("../Controler/user");
 const { addReview, getReviews } = require("../Controler/reviews");
 const { getAnalyticsData } = require("../Controler/analytics");
 const { getPages, updatePage } = require("../Controler/pages");
@@ -27,9 +32,16 @@ const {
   editCategory,
 } = require("../Controler/category");
 const { postConatctForm } = require("../Controler/Contact");
-const { handleDomainRequest, automateDomainSetup } = require("../Controler/domain");
+const {
+  handleDomainRequest,
+  automateDomainSetup,
+  fetchSiteByDomain,
+} = require("../Controler/domain");
 const { uploadSingle, uploadMultiple } = require("../Controler/imageUpload");
-const { uploadSingleImage, uploadMultipleImages } = require("../Utils/ImageUpload");
+const {
+  uploadSingleImage,
+  uploadMultipleImages,
+} = require("../Utils/ImageUpload");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -60,6 +72,7 @@ withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
 withParams.get("/getUserFromToken", getUserFromToken);
+withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 
 // delete apis
 withParams.delete("/deleteCartProduct", deleteCartProduct);
