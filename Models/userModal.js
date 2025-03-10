@@ -24,6 +24,7 @@ const userSchema = new Schema(
 
     subDomain: {
       type: String,
+      unique: true,
       required: true,
     },
 
@@ -32,6 +33,10 @@ const userSchema = new Schema(
       default: null,
     },
 
+    isDomainVerified: {
+      type: Boolean,
+      default: false,
+    },
     name: {
       type: String,
       required: true,

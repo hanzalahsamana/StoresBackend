@@ -21,10 +21,6 @@ const getPages = async (req, res) => {
 const updatePage = async (req, res) => {
   const type = req.collectionType;
   const pageID = req.query.id;
-  console.log("Page ID:", pageID); // Logs the value
-  console.log("Type of Page ID:", typeof pageID); // Logs the type
-  console.log("Is Valid ObjectId:", mongoose.isValidObjectId(pageID)); 
-  
 
   try {
     if (!mongoose.isValidObjectId(pageID) || !pageID) {
@@ -54,9 +50,6 @@ const updatePage = async (req, res) => {
     Object.assign(page, updatedFields);
 
     await page.save();
-
-  console.log(type , page);
-
 
     return res.status(200).json(page);
   } catch (e) {

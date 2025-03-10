@@ -1,22 +1,28 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+  const mongoose = require("mongoose");
+  const Schema = mongoose.Schema;
 
-const SectionSchema = new Schema(
-  {
-    pageId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Page",
-      required: true,
-    }, // Connect section to a page
-    type: {
-      type: String,
-      required: true,
-      enum: ["banner", "rich_text", "product_feature"],
+  const SectionSchema = new Schema(
+    {
+      type: {
+        type: String,
+        required: true,
+        // enum: ["hero", "product_catalog", "rich_text", "collection_card"], // Optional: Restrict to known types
+      },
+      order: {
+        type: Number,
+        required: true,
+      },
+      visibility: {
+        type: Boolean,
+        default: true, // Section is visible by default
+      },
+      content: {
+        type: Object, // Flexible field for different section data
+        required: true,
+        default: {}, // Prevents undefined errors
+      },
     },
-    order: { type: Number, required: true },
-    content: { type: mongoose.Schema.Types.Mixed, required: true },
-  },
-  { timestamps: true }
-);
+    { timestamps: true } // Automatically adds createdAt and updatedAt
+  );
 
-module.exports = { SectionSchema };
+  module.exports = { SectionSchema };

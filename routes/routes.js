@@ -36,12 +36,14 @@ const {
   handleDomainRequest,
   automateDomainSetup,
   fetchSiteByDomain,
+  removeDomainFromDatabase,
 } = require("../Controler/domain");
 const { uploadSingle, uploadMultiple } = require("../Controler/imageUpload");
 const {
   uploadSingleImage,
   uploadMultipleImages,
 } = require("../Utils/ImageUpload");
+const { getSections } = require("../Controler/Sections");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -71,6 +73,7 @@ withParams.get("/getOrders", getOrders);
 withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
+withParams.get("/getSections", getSections);
 withParams.get("/getUserFromToken", getUserFromToken);
 withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 
@@ -78,6 +81,7 @@ withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 withParams.delete("/deleteCartProduct", deleteCartProduct);
 withParams.delete("/deleteCategory", deleteCategory);
 withParams.delete("/deleteProduct", deleteProduct);
+withParams.delete("/deleteDomain", removeDomainFromDatabase);
 
 //  edit product
 withParams.put("/editProduct", editProduct);

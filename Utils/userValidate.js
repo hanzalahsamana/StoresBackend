@@ -8,9 +8,6 @@ const userRegisterValidate = (req, res) => {
     subDomain: Joi.string().min(3).max(100).required().messages({
       "string.pattern.base": "Subdomain is required",
     }),
-    name: Joi.string().min(3).max(100).required().regex(/^\S+$/).messages({
-      "string.pattern.base": "Name must not contain spaces",
-    }),
     isResend: Joi.boolean().messages({
       "string.pattern.base": "IsResend should be boolean",
     }),

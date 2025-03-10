@@ -14,14 +14,10 @@ const addOrderData = async (req, res) => {
     type + "_Orders"
   );
   try {
-    console.log(type , req.body , "👩‍🦰👩‍🦰🍔🍔");
     const admin = await UserModal.findOne({ brandName: type });
     
     const newOrder = new OrderModel(req.body); 
     await newOrder.save();
-
-    console.log("newOrder: ",newOrder , "admin: ",admin );
-    
     await customerOrderDetail(
       { ...admin.toObject(), logo: newOrder?.to },
       newOrder?.customerInfo?.email,

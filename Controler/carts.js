@@ -21,7 +21,6 @@ const addCarts = async (req, res) => {
     });
   }
   
-  console.log("okk");
   try {
     const CartModel = mongoose.model(
       type + "_Cart",
@@ -72,74 +71,6 @@ const addCarts = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-//updateCart data
-// const UpdateCart = async (req, res) => {
-//   const cartId = req.params.cartId;
-//   const type = req.collectionType;
-//   const { _id: productId, quantity, selectedSize } = req.body;
-
-//   console.log(cartId , type , "ohhh");
-  
-
-//   if (!productId || (!quantity  && quantity !== 0 ) || !selectedSize) {
-//     return res.status(400).json({
-//       message: `${
-//         !quantity
-//           ? "Quantity is required"
-//           : !productId
-//           ? "Product ID is required"
-//           : "Size is required"
-//       }`,
-//     });
-//   }
-
-//   try {
-//     const CartModel = mongoose.model(
-//       type + "_Cart",
-//       CartSchema,
-//       type + "_Cart"
-//     );
-
-//     if (!cartId) {
-//       return res.status(404).json({ message: "Cart Id Not Found" });
-//     }
-
-//     const cartData = await CartModel.findOne({ cartId: cartId });
-
-//     if (!cartData) {
-//       return res.status(404).json({ message: "Cart Id is incorrect" });
-//     }
-//     console.log("error");
-
-//     const productInCart = cartData.products.find(
-//       (p) => p._id?.toString() === productId && p.selectedSize === selectedSize
-//     );
-//     console.log("error0");
-
-//     if (!productInCart) {
-//       console.log("error1");
-//       return res.status(404).json({ message: "Product not found In Cart" });
-//     }
-//     console.log("error2");
-    
-//     productInCart.quantity += quantity;
-//     productInCart.selectedSize = selectedSize;
-//     if (productInCart.quantity < 1) {
-//       productInCart.quantity = 1;
-//     }
-//     console.log("error3");
-//     cartData.markModified("products");
-    
-//     await cartData.save();
-//     console.log("error4");
-//     return res.status(200).json(cartData);
-//   } catch (error) {
-//     console.log("error5");
-    
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 // get cart data function
 const getCartData = async (req, res) => {

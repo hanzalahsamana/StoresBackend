@@ -2,38 +2,54 @@ const mongoose = require("mongoose");
 const { pageSchema } = require("../Models/PagesModel");
 const { categorySchema } = require("../Models/CategoryModal");
 const { productSchema } = require("../Models/ProductModal");
+const { SectionSchema } = require("../Models/SectionsModal");
+
+// {
+//   title: "Site Logo",
+//   type: "Site Logo",
+//   image:
+//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/fduuuz6bcqbwvcdfkhhy.png",
+// },
+// {
+//   title: "Hero Banner",
+//   type: "Hero Banner",
+//   image:
+//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
+// },
+// {
+//   title: "Our Quality",
+//   type: "Our Quality",
+//   image:
+//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/rdtqahnjtnl3eehnz4lm.png",
+//   text: "At [Your Company Name], we are dedicated to delivering high-quality products and services. We adhere to strict quality control standards throughout the production and development processes to ensure that our customers receive only the best. Our team is committed to continuous improvement and regularly reviews feedback to enhance our offerings. If you ever experience any issues with the quality of our products or services, please reach out to us, and we will resolve the matter promptly. Your satisfaction is our top priority.",
+// },
+// {
+//   title: "Manufacture Process",
+//   type: "Manufacture Process",
+//   image:
+//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736859498/v6pws4qg9rfegcqx85en.jpg",
+//   text: "Our manufacturing process is designed to ensure that every product meets the highest standards of quality and durability. We use state-of-the-art technology and adhere to strict safety and quality control measures at every step. From sourcing raw materials to the final production, each phase is carefully monitored by our skilled team. Our commitment to precision and efficiency ensures that we deliver products that our customers can trust and rely on.",
+// },
+// {
+//   title: "Fabric Remants",
+//   type: "Fabric Remants",
+//   image:
+//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
+//   text: "At [Your Company Name], we are committed to offering only the highest quality products. We use the best materials and adhere to rigorous manufacturing standards to ensure that every item we sell is durable, reliable, and performs as expected. Our products undergo thorough testing to guarantee quality, and we stand behind everything we sell. If you are not satisfied with the quality of your purchase, please contact us, and we will work to resolve any issues promptly.",
+// },
+// {
+//   title: "Contact Us",
+//   type: "Contact",
+//   email: "support@example.com",
+//   phone: "+1 234 234 234",
+//   address: "1234 Elm Street, Springfield, IL 62701,United States",
+// },
 
 const defaultPages = [
-  {
-    title: "Site Logo",
-    type: "Site Logo",
-    image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/fduuuz6bcqbwvcdfkhhy.png",
-  },
-  {
-    title: "Hero Banner",
-    type: "Hero Banner",
-    image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
-  },
   {
     title: "About Us",
     type: "About Us",
     text: "At [Your Company Name], we are passionate about delivering innovative solutions that meet the needs of our customers. Our company was founded with the goal of providing high-quality products and services that improve lives and create lasting value. With a dedicated team of professionals and a commitment to excellence, we aim to be a leader in [your industry]. We pride ourselves on our customer-centric approach and strive to exceed expectations in everything we do.",
-  },
-  {
-    title: "Our Quality",
-    type: "Our Quality",
-    image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/rdtqahnjtnl3eehnz4lm.png",
-    text: "At [Your Company Name], we are dedicated to delivering high-quality products and services. We adhere to strict quality control standards throughout the production and development processes to ensure that our customers receive only the best. Our team is committed to continuous improvement and regularly reviews feedback to enhance our offerings. If you ever experience any issues with the quality of our products or services, please reach out to us, and we will resolve the matter promptly. Your satisfaction is our top priority.",
-  },
-  {
-    title: "Manufacture Process",
-    type: "Manufacture Process",
-    image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736859498/v6pws4qg9rfegcqx85en.jpg",
-    text: "Our manufacturing process is designed to ensure that every product meets the highest standards of quality and durability. We use state-of-the-art technology and adhere to strict safety and quality control measures at every step. From sourcing raw materials to the final production, each phase is carefully monitored by our skilled team. Our commitment to precision and efficiency ensures that we deliver products that our customers can trust and rely on.",
   },
   {
     title: "FAQ",
@@ -58,13 +74,6 @@ const defaultPages = [
     ],
   },
   {
-    title: "Contact Us",
-    type: "Contact",
-    email: "support@example.com",
-    phone: "+1 234 234 234",
-    address: "1234 Elm Street, Springfield, IL 62701,United States",
-  },
-  {
     title: "Privacy Policy",
     type: "Privacy Policy",
     text: "At [Your Company Name], we are committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard your personal information when you visit our website or use our services. We may collect information such as your name, email address, and browsing behavior to enhance your user experience. We do not share your personal information with third parties without your consent, except as required by law. By using our services, you agree to the terms outlined in this policy. For any questions or concerns, please contact us at [Your Contact Information].",
@@ -73,13 +82,6 @@ const defaultPages = [
     title: "Return Policy",
     type: "Return Policy",
     text: "At [Your Company Name], we strive for customer satisfaction. If you are not completely satisfied with your purchase, you may return it within [X] days of receiving the item. The product must be unused, in its original packaging, and in the same condition as when it was delivered. Please contact our customer service team at [Your Contact Information] to initiate the return process. Shipping costs for returns are the responsibility of the customer, unless the return is due to a defect or error on our part. Once the return is processed, a refund will be issued to the original payment method.",
-  },
-  {
-    title: "Fabric Remants",
-    type: "Fabric Remants",
-    image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
-    text: "At [Your Company Name], we are committed to offering only the highest quality products. We use the best materials and adhere to rigorous manufacturing standards to ensure that every item we sell is durable, reliable, and performs as expected. Our products undergo thorough testing to guarantee quality, and we stand behind everything we sell. If you are not satisfied with the quality of your purchase, please contact us, and we will work to resolve any issues promptly.",
   },
   {
     title: "Shipping Policy",
@@ -93,9 +95,69 @@ const defaultPages = [
   },
 ];
 
-// const defaultSections = [
-  
-// ]
+const defaultSections = [
+  {
+    type: "hero_banner",
+    order: 1,
+    visibility: true,
+    content: {
+      title: "Hero Banner",
+      image:
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
+    },
+  },
+  {
+    type: "feature_collection",
+    order: 2,
+    visibility: true,
+    content: {
+      title: "Featured Collections",
+      collections: ["all"],
+    },
+  },
+  {
+    type: "promo_section",
+    order: 3,
+    visibility: true,
+    content: {
+      title: "Manufacture Process",
+      image:
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1736859498/v6pws4qg9rfegcqx85en.jpg",
+      text: "Our manufacturing process is designed to ensure that every product meets the highest standards of quality and durability. We use state-of-the-art technology and adhere to strict safety and quality control measures at every step. From sourcing raw materials to the final production, each phase is carefully monitored by our skilled team. Our commitment to precision and efficiency ensures that we deliver products that our customers can trust and rely on.",
+    },
+  },
+  {
+    type: "feature_product",
+    order: 4,
+    visibility: true,
+    content: {
+      title: "Best Sellers",
+      products: "all",
+      maxLength:4,
+    },
+  },
+  {
+    type: "promo_section",
+    order: 5,
+    visibility: true,
+    content: {
+      title: "Fabric Remants",
+      image:
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
+      text: "At [Your Company Name], we are committed to offering only the highest quality products. We use the best materials and adhere to rigorous manufacturing standards to ensure that every item we sell is durable, reliable, and performs as expected. Our products undergo thorough testing to guarantee quality, and we stand behind everything we sell. If you are not satisfied with the quality of your purchase, please contact us, and we will work to resolve any issues promptly.",
+    },
+  },
+  {
+    type: "rich_text",
+    order: 6,
+    visibility: true,
+    content: {
+      title: "Why Choose Us?",
+      text: "We provide high-quality products with fast delivery and excellent customer service.",
+      buttonText: "Shop Now",
+    },
+  },
+];
 
 const defaultProducts = [
   {
@@ -128,7 +190,7 @@ const defaultProducts = [
     collectionName: "Collection-1",
     stock: 100,
     size: 4,
-    type: "Unstiched", 
+    type: "Unstiched",
   },
   {
     name: "Product 3",
@@ -181,17 +243,33 @@ const defaultCategories = [
 
 const SeedDefaultData = async (type) => {
   try {
+    const PageModel = mongoose.model(
+      type + "_pages",
+      pageSchema,
+      type + "_pages"
+    );
     for (const page of defaultPages) {
-      const PageModel = mongoose.model(
-        type + "_pages",
-        pageSchema,
-        type + "_pages"
-      );
       let existingPage = await PageModel.findOne({ type: page.type });
 
       if (!existingPage) {
         const newPage = new PageModel(page);
         await newPage.save();
+      }
+    }
+
+    const SectionModel = mongoose.model(
+      type + "_sections",
+      SectionSchema,
+      type + "_section"
+    );
+    for (const section of defaultSections) {
+      let existingSection = await SectionModel.findOne({
+        order: section?.order,
+      });
+
+      if (!existingSection) {
+        const newSection = new SectionModel(section);
+        await newSection.save();
       }
     }
 

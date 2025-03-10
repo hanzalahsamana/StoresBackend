@@ -14,7 +14,6 @@ const Schema = mongoose.Schema;
 const pageSchema = new Schema({
   title: { type: String, required: true },
   type: { type: String, required: true },
-
   text: { type: String, default: "" },
   buttonText: { type: String, default: "" },
   image: { type: String, default: "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp" },

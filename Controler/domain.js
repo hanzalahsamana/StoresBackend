@@ -2,13 +2,30 @@ const { exec } = require("child_process");
 const dns = require("dns");
 const { checkDomainDNS } = require("../Utils/CheckDomainDns");
 const { UserModal } = require("../Models/userModal");
+const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 const serverIP = "13.51.93.22";
 const frontendIP = "13.61.204.32";
 const privateKeyPath = "/home/ubuntu/saasweb.pem";
 const frontendUser = "ubuntu";
 
-const updateDomainToDatabase = async (siteName, domain) => {
+const isDomainAlreadyInUse = async (sitename, domain) => {
+  try {
+    const existingUser = await UserModal.findOne({
+      customDomain: domain,
+      isDomainVerified: true,
+      brandName: { $ne: sitename }, // Ensure brandName is NOT the given sitename
+    });
+
+    return !!existingUser; // Returns true if a verified domain exists with a different site name, else false
+  } catch (error) {
+    console.error("Error checking domain:", error);
+    return false; // In case of error, return false to avoid breaking logic
+  }
+};
+
+
+const updateDomainToDatabase = async (siteName, domain, isDomainVerified) => {
   try {
     const user = await UserModal.findOne({ brandName: String(siteName) });
 
@@ -17,6 +34,7 @@ const updateDomainToDatabase = async (siteName, domain) => {
     }
 
     user.customDomain = domain; // Update the field
+    user.isDomainVerified = isDomainVerified; // Update the field
     await user.save(); // Save the updated document
 
     console.log(`Domain updated successfully for ${siteName}`);
@@ -27,9 +45,42 @@ const updateDomainToDatabase = async (siteName, domain) => {
   }
 };
 
+const removeDomainFromDatabase = async (req, res) => {
+  const siteName = req.collectionType;
+  try {
+    const user = await UserModal.findOne({ brandName: String(siteName) });
+
+    if (!user) {
+      return res.status(404).json({
+        message: `No document found with brandName: ${siteName}`,
+        StatusCode: "FailedToProcess",
+      });
+    }
+
+    user.customDomain = null; // Remove the domain
+    user.isDomainVerified = false; // Remove the domain
+    await user.save(); // Save the update
+
+    console.log(`Domain removed successfully for ${siteName}`);
+    return res.status(200).json({
+      message: `Domain removed successfully`,
+      StatusCode: "success",
+    });
+  } catch (error) {
+    console.error("Error removing domain:", error);
+    return res.status(500).json({
+      message: "Error occurring while deleting domain.",
+      StatusCode: "FailedToProcess",
+      error: error.message,
+    });
+  }
+};
+
 const handleDomainRequest = async (req, res) => {
   const { domain } = req.body;
   const type = req.collectionType;
+  console.log(domain, type, "🙂‍↔️🙂‍↔️");
+  // await SeedDefaultData(type);
 
   try {
     if (!domain) {
@@ -38,9 +89,12 @@ const handleDomainRequest = async (req, res) => {
         StatusCode: "InvalidDomain",
       });
     }
-    if (domain === "hannanfabrics.com") {
+    if (
+      domain.includes("hannanfabrics.com") ||
+      (await isDomainAlreadyInUse(type,domain))
+    ) {
       return res.status(400).json({
-        message: "❌ This domain is already in use.",
+        message: `❌ domain ${domain} is already in use.`,
         StatusCode: "InvalidDomain",
       });
     }
@@ -48,12 +102,12 @@ const handleDomainRequest = async (req, res) => {
     const isDomainLive = dnsRecords.includes(WEBSITE_IP_ADDRESS);
 
     if (isDomainLive) {
-      await updateDomainToDatabase(type, domain);
+      await updateDomainToDatabase(type, domain, true);
       return res
         .status(200)
         .json({ domain: domain, message: "✅ Your domain is live!" });
     } else if (dnsRecords.length === 0) {
-      await updateDomainToDatabase(type, domain);
+      await updateDomainToDatabase(type, domain, false);
       return res.status(400).json({
         message: "❌ Your domain has no valid A record.",
         StatusCode: "UpdateDNS",
@@ -65,7 +119,7 @@ const handleDomainRequest = async (req, res) => {
         },
       });
     } else {
-      await updateDomainToDatabase(type, domain);
+      await updateDomainToDatabase(type, domain, false);
       return res.status(400).json({
         message: "❌ Your domain is pointing to the wrong IP.",
         current_ip: dnsRecords,
@@ -177,7 +231,7 @@ EOF_NGINX'
           error: stderr,
         });
       }
-      console.log(`🎉 Success: ${stdout}`);
+      console.log(`🎉 Success: ${stdout} ${stderr}`);
       return res.status(200).json({
         message: `✅ SSL setup complete for ${userDomain}!`,
         output: stdout,
@@ -195,19 +249,21 @@ EOF_NGINX'
 // Fetch site by domain or subdomain
 const fetchSiteByDomain = async (req, res) => {
   try {
-    const { domain } = req.query;
-    if (!domain) {
-      
-      return res.status(400).json({ error: "Domain is required" });
+    const { domain, subDomain } = req.query;
+
+    if (!domain && !subDomain) {
+      return res.status(400).json({ error: "Domain or Subdomain is required" });
     }
-    
-    // Find the site where customDomain or subdomain matches the given domain
-    const site = await UserModal.findOne({
-      $or: [
-        { subDomain: { $regex: `^${domain}$`, $options: "i" } }, // Case-insensitive exact match
-        { customDomain: { $regex: `^${domain}.*$`, $options: "i" } }, // Matches domain.com, domain.net, etc.
-      ],
-    });
+
+    let query = {};
+
+    if (subDomain) {
+      query = { subDomain: { $regex: `^${subDomain}$`, $options: "i" } }; // Exact match (case-insensitive)
+    } else if (domain) {
+      query = { customDomain: { $regex: `^${domain}$`, $options: "i" } }; // Exact match (case-insensitive)
+    }
+
+    const site = await UserModal.findOne(query);
     console.log(site);
 
     if (!site) {
@@ -221,8 +277,10 @@ const fetchSiteByDomain = async (req, res) => {
   }
 };
 
+
 module.exports = {
   handleDomainRequest,
   automateDomainSetup,
   fetchSiteByDomain,
+  removeDomainFromDatabase,
 };

@@ -13,7 +13,7 @@ app.use(express.json());
 
 module.exports = {
   sendOtp: async (req, res) => {
-    const { email, brandName, name, password, subDomain, isResend } = req.body;
+    const { email, brandName, password, subDomain, isResend } = req.body;
 
     try {
       const otp = generateOtp();
@@ -69,7 +69,6 @@ module.exports = {
         user = new UserModal({
           email,
           password: await generateHash(password, 10),
-          name,
           brandName,
           subDomain,
           otp: hashedOtp,
