@@ -37,7 +37,6 @@ const updateDomainToDatabase = async (siteName, domain, isDomainVerified) => {
     user.isDomainVerified = isDomainVerified; // Update the field
     await user.save(); // Save the updated document
 
-    console.log(`Domain updated successfully for ${siteName}`);
     return { success: true, message: "Domain updated successfully" };
   } catch (error) {
     console.error("Error updating domain:", error);
@@ -79,7 +78,6 @@ const removeDomainFromDatabase = async (req, res) => {
 const handleDomainRequest = async (req, res) => {
   const { domain } = req.body;
   const type = req.collectionType;
-  console.log(domain, type, "🙂‍↔️🙂‍↔️");
   // await SeedDefaultData(type);
 
   try {

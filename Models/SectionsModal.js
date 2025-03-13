@@ -8,6 +8,10 @@
         required: true,
         // enum: ["hero", "product_catalog", "rich_text", "collection_card"], // Optional: Restrict to known types
       },
+      sectionName:{
+        type: String,
+        required: true,
+      },
       order: {
         type: Number,
         required: true,

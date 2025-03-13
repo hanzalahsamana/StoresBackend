@@ -18,6 +18,45 @@ const getSections = async (req, res) => {
   }
 };
 
+const updateSection = async (req, res) => {
+  const type = req.collectionType;
+  const sectionID = req.query.id;
+
+  try {
+    if (!mongoose.isValidObjectId(sectionID) || !sectionID) {
+      return res
+        .status(400)
+        .json({ message: "Invalid id OR id is not defined" });
+    }
+
+    const SectionModel = mongoose.model(
+      type + "_section",
+      SectionSchema,
+      type + "_section"
+    );
+
+    const section = await SectionModel.findById(sectionID);
+
+    if (!section) {
+      return res.status(404).json({ message: "Section not found" });
+    }
+
+    const updatedFields = req.body;
+
+    if (!updatedFields || Object.keys(updatedFields).length === 0) {
+      return res.status(400).json({ message: "Data is required" });
+    }
+
+    Object.assign(section.content, updatedFields);
+    section.markModified("content");
+    await section.save();
+
+    return res.status(200).json(section);
+  } catch (e) {
+    return res.status(500).json({ message: e.message || "An error occurred" });
+  }
+};
+
 // const updateSectionOrder = async (sectionId, newOrder) => {
 //   try {
 //     const sectionToMove = await Section.findById(sectionId);
@@ -52,4 +91,4 @@ const getSections = async (req, res) => {
 //   }
 // };
 
-module.exports = { getSections };
+module.exports = { getSections, updateSection };

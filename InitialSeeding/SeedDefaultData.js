@@ -98,6 +98,7 @@ const defaultPages = [
 const defaultSections = [
   {
     type: "hero_banner",
+    sectionName: "Hero Banner",
     order: 1,
     visibility: true,
     content: {
@@ -108,15 +109,17 @@ const defaultSections = [
   },
   {
     type: "feature_collection",
+    sectionName: "Featured Collection",
     order: 2,
     visibility: true,
     content: {
       title: "Featured Collections",
-      collections: ["all"],
+      collections: [],
     },
   },
   {
     type: "promo_section",
+    sectionName: "Promo Section",
     order: 3,
     visibility: true,
     content: {
@@ -124,23 +127,31 @@ const defaultSections = [
       image:
         "https://res.cloudinary.com/duaxitxph/image/upload/v1736859498/v6pws4qg9rfegcqx85en.jpg",
       text: "Our manufacturing process is designed to ensure that every product meets the highest standards of quality and durability. We use state-of-the-art technology and adhere to strict safety and quality control measures at every step. From sourcing raw materials to the final production, each phase is carefully monitored by our skilled team. Our commitment to precision and efficiency ensures that we deliver products that our customers can trust and rely on.",
+      buttonText: "Shop Now",
+      styleType: "style1",
     },
   },
   {
     type: "feature_product",
+    sectionName: "Featured Product",
     order: 4,
     visibility: true,
     content: {
       title: "Best Sellers",
-      products: "all",
-      maxLength:4,
+      maxLength: 4,
+      productType: "All",
+      selectedCategories: [],
+      selectedProducts: [],
     },
   },
   {
     type: "promo_section",
+    sectionName: "Promo Section",
     order: 5,
     visibility: true,
     content: {
+      buttonText: "Shop Now",
+      styleType: "style2",
       title: "Fabric Remants",
       image:
         "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
@@ -149,6 +160,7 @@ const defaultSections = [
   },
   {
     type: "rich_text",
+    sectionName: "Rich Text",
     order: 6,
     visibility: true,
     content: {

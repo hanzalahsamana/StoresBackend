@@ -159,6 +159,7 @@ module.exports = {
   getUserFromToken: async (req, res) => {
     try {
       const siteName = req.collectionType;
+      // await SeedDefaultData(siteName);
       // const token = req.headers.authorization?.split(" ")[1]; // Extract token from the header
 
       // if (!token) {
