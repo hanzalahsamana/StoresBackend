@@ -43,7 +43,7 @@ const {
   uploadSingleImage,
   uploadMultipleImages,
 } = require("../Utils/ImageUpload");
-const { getSections, updateSection } = require("../Controler/sections");
+const { getSections, updateSection, createSection, deleteSection } = require("../Controler/sections");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -58,6 +58,7 @@ withParams.post("/postContact", postConatctForm);
 withParams.post("/uploadSingle", uploadSingle, uploadSingleImage);
 withParams.post("/uploadMultiple", uploadMultiple, uploadMultipleImages);
 withParams.post("/addDomainDns", handleDomainRequest);
+withParams.post("/addSection", createSection);
 withParams.post("/genrateSSl", automateDomainSetup);
 
 withoutParams.post("/login", userLoginValidate, loginUser);
@@ -82,6 +83,7 @@ withParams.delete("/deleteCartProduct", deleteCartProduct);
 withParams.delete("/deleteCategory", deleteCategory);
 withParams.delete("/deleteProduct", deleteProduct);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
+withParams.delete("/deleteSection", deleteSection);
 
 //  edit product
 withParams.put("/editProduct", editProduct);

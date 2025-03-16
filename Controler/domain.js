@@ -24,7 +24,6 @@ const isDomainAlreadyInUse = async (sitename, domain) => {
   }
 };
 
-
 const updateDomainToDatabase = async (siteName, domain, isDomainVerified) => {
   try {
     const user = await UserModal.findOne({ brandName: String(siteName) });
@@ -78,8 +77,6 @@ const removeDomainFromDatabase = async (req, res) => {
 const handleDomainRequest = async (req, res) => {
   const { domain } = req.body;
   const type = req.collectionType;
-  // await SeedDefaultData(type);
-
   try {
     if (!domain) {
       return res.status(400).json({
@@ -262,7 +259,6 @@ const fetchSiteByDomain = async (req, res) => {
     }
 
     const site = await UserModal.findOne(query);
-    console.log(site);
 
     if (!site) {
       return res.status(404).json({ message: "Site not found" });

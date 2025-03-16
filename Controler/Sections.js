@@ -10,7 +10,7 @@ const getSections = async (req, res) => {
       type + "_section"
     );
 
-    const sections = await SectionModel.find();
+    const sections = await SectionModel.find().sort({ order: 1 });
 
     return res.status(200).json(sections);
   } catch (e) {
@@ -57,6 +57,71 @@ const updateSection = async (req, res) => {
   }
 };
 
+const createSection = async (req, res) => {
+  const type = req.collectionType;
+  const sectionToAdd = req.body;
+  const { order } = sectionToAdd;
+
+  try {
+    const SectionModel = mongoose.model(
+      type + "_section",
+      SectionSchema,
+      type + "_section"
+    );
+
+    await SectionModel.updateMany(
+      { order: { $gte: order } },
+      { $inc: { order: 1 } }
+    );
+
+    const section = new SectionModel(sectionToAdd);
+    await section.save();
+
+    const allSections = await SectionModel.find().sort({ order: 1 });
+
+    return res.status(200).json(allSections);
+  } catch (e) {
+    return res.status(500).json({ message: e.message || "An error occurred" });
+  }
+};
+
+const deleteSection = async (req, res) => {
+  const type = req.collectionType;
+  const sectionId = req.query.id;
+
+  try {
+    const SectionModel = mongoose.model(
+      type + "_section",
+      SectionSchema,
+      type + "_section"
+    );
+
+    // Find the section to be deleted
+    const sectionToDelete = await SectionModel.findById(sectionId);
+    if (!sectionToDelete) {
+      return res.status(404).json({ message: "Section not found" });
+    }
+
+    const deletedOrder = sectionToDelete.order;
+
+    // Delete the section
+    await SectionModel.findByIdAndDelete(sectionId);
+
+    // Shift orders for sections that come after the deleted one
+    await SectionModel.updateMany(
+      { order: { $gt: deletedOrder } },
+      { $inc: { order: -1 } } // Decrease order by 1
+    );
+
+    // Return updated sections
+    const updatedSections = await SectionModel.find().sort({ order: 1 });
+
+    return res.status(200).json(updatedSections);
+  } catch (e) {
+    return res.status(500).json({ message: e.message || "An error occurred" });
+  }
+};
+
 // const updateSectionOrder = async (sectionId, newOrder) => {
 //   try {
 //     const sectionToMove = await Section.findById(sectionId);
@@ -91,4 +156,4 @@ const updateSection = async (req, res) => {
 //   }
 // };
 
-module.exports = { getSections, updateSection };
+module.exports = { getSections, updateSection, createSection, deleteSection };

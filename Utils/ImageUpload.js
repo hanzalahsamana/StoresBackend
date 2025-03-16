@@ -10,8 +10,6 @@ const uploadMultipleImages = (req, res) => {
     return res.status(400).json({ error: "No files uploaded" });
   }
   const imageUrls = req.files.map((file) => file.location);
-  console.log("wowo" , imageUrls);
-  
   res.json({ imageUrls });
 };
 

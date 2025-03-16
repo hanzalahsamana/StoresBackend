@@ -108,6 +108,19 @@ const defaultSections = [
     },
   },
   {
+    type: "hero_banner",
+    sectionName: "Banner Slider",
+    order: 1,
+    visibility: true,
+    content: {
+      title: "Banner Slider",
+      imagesUrl: [
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
+      ],
+    },
+  },
+  {
     type: "feature_collection",
     sectionName: "Featured Collection",
     order: 2,

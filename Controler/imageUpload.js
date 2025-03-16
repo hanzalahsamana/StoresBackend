@@ -16,7 +16,6 @@ const s3 = new S3Client({
 const s3Storage = multerS3({
   s3: s3,
   bucket: process.env.AWS_BUCKET_NAME,
-  acl: "public-read",
   metadata: (req, file, cb) => {
     cb(null, { fieldName: file.fieldname });
   },
@@ -35,8 +34,11 @@ const upload = multer({
     // Allowed file types
     const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     if (allowedMimeTypes.includes(file.mimetype)) {
+      console.log(file);
+      
       cb(null, true);
     } else {
+      console.log(file , "ghiop");
       cb(new Error("Invalid file type. Only JPG, PNG, WEBP, and GIF are allowed."));
     }
   },
