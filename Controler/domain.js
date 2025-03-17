@@ -86,7 +86,7 @@ const handleDomainRequest = async (req, res) => {
     }
     if (
       domain.includes("hannanfabrics.com") ||
-      (await isDomainAlreadyInUse(type,domain))
+      (await isDomainAlreadyInUse(type, domain))
     ) {
       return res.status(400).json({
         message: `❌ domain ${domain} is already in use.`,
@@ -155,25 +155,7 @@ const automateDomainSetup = async (req, res) => {
   }
 
   try {
-    console.log(`Verifying domain: ${userDomain}...`);
-
-    // Check DNS records for domain
-    // const { address } = await dns.lookup(userDomain);
-    // if (address !== frontendIP) {
-    //   return res.status(400).json({
-    //     message: `❌ Domain verification failed. ${userDomain} is not pointing to ${frontendIP}.`,
-    //     currentIP: address,
-    //     requiredIP: frontendIP,
-    //   });
-    // }
-
-    console.log(
-      `✅ Domain ${userDomain} is verified! Proceeding with SSL setup...`
-    );
-
-    // SSH command for SSL setup
-    const command = `
-      ssh -T -o StrictHostKeyChecking=no -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'ENDSSH'
+    const command = `ssh -T -o StrictHostKeyChecking=no -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'ENDSSH'
         echo "🔹 Connected to frontend server..."
         
         # Install Certbot if not installed
@@ -217,7 +199,6 @@ EOF_NGINX'
         sudo systemctl restart nginx
       
         echo "✅ SSL setup complete for ${userDomain}!"ENDSSH`;
-
     exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error(`❌ Error issuing SSL certificate: ${stderr}`);
@@ -249,7 +230,8 @@ const fetchSiteByDomain = async (req, res) => {
     if (!domain && !subDomain) {
       return res.status(400).json({ error: "Domain or Subdomain is required" });
     }
-
+    console.log(req.query);
+    
     let query = {};
 
     if (subDomain) {
@@ -270,7 +252,6 @@ const fetchSiteByDomain = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 module.exports = {
   handleDomainRequest,

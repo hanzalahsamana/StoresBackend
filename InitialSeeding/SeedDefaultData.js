@@ -4,48 +4,13 @@ const { categorySchema } = require("../Models/CategoryModal");
 const { productSchema } = require("../Models/ProductModal");
 const { SectionSchema } = require("../Models/SectionsModal");
 
-// {
-//   title: "Site Logo",
-//   type: "Site Logo",
-//   image:
-//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/fduuuz6bcqbwvcdfkhhy.png",
-// },
-// {
-//   title: "Hero Banner",
-//   type: "Hero Banner",
-//   image:
-//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
-// },
-// {
-//   title: "Our Quality",
-//   type: "Our Quality",
-//   image:
-//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/rdtqahnjtnl3eehnz4lm.png",
-//   text: "At [Your Company Name], we are dedicated to delivering high-quality products and services. We adhere to strict quality control standards throughout the production and development processes to ensure that our customers receive only the best. Our team is committed to continuous improvement and regularly reviews feedback to enhance our offerings. If you ever experience any issues with the quality of our products or services, please reach out to us, and we will resolve the matter promptly. Your satisfaction is our top priority.",
-// },
-// {
-//   title: "Manufacture Process",
-//   type: "Manufacture Process",
-//   image:
-//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736859498/v6pws4qg9rfegcqx85en.jpg",
-//   text: "Our manufacturing process is designed to ensure that every product meets the highest standards of quality and durability. We use state-of-the-art technology and adhere to strict safety and quality control measures at every step. From sourcing raw materials to the final production, each phase is carefully monitored by our skilled team. Our commitment to precision and efficiency ensures that we deliver products that our customers can trust and rely on.",
-// },
-// {
-//   title: "Fabric Remants",
-//   type: "Fabric Remants",
-//   image:
-//     "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
-//   text: "At [Your Company Name], we are committed to offering only the highest quality products. We use the best materials and adhere to rigorous manufacturing standards to ensure that every item we sell is durable, reliable, and performs as expected. Our products undergo thorough testing to guarantee quality, and we stand behind everything we sell. If you are not satisfied with the quality of your purchase, please contact us, and we will work to resolve any issues promptly.",
-// },
-// {
-//   title: "Contact Us",
-//   type: "Contact",
-//   email: "support@example.com",
-//   phone: "+1 234 234 234",
-//   address: "1234 Elm Street, Springfield, IL 62701,United States",
-// },
-
 const defaultPages = [
+  {
+    title: "Site Logo",
+    type: "Site Logo",
+    image:
+      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/fduuuz6bcqbwvcdfkhhy.png",
+  },
   {
     title: "About Us",
     type: "About Us",
@@ -92,6 +57,13 @@ const defaultPages = [
     title: "Terms and Conditions",
     type: "Terms and Conditions",
     text: "By using [Your Company Name]'s services or purchasing our products, you agree to abide by the terms and conditions outlined here. Our terms include information on payment policies, returns and exchanges, shipping and delivery, and limitations of liability. We reserve the right to update these terms at any time, and we recommend reviewing them regularly. If you have any questions or concerns, please contact us at [Your Contact Information].",
+  },
+  {
+    title: "Contact Us",
+    type: "Contact",
+    email: "support@example.com",
+    phone: "+1 234 234 234",
+    address: "1234 Elm Street, Springfield, IL 62701,United States",
   },
 ];
 
