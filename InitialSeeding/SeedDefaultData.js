@@ -97,18 +97,7 @@ const defaultPages = [
 
 const defaultSections = [
   {
-    type: "hero_banner",
-    sectionName: "Hero Banner",
-    order: 1,
-    visibility: true,
-    content: {
-      title: "Hero Banner",
-      image:
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
-    },
-  },
-  {
-    type: "hero_banner",
+    type: "banner_slider",
     sectionName: "Banner Slider",
     order: 1,
     visibility: true,
@@ -197,8 +186,8 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
     stock: 100,
-    size: 4,
-    collectionName: "Collection-1",
+    size: ["S", "M", "L", "XL"],
+    collectionName: "collection-1",
     type: "Unstiched",
   },
   {
@@ -212,9 +201,9 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
-    collectionName: "Collection-1",
+    collectionName: "collection-1",
     stock: 100,
-    size: 4,
+    size: ["S", "M", "L", "XL"],
     type: "Unstiched",
   },
   {
@@ -228,9 +217,9 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
-    collectionName: "Collection-2",
+    collectionName: "collection-2",
     stock: 100,
-    size: 4,
+    size: ["S", "M", "L", "XL"],
     type: "stiched",
   },
   {
@@ -244,9 +233,9 @@ const defaultProducts = [
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
     ],
-    collectionName: "Collection-2",
+    collectionName: "collection-2",
     stock: 100,
-    size: 4,
+    size: ["S", "M", "L", "XL"],
     type: "stiched",
   },
 ];
@@ -263,6 +252,12 @@ const defaultCategories = [
     image:
       "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/bbg5cqlwuu9puvtopi9b.jpg",
     link: "collection-2",
+  },
+  {
+    name: "Collection-3",
+    image:
+      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/bbg5cqlwuu9puvtopi9b.jpg",
+    link: "collection-3",
   },
 ];
 
