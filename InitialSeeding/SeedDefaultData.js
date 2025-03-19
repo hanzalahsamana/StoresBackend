@@ -76,8 +76,8 @@ const defaultSections = [
     content: {
       title: "Banner Slider",
       imagesUrl: [
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1737576876/qcte92lscbynyvsldpvm.png",
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1737576876/qcte92lscbynyvsldpvm.png",
       ],
     },
   },
@@ -97,10 +97,10 @@ const defaultSections = [
     order: 3,
     visibility: true,
     content: {
-      title: "Manufacture Process",
+      title: "Our Quality Promise:",
       image:
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1736859498/v6pws4qg9rfegcqx85en.jpg",
-      text: "Our manufacturing process is designed to ensure that every product meets the highest standards of quality and durability. We use state-of-the-art technology and adhere to strict safety and quality control measures at every step. From sourcing raw materials to the final production, each phase is carefully monitored by our skilled team. Our commitment to precision and efficiency ensures that we deliver products that our customers can trust and rely on.",
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1737653347/nwfziv7e8iaouflrxvtw.png",
+      text: "<p>At <em>Modest Wardrobe</em>, quality is at the heart of everything we do. Here’s what sets us apart:</p><p>💎 <strong>Premium Fabrics:</strong> We source the finest materials to ensure each piece is soft, breathable, and durable.</p><p>💎 <strong>Stringent Quality Checks:</strong> Every item is inspected thoroughly to meet our high standards before it reaches you.</p><p>💎 <strong>Comfort Meets Elegance:</strong> We prioritize your comfort without compromising on style, ensuring every piece feels as good as it looks.</p><p>💎 <strong>Sustainable Practices:</strong> We are mindful of the environment and practice ethical manufacturing processes.</p><p>When you shop with <em>Modest Wardrobe</em>, you’re not just buying clothes—you’re investing in timeless pieces designed with love, care, and purpose.</p><p><em>Ready to experience the difference? Explore our collection and feel the quality for yourself!</em> 💕</p>",
       buttonText: "Shop Now",
       styleType: "style1",
     },
@@ -126,10 +126,10 @@ const defaultSections = [
     content: {
       buttonText: "Shop Now",
       styleType: "style2",
-      title: "Fabric Remants",
+      title: "Manufacture Process",
       image:
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
-      text: "At [Your Company Name], we are committed to offering only the highest quality products. We use the best materials and adhere to rigorous manufacturing standards to ensure that every item we sell is durable, reliable, and performs as expected. Our products undergo thorough testing to guarantee quality, and we stand behind everything we sell. If you are not satisfied with the quality of your purchase, please contact us, and we will work to resolve any issues promptly.",
+        "https://res.cloudinary.com/duaxitxph/image/upload/v1737654268/oc4p9o1qoe3hcauforq6.png",
+      text: `<p><strong>Our Manufacturing Process – Crafted with Care 🤍</strong></p><p>At <em>Modest Wardrobe</em>, every piece is designed and crafted to ensure you feel confident, comfortable, and beautiful. Here’s a glimpse into our thoughtful manufacturing process:</p><p>🌟 <strong>Step 1: Inspired Designs</strong></p><p>We begin with you in mind—creating designs that balance modesty with modern elegance, tailored to your needs and preferences.</p><p>🌟 <strong>Step 2: Premium Fabric Selection</strong></p><p>We handpick high-quality, breathable, and durable fabrics to ensure every piece feels as good as it looks.</p><p>🌟 <strong>Step 3: Expert Craftsmanship</strong></p><p>Our skilled artisans bring each design to life with precision and care, ensuring flawless finishes and timeless quality.</p><p>🌟 <strong>Step 4: Ethical Practices</strong></p><p>We are committed to fair and ethical practices, ensuring our team works in a safe and empowering environment.</p><p>🌟 <strong>Step 5: Quality Checks</strong></p><p>Every item undergoes strict quality control to ensure it meets our high standards before reaching your wardrobe.</p><p>🌟 <strong>Step 6: Thoughtful Packaging</strong></p><p>Your order is lovingly packed to feel like a gift—because you deserve nothing less!</p><p>With <em>Modest Wardrobe</em>, you’re not just wearing clothes; you’re embracing a lifestyle that reflects your values and celebrates your individuality.</p><p>Follow us on Instagram for more updates and behind-the-scenes moments!</p><p><strong><a href="https://www.instagram.com/_modestwardrobe_6912/" rel="noopener noreferrer" target="_blank">Instagram: @_modestwardrobe_6912</a></strong></p>`,
     },
   },
   {
@@ -235,19 +235,19 @@ const defaultCategories = [
 
 const SeedDefaultData = async (type) => {
   try {
-    const PageModel = mongoose.model(
-      type + "_pages",
-      pageSchema,
-      type + "_pages"
-    );
-    for (const page of defaultPages) {
-      let existingPage = await PageModel.findOne({ type: page.type });
+    // const PageModel = mongoose.model(
+    //   type + "_pages",
+    //   pageSchema,
+    //   type + "_pages"
+    // );
+    // for (const page of defaultPages) {
+    //   let existingPage = await PageModel.findOne({ type: page.type });
 
-      if (!existingPage) {
-        const newPage = new PageModel(page);
-        await newPage.save();
-      }
-    }
+    //   if (!existingPage) {
+    //     const newPage = new PageModel(page);
+    //     await newPage.save();
+    //   }
+    // }
 
     const SectionModel = mongoose.model(
       type + "_sections",
@@ -265,36 +265,36 @@ const SeedDefaultData = async (type) => {
       }
     }
 
-    const CategoryModel = mongoose.model(
-      type + "_category",
-      categorySchema,
-      type + "_category"
-    );
-    for (const category of defaultCategories) {
-      let existingCategory = await CategoryModel.findOne({
-        link: category.link,
-      });
+    // const CategoryModel = mongoose.model(
+    //   type + "_category",
+    //   categorySchema,
+    //   type + "_category"
+    // );
+    // for (const category of defaultCategories) {
+    //   let existingCategory = await CategoryModel.findOne({
+    //     link: category.link,
+    //   });
 
-      if (!existingCategory) {
-        const newCategory = new CategoryModel(category);
-        await newCategory.save();
-      }
-    }
+    //   if (!existingCategory) {
+    //     const newCategory = new CategoryModel(category);
+    //     await newCategory.save();
+    //   }
+    // }
 
-    const ProductModel = mongoose.model(
-      type + "_products",
-      productSchema,
-      type + "_products"
-    );
+    // const ProductModel = mongoose.model(
+    //   type + "_products",
+    //   productSchema,
+    //   type + "_products"
+    // );
 
-    for (const product of defaultProducts) {
-      let existingProduct = await ProductModel.findOne({ name: product.name });
+    // for (const product of defaultProducts) {
+    //   let existingProduct = await ProductModel.findOne({ name: product.name });
 
-      if (!existingProduct) {
-        const newProduct = new ProductModel(product);
-        await newProduct.save();
-      }
-    }
+    //   if (!existingProduct) {
+    //     const newProduct = new ProductModel(product);
+    //     await newProduct.save();
+    //   }
+    // }
   } catch (error) {
     console.error("Error seeding default data:", error);
   }
