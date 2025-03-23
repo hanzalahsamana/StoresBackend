@@ -43,7 +43,7 @@ const {
   uploadSingleImage,
   uploadMultipleImages,
 } = require("../Utils/ImageUpload");
-const { getSections, updateSection, createSection, deleteSection } = require("../Controler/sections");
+const { getSections, updateSection, createSection, deleteSection, updateSectionOrder } = require("../Controler/sections");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -91,5 +91,6 @@ withParams.put("/editCategory", editCategory);
 withParams.put("/editOrder", editOrderData);
 withParams.patch("/editPage", updatePage);
 withParams.patch("/editSection", updateSection);
+withParams.patch("/editSectionOrder", updateSectionOrder);
 
 module.exports = { withParams, withoutParams };

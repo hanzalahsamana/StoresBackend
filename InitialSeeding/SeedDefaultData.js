@@ -76,8 +76,8 @@ const defaultSections = [
     content: {
       title: "Banner Slider",
       imagesUrl: [
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1737576876/qcte92lscbynyvsldpvm.png",
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1737576876/qcte92lscbynyvsldpvm.png",
+        "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742559716118_6ss81ef2q62_34680372_8155774.jpg",
+        "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742559716125_e9cd4hwd4nb_34680382_8155356.jpg",
       ],
     },
   },
@@ -99,7 +99,7 @@ const defaultSections = [
     content: {
       title: "Our Quality Promise:",
       image:
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1737653347/nwfziv7e8iaouflrxvtw.png",
+        "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742560368509_9su05qv3wt_36242432_8410253.jpg",
       text: "<p>At <em>Modest Wardrobe</em>, quality is at the heart of everything we do. Here’s what sets us apart:</p><p>💎 <strong>Premium Fabrics:</strong> We source the finest materials to ensure each piece is soft, breathable, and durable.</p><p>💎 <strong>Stringent Quality Checks:</strong> Every item is inspected thoroughly to meet our high standards before it reaches you.</p><p>💎 <strong>Comfort Meets Elegance:</strong> We prioritize your comfort without compromising on style, ensuring every piece feels as good as it looks.</p><p>💎 <strong>Sustainable Practices:</strong> We are mindful of the environment and practice ethical manufacturing processes.</p><p>When you shop with <em>Modest Wardrobe</em>, you’re not just buying clothes—you’re investing in timeless pieces designed with love, care, and purpose.</p><p><em>Ready to experience the difference? Explore our collection and feel the quality for yourself!</em> 💕</p>",
       buttonText: "Shop Now",
       styleType: "style1",
@@ -128,7 +128,7 @@ const defaultSections = [
       styleType: "style2",
       title: "Manufacture Process",
       image:
-        "https://res.cloudinary.com/duaxitxph/image/upload/v1737654268/oc4p9o1qoe3hcauforq6.png",
+        "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742557598815_irbwjjex6ab_132321044_2303.i039.019.F.m004.c9.sustainable_clothes_slow_fashion_isometric-removebg.png",
       text: `<p><strong>Our Manufacturing Process – Crafted with Care 🤍</strong></p><p>At <em>Modest Wardrobe</em>, every piece is designed and crafted to ensure you feel confident, comfortable, and beautiful. Here’s a glimpse into our thoughtful manufacturing process:</p><p>🌟 <strong>Step 1: Inspired Designs</strong></p><p>We begin with you in mind—creating designs that balance modesty with modern elegance, tailored to your needs and preferences.</p><p>🌟 <strong>Step 2: Premium Fabric Selection</strong></p><p>We handpick high-quality, breathable, and durable fabrics to ensure every piece feels as good as it looks.</p><p>🌟 <strong>Step 3: Expert Craftsmanship</strong></p><p>Our skilled artisans bring each design to life with precision and care, ensuring flawless finishes and timeless quality.</p><p>🌟 <strong>Step 4: Ethical Practices</strong></p><p>We are committed to fair and ethical practices, ensuring our team works in a safe and empowering environment.</p><p>🌟 <strong>Step 5: Quality Checks</strong></p><p>Every item undergoes strict quality control to ensure it meets our high standards before reaching your wardrobe.</p><p>🌟 <strong>Step 6: Thoughtful Packaging</strong></p><p>Your order is lovingly packed to feel like a gift—because you deserve nothing less!</p><p>With <em>Modest Wardrobe</em>, you’re not just wearing clothes; you’re embracing a lifestyle that reflects your values and celebrates your individuality.</p><p>Follow us on Instagram for more updates and behind-the-scenes moments!</p><p><strong><a href="https://www.instagram.com/_modestwardrobe_6912/" rel="noopener noreferrer" target="_blank">Instagram: @_modestwardrobe_6912</a></strong></p>`,
     },
   },
@@ -147,107 +147,96 @@ const defaultSections = [
 
 const defaultProducts = [
   {
-    name: "Product 1",
-    alt: "Product 1",
-    brand: "ABCD",
+    name: "Tshirt 1",
+    alt: "Tshirt 1",
+    brand: "vendor name",
     originalPrice: 4500,
     discountedPrice: 2925,
     discount: 35,
     images: [
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
     ],
     stock: 100,
     size: ["S", "M", "L", "XL"],
-    collectionName: "collection-1",
+    collectionName: "tshirts",
     type: "Unstiched",
   },
   {
-    name: "Product 2",
-    alt: "Product 2",
-    brand: "ABCD",
+    name: "Tshirt 2",
+    alt: "Tshirt 2",
+    brand: "vendor name",
     originalPrice: 4500,
     discountedPrice: 2925,
     discount: 35,
     images: [
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
     ],
-    collectionName: "collection-1",
     stock: 100,
     size: ["S", "M", "L", "XL"],
+    collectionName: "tshirts",
     type: "Unstiched",
   },
   {
-    name: "Product 3",
-    alt: "Product 3",
-    brand: "ABCD",
-    originalPrice: 5000,
-    discountedPrice: 4000,
-    discount: 20,
+    name: "Tshirt 3",
+    alt: "Tshirt 3",
+    brand: "vendor name",
+    originalPrice: 4500,
+    discountedPrice: 2925,
+    discount: 35,
     images: [
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
     ],
-    collectionName: "collection-2",
     stock: 100,
     size: ["S", "M", "L", "XL"],
-    type: "stiched",
+    collectionName: "tshirts",
+    type: "Unstiched",
   },
   {
-    name: "Product 4",
-    alt: "Product 4",
-    brand: "ABCD",
-    originalPrice: 5000,
-    discountedPrice: 4000,
-    discount: 20,
+    name: "Tshirt 4",
+    alt: "Tshirt 4",
+    brand: "vendor name",
+    originalPrice: 4500,
+    discountedPrice: 2925,
+    discount: 35,
     images: [
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/oviqnxjktnoyrpv2yono.jpg",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
+      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
     ],
-    collectionName: "collection-2",
     stock: 100,
     size: ["S", "M", "L", "XL"],
-    type: "stiched",
+    collectionName: "tshirts",
+    type: "Unstiched",
   },
+
 ];
 
 const defaultCategories = [
   {
-    name: "Collection-1",
+    name: "Tshirts",
     image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/bbg5cqlwuu9puvtopi9b.jpg",
-    link: "collection-1",
-  },
-  {
-    name: "Collection-2",
-    image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/bbg5cqlwuu9puvtopi9b.jpg",
-    link: "collection-2",
-  },
-  {
-    name: "Collection-3",
-    image:
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736856557/bbg5cqlwuu9puvtopi9b.jpg",
-    link: "collection-3",
+      "https://res.cloudinary.com/duaxitxph/image/upload/v1742551330/sc88u7bpbwiqeuwb40dv.png",
+    link: "tshirts",
   },
 ];
 
 const SeedDefaultData = async (type) => {
   try {
-    // const PageModel = mongoose.model(
-    //   type + "_pages",
-    //   pageSchema,
-    //   type + "_pages"
-    // );
-    // for (const page of defaultPages) {
-    //   let existingPage = await PageModel.findOne({ type: page.type });
+    const PageModel = mongoose.model(
+      type + "_pages",
+      pageSchema,
+      type + "_pages"
+    );
+    for (const page of defaultPages) {
+      let existingPage = await PageModel.findOne({ type: page.type });
 
-    //   if (!existingPage) {
-    //     const newPage = new PageModel(page);
-    //     await newPage.save();
-    //   }
-    // }
+      if (!existingPage) {
+        const newPage = new PageModel(page);
+        await newPage.save();
+      }
+    }
 
     const SectionModel = mongoose.model(
       type + "_sections",
@@ -265,36 +254,36 @@ const SeedDefaultData = async (type) => {
       }
     }
 
-    // const CategoryModel = mongoose.model(
-    //   type + "_category",
-    //   categorySchema,
-    //   type + "_category"
-    // );
-    // for (const category of defaultCategories) {
-    //   let existingCategory = await CategoryModel.findOne({
-    //     link: category.link,
-    //   });
+    const CategoryModel = mongoose.model(
+      type + "_category",
+      categorySchema,
+      type + "_category"
+    );
+    for (const category of defaultCategories) {
+      let existingCategory = await CategoryModel.findOne({
+        link: category.link,
+      });
 
-    //   if (!existingCategory) {
-    //     const newCategory = new CategoryModel(category);
-    //     await newCategory.save();
-    //   }
-    // }
+      if (!existingCategory) {
+        const newCategory = new CategoryModel(category);
+        await newCategory.save();
+      }
+    }
 
-    // const ProductModel = mongoose.model(
-    //   type + "_products",
-    //   productSchema,
-    //   type + "_products"
-    // );
+    const ProductModel = mongoose.model(
+      type + "_products",
+      productSchema,
+      type + "_products"
+    );
 
-    // for (const product of defaultProducts) {
-    //   let existingProduct = await ProductModel.findOne({ name: product.name });
+    for (const product of defaultProducts) {
+      let existingProduct = await ProductModel.findOne({ name: product.name });
 
-    //   if (!existingProduct) {
-    //     const newProduct = new ProductModel(product);
-    //     await newProduct.save();
-    //   }
-    // }
+      if (!existingProduct) {
+        const newProduct = new ProductModel(product);
+        await newProduct.save();
+      }
+    }
   } catch (error) {
     console.error("Error seeding default data:", error);
   }

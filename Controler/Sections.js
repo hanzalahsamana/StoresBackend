@@ -122,38 +122,84 @@ const deleteSection = async (req, res) => {
   }
 };
 
-// const updateSectionOrder = async (sectionId, newOrder) => {
-//   try {
-//     const sectionToMove = await Section.findById(sectionId);
-//     if (!sectionToMove) throw new Error("Section not found");
+const updateSectionOrder = async (req, res) => {
+  const type = req.collectionType;
+  const sectionId = req.query.id;
+  const {newOrder} = req.body;
+console.log(type , sectionId , newOrder);
 
-//     const currentOrder = sectionToMove.order;
+  try {
+    const SectionModel = mongoose.model(
+      `${type}_section`,
+      SectionSchema,
+      `${type}_section`
+    );
 
-//     // Find all sections
-//     const sections = await Section.find().sort({ order: 1 });
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-//     if (newOrder < 1 || newOrder > sections.length) {
-//       throw new Error("Invalid order position");
-//     }
+    const sectionToMove = await SectionModel.findById(sectionId).session(
+      session
+    );
+    if (!sectionToMove) throw new Error("Section not found");
 
-//     // Update order of affected sections
-//     for (const section of sections) {
-//       if (section._id.equals(sectionId)) {
-//         section.order = newOrder;
-//       } else if (currentOrder < newOrder && section.order > currentOrder && section.order <= newOrder) {
-//         section.order -= 1;
-//       } else if (currentOrder > newOrder && section.order < currentOrder && section.order >= newOrder) {
-//         section.order += 1;
-//       }
-//       await section.save();
-//     }
+    const currentOrder = sectionToMove.order;
 
-//     console.log("Order updated successfully");
-//     return { success: true, message: "Order updated successfully" };
-//   } catch (error) {
-//     console.error("Error updating order:", error);
-//     return { success: false, message: error.message };
-//   }
-// };
+    if (newOrder < 1) throw new Error("Invalid order position");
 
-module.exports = { getSections, updateSection, createSection, deleteSection };
+    const totalSections = await SectionModel.countDocuments().session(session);
+    if (newOrder > totalSections) throw new Error("Invalid order position");
+
+    // Update affected sections efficiently
+    await SectionModel.updateMany(
+      {
+        order: {
+          $gte: Math.min(currentOrder, newOrder),
+          $lte: Math.max(currentOrder, newOrder),
+        },
+        _id: { $ne: sectionId },
+      },
+      [
+        {
+          $set: {
+            order: {
+              $cond: {
+                if: { $eq: ["$order", currentOrder] },
+                then: newOrder,
+                else: {
+                  $cond: {
+                    if: { $gt: [currentOrder, newOrder] },
+                    then: { $add: ["$order", 1] },
+                    else: { $subtract: ["$order", 1] },
+                  },
+                },
+              },
+            },
+          },
+        },
+      ]
+    ).session(session);
+
+    // Update the moved section
+    await SectionModel.findByIdAndUpdate(sectionId, {
+      order: newOrder,
+    }).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // Fetch updated sections sorted by order
+    const updatedSections = await SectionModel.find().sort({ order: 1 });
+
+    return res.status(200).json({
+      success: true,
+      message: "Order updated successfully",
+      sections: updatedSections,
+    });
+  } catch (error) {
+    console.error("Error updating order:", error);
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = { getSections, updateSection, createSection, deleteSection , updateSectionOrder };

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema(
+const storeSchema = new Schema(
   {
     brandName: {
       type: String,
@@ -16,12 +16,17 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    colorTheme: {
+      type: Object,
+      required: true,
+      default: {},
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const UserModal = mongoose.model("users", userSchema);
+const UserModal = mongoose.model("store", userSchema);
 
 module.exports = { UserModal };

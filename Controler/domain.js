@@ -2,7 +2,6 @@ const { exec } = require("child_process");
 const dns = require("dns");
 const { checkDomainDNS } = require("../Utils/CheckDomainDns");
 const { UserModal } = require("../Models/userModal");
-const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 const serverIP = "13.51.93.22";
 const frontendIP = "13.61.204.32";
