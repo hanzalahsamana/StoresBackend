@@ -43,7 +43,7 @@ const {
   uploadSingleImage,
   uploadMultipleImages,
 } = require("../Utils/ImageUpload");
-const { getSections, updateSection, createSection, deleteSection, updateSectionOrder } = require("../Controler/sections");
+const { getSections, updateSection, createSection, deleteSection, updateSectionOrder } = require("../Controler/Sections");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
