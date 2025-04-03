@@ -48,7 +48,7 @@ const customerOrderDetail = async (admin, to, orderDetails) => {
   );
 };
 
-const OTPVerification = async (user, otp) => {
+const OTPVerificationEmail = async (user, otp) => {
   await sendEmail(
     AdminPanel,
     user.email,
@@ -62,5 +62,5 @@ module.exports = {
   customerContactResponse,
   adminOrderDetail,
   customerOrderDetail,
-  OTPVerification,
+  OTPVerificationEmail,
 };

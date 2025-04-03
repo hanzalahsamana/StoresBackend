@@ -1,8 +1,8 @@
 const express = require("express");
+require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { withParams, withoutParams } = require("./routes/routes");
-require("dotenv").config();
 require("./Config/Database");
 
 const app = express();
@@ -28,6 +28,8 @@ app.use("/api/v1/:type", (req, res, next) => {
 
 app.use("/api/v1/:type", withParams);
 app.use("/api/v1", withoutParams);
+const secretKey = process.env.SECRET;
+console.log(secretKey , " 🫀");
 
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 1234;

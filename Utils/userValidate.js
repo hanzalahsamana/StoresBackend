@@ -1,40 +1,42 @@
 const Joi = require("joi");
 
-const userRegisterValidate = (req, res) => {
+const userRegisterValidate = (req, res, next) => {
   const schema = Joi.object({
     brandName: Joi.string().min(3).max(100).required().messages({
-      "string.pattern.base": "brandName is required",
+      "any.required": "Brand name is required",
+      "string.min": "Brand name must be at least 3 characters",
+      "string.max": "Brand name cannot exceed 100 characters",
     }),
     subDomain: Joi.string().min(3).max(100).required().messages({
-      "string.pattern.base": "Subdomain is required",
+      "any.required": "Subdomain is required",
+      "string.min": "Subdomain must be at least 3 characters",
+      "string.max": "Subdomain cannot exceed 100 characters",
     }),
-    isResend: Joi.boolean().messages({
-      "string.pattern.base": "IsResend should be boolean",
-    }),
-    email: Joi.string().email().required().regex(/^\S+$/).messages({
-      "string.pattern.base": "email must not contain spaces",
+    email: Joi.string().email().required().pattern(/^\S+$/).messages({
+      "any.required": "Email is required",
+      "string.email": "Invalid email format",
+      "string.pattern.base": "Email must not contain spaces",
     }),
     password: Joi.string()
       .min(6)
       .required()
-      .regex(/^[\w!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]+$/)
+      .pattern(/^[\w!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]+$/)
       .messages({
-        "string.pattern.base":
-          "Password must not contain spaces and should include special characters if needed",
+        "any.required": "Password is required",
+        "string.min": "Password must be at least 6 characters",
+        "string.pattern.base": "Password must not contain spaces and should include special characters if needed",
       }),
   });
 
-  const { error, value } = schema.validate(req.body, { abortEarly: false });
+  const { error } = schema.validate(req.body, { abortEarly: false });
 
   if (error) {
-    const errorMessages = error.details.map((err) => err.message);
-    return res.status(400).json({
-      message: errorMessages[0], // Return the first error message
-    });
+    return res.status(400).json({ message: error.details[0].message });
   }
 
-  return null; // If no error, return null
+  next();
 };
+
 
 const userLoginValidate = (req, res, next) => {
   const schema = Joi.object({

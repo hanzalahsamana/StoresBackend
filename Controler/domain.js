@@ -244,7 +244,8 @@ const fetchSiteByDomain = async (req, res) => {
     if (!site) {
       return res.status(404).json({ message: "Site not found" });
     }
-
+    console.log(site);
+    
     res.json({ siteName: site.brandName });
   } catch (error) {
     console.error("Error fetching site:", error);
