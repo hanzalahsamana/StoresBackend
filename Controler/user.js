@@ -150,13 +150,15 @@ module.exports = {
       const savedUser = await user.save();
       savedUser.password = undefined;
 
-      const token = generateJwtToken({ _id:savedUser._id});
+      const token = generateJwtToken({ _id: savedUser._id });
 
-      // await SeedDefaultData(user.brandName);
+      await SeedDefaultData(user.brandName);
 
-      return res
-        .status(200)
-        .json({ token, user:savedUser, message: "Email verified successfully!" });
+      return res.status(200).json({
+        token,
+        user: savedUser,
+        message: "Email verified successfully!",
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({
@@ -165,6 +167,7 @@ module.exports = {
     }
   },
 
+  
   loginUser: async (req, res) => {
     try {
       const { email, password } = req.body;

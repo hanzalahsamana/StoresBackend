@@ -40,8 +40,20 @@ const userRegisterValidate = (req, res, next) => {
 
 const userLoginValidate = (req, res, next) => {
   const schema = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(2).required(),
+    email: Joi.string().email().required().pattern(/^\S+$/).messages({
+      "any.required": "Email is required",
+      "string.email": "Invalid email format",
+      "string.pattern.base": "Email must not contain spaces",
+    }),
+    password: Joi.string()
+      .min(6)
+      .required()
+      .pattern(/^[\w!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]+$/)
+      .messages({
+        "any.required": "Password is required",
+        "string.min": "Password must be at least 6 characters",
+        "string.pattern.base": "Password must not contain spaces and should include special characters if needed",
+      }),
   });
   const { error, value } = schema.validate(req.body);
   if (error) {
