@@ -15,7 +15,10 @@ const {
   deleteProduct,
 } = require("../Controler/product");
 const express = require("express");
-const { userLoginValidate, userRegisterValidate } = require("../Utils/userValidate");
+const {
+  userLoginValidate,
+  userRegisterValidate,
+} = require("../Utils/userValidate");
 const {
   loginUser,
   sendOtp,
@@ -44,8 +47,15 @@ const {
   uploadSingleImage,
   uploadMultipleImages,
 } = require("../Utils/ImageUpload");
-const { getSections, updateSection, createSection, deleteSection, updateSectionOrder } = require("../Controler/Sections");
+const {
+  getSections,
+  updateSection,
+  createSection,
+  deleteSection,
+  updateSectionOrder,
+} = require("../Controler/Sections");
 const tokenChecker = require("../middlewear/TokenChecker");
+const { addTheme } = require("../Controler/Theme");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -62,11 +72,12 @@ withParams.post("/uploadMultiple", uploadMultiple, uploadMultipleImages);
 withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/addSection", createSection);
 withParams.post("/genrateSSl", automateDomainSetup);
+withoutParams.post("/setTheme", tokenChecker, addTheme);
 
 withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
-withoutParams.post("/register",userRegisterValidate ,  registerUser);
+withoutParams.post("/register", userRegisterValidate, registerUser);
 
 // get apis
 // withParams.get("/verifyDomain", verifyDomain);
@@ -79,7 +90,7 @@ withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
 withParams.get("/getSections", getSections);
 withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
-withoutParams.get("/getUserFromToken",tokenChecker, getUserFromToken);
+withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
 
 // delete apis
 withParams.delete("/deleteCartProduct", deleteCartProduct);
