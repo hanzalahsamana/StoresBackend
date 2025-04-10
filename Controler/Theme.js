@@ -22,6 +22,7 @@ const addTheme = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Theme updated successfully",
+      data: theme,
     });
   } catch (error) {
     console.error("Error updating theme:", error);
@@ -64,4 +65,4 @@ const getTheme = async (req, res) => {
   }
 };
 
-module.exports = { addTheme };
+module.exports = { addTheme , getTheme };

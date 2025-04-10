@@ -55,7 +55,7 @@ const {
   updateSectionOrder,
 } = require("../Controler/Sections");
 const tokenChecker = require("../middlewear/TokenChecker");
-const { addTheme } = require("../Controler/Theme");
+const { addTheme, getTheme } = require("../Controler/Theme");
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -79,6 +79,10 @@ withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
 withoutParams.post("/register", userRegisterValidate, registerUser);
 
+withoutParams.post("/jazzresponse", (req, res) => {
+  console.log("Here you will receive payment token", req.body);
+});
+
 // get apis
 // withParams.get("/verifyDomain", verifyDomain);
 withParams.get("/getProducts", getProductData);
@@ -89,6 +93,7 @@ withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
 withParams.get("/getSections", getSections);
+withParams.get("/getTheme", getTheme);
 withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
 
