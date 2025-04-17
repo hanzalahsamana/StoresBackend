@@ -1,10 +1,8 @@
 const { exec } = require("child_process");
-const dns = require("dns");
 const { checkDomainDNS } = require("../Utils/CheckDomainDns");
 const { UserModal } = require("../Models/userModal");
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
-const serverIP = "13.51.93.22";
-const frontendIP = "13.61.204.32";
+const frontendIP = "18.198.243.219";
 const privateKeyPath = "/home/ubuntu/saasweb.pem";
 const frontendUser = "ubuntu";
 
@@ -84,7 +82,7 @@ const handleDomainRequest = async (req, res) => {
       });
     }
     if (
-      domain.includes("hannanfabrics.com") ||
+      domain.includes("xperiode.com") ||
       (await isDomainAlreadyInUse(type, domain))
     ) {
       return res.status(400).json({

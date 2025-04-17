@@ -8,12 +8,12 @@ require("./Config/Database");
 
 const app = express();
 
-app.use(cors());
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.options("*", cors()); 
 
 app.use(bodyParser.json());
 
@@ -32,7 +32,7 @@ app.use("/api/v1", withoutParams);
 const secretKey = process.env.SECRET;
 console.log(secretKey , " 🫀");
 
-processPayment('your_payment_token_here')
+// processPayment('your_payment_token_here')
 
 
 // generatePaymentToken(100)
