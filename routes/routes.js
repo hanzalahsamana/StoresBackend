@@ -60,7 +60,8 @@ const { addTheme, getTheme } = require("../Controler/Theme");
 const { exportSite } = require("../Controler/migration");
 const importSiteData = require("../Utils/ImportSite");
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "/tmp" });
+
 
 const withParams = express.Router();
 const withoutParams = express.Router();
