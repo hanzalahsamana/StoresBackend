@@ -1,5 +1,5 @@
 const { mongoose } = require("mongoose");
-const {orderSchema} = require("../Models/OrderModal");
+const { orderSchema } = require("../Models/OrderModal");
 const {
   customerOrderDetail,
   adminOrderDetail,
@@ -15,7 +15,7 @@ const addOrderData = async (req, res) => {
   );
   try {
     const admin = await UserModal.findOne({ brandName: type });
-    
+
     const newOrder = new OrderModel(req.body);
     await newOrder.save();
     await customerOrderDetail(
@@ -31,7 +31,7 @@ const addOrderData = async (req, res) => {
     return res.status(201).json(newOrder);
   } catch (e) {
     console.log(e);
-    
+
     return res.status(500).json({ message: e.message });
   }
 };
@@ -112,7 +112,5 @@ const editOrderData = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
-
 
 module.exports = { addOrderData, getOrders, editOrderData };
