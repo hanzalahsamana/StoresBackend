@@ -32,6 +32,7 @@ module.exports = {
         categorySchema,
         type + "_category"
       );
+    
       const categories = await CategoryModal.find();
       return res.status(200).json(categories);
     } catch (e) {

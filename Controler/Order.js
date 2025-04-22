@@ -1,5 +1,5 @@
 const { mongoose } = require("mongoose");
-const orderSchema = require("../Models/OrderModal");
+const {orderSchema} = require("../Models/OrderModal");
 const {
   customerOrderDetail,
   adminOrderDetail,
@@ -16,7 +16,7 @@ const addOrderData = async (req, res) => {
   try {
     const admin = await UserModal.findOne({ brandName: type });
     
-    const newOrder = new OrderModel(req.body); 
+    const newOrder = new OrderModel(req.body);
     await newOrder.save();
     await customerOrderDetail(
       { ...admin.toObject(), logo: newOrder?.to },

@@ -11,7 +11,7 @@ const addTheme = async (req, res) => {
       console.log(`User with ID ${userId} not found.`);
       return res.status(404).json({
         success: false,
-        message: `No document found with brandName: ${siteName}`,
+        message: `No document found with brandName: ${userId}`,
       });
     }
 

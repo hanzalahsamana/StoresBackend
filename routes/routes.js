@@ -1,3 +1,4 @@
+const multer = require("multer");
 const {
   addCarts,
   getCartData,
@@ -56,6 +57,10 @@ const {
 } = require("../Controler/Sections");
 const tokenChecker = require("../middlewear/TokenChecker");
 const { addTheme, getTheme } = require("../Controler/Theme");
+const { exportSite } = require("../Controler/migration");
+const importSiteData = require("../Utils/ImportSite");
+
+const upload = multer({ dest: "uploads/" });
 
 const withParams = express.Router();
 const withoutParams = express.Router();
@@ -73,6 +78,7 @@ withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/addSection", createSection);
 withParams.post("/genrateSSl", automateDomainSetup);
 withoutParams.post("/setTheme", tokenChecker, addTheme);
+withoutParams.post("/importSiteData", tokenChecker, upload.single("file"), importSiteData);
 
 withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
@@ -94,6 +100,7 @@ withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
 withParams.get("/getSections", getSections);
 withParams.get("/getTheme", getTheme);
+withoutParams.get("/exportSiteData", tokenChecker, exportSite);
 withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
 
