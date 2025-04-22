@@ -3,8 +3,6 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { withParams, withoutParams } = require("./routes/routes");
-const { processPayment, generatePaymentToken } = require("./Controler/payment");
-const importSiteData = require("./Utils/ImportSite");
 require("./Config/Database");
 
 const app = express();
@@ -37,14 +35,7 @@ app.use("/api/v1/:type", (req, res, next) => {
 
 app.use("/api/v1/:type", withParams);
 app.use("/api/v1", withoutParams);
-const secretKey = process.env.SECRET;
-console.log(secretKey, " 🫀");
 
-// processPayment('your_payment_token_here')
-
-// generatePaymentToken(100)
-// exportSiteData('Fiztees')
-// importSiteData("Fiztees", "exports/Fiztees_data.csv")
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 1234;
   app.listen(PORT, () => {
