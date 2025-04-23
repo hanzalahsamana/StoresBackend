@@ -62,7 +62,6 @@ const importSiteData = require("../Utils/ImportSite");
 
 const upload = multer({ dest: "/tmp" });
 
-
 const withParams = express.Router();
 const withoutParams = express.Router();
 
@@ -79,7 +78,12 @@ withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/addSection", createSection);
 withParams.post("/genrateSSl", automateDomainSetup);
 withoutParams.post("/setTheme", tokenChecker, addTheme);
-withoutParams.post("/importSiteData", tokenChecker, upload.single("file"), importSiteData);
+withoutParams.post(
+  "/importSiteData",
+  tokenChecker,
+  upload.single("file"),
+  importSiteData
+);
 
 withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
@@ -92,6 +96,7 @@ withoutParams.post("/jazzresponse", (req, res) => {
 
 // get apis
 // withParams.get("/verifyDomain", verifyDomain);
+
 withParams.get("/getProducts", getProductData);
 withParams.get("/getCategory", getCategory);
 withParams.get("/getCartData", getCartData);
@@ -104,6 +109,10 @@ withParams.get("/getTheme", getTheme);
 withoutParams.get("/exportSiteData", tokenChecker, exportSite);
 withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
+
+withoutParams.get("/ping", (req, res) => {
+  res.status(200).send("OK");
+});
 
 // delete apis
 withParams.delete("/deleteCartProduct", deleteCartProduct);
