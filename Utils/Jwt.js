@@ -13,5 +13,4 @@ const verifyJwt = async (token) => {
   return decoded;
 };
 
-// console.log(verifyJwt("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2UzZTgwM2NhMGE1MmFkZTg2NDY2MDIiLCJpYXQiOjE3NDI5ODk2NTUsImV4cCI6MTc0NTU4MTY1NX0.R3doU89Zd1tF3qBxnpal532RrCRYvEgbbF7UgHY0vjs"))
 module.exports = { generateJwtToken, verifyJwt };

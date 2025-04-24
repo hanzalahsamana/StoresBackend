@@ -1,3 +1,4 @@
+const { StoreDetailModal } = require("../Models/StoreDetailModal");
 const { UserModal } = require("../Models/userModal");
 
 const addTheme = async (req, res) => {
@@ -8,52 +9,27 @@ const addTheme = async (req, res) => {
     const user = await UserModal.findById(userId).select("-password");
 
     if (!user) {
-      console.log(`User with ID ${userId} not found.`);
       return res.status(404).json({
         success: false,
         message: `No document found with brandName: ${userId}`,
       });
     }
 
-    console.log(req.body);
-    user.theme = theme;
-    const suser = await user.save();
+    const store = await StoreDetailModal.findOne({ brand_Id: user?.brand_Id });
 
-    res.status(200).json({
-      success: true,
-      message: "Theme updated successfully",
-      data: theme,
-    });
-  } catch (error) {
-    console.error("Error updating theme:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
-  }
-};
-
-const getTheme = async (req, res) => {
-  const type = req.collectionType;
-
-  try {
-    const user = await UserModal.findOne({ brandName: String(type) });
-
-    if (!user) {
-      console.log(`User with store ${type} not found.`);
-      return res.status(404).json({
-        success: false,
-        message: `No document found with brandName: ${siteName}`,
-      });
+    if (!store) {
+      return res
+        .status(404)
+        .json({ error: "No store found with the provided brand_Id." });
     }
 
-    console.log(req.body);
+    store.theme = theme;
+    const savedStore = await store.save();
 
     res.status(200).json({
       success: true,
       message: "Theme updated successfully",
-      data: user.theme,
+      data: savedStore,
     });
   } catch (error) {
     console.error("Error updating theme:", error);
@@ -65,4 +41,5 @@ const getTheme = async (req, res) => {
   }
 };
 
-module.exports = { addTheme , getTheme };
+
+module.exports = { addTheme };

@@ -9,6 +9,7 @@ const { generateHash, compareHash } = require("../Utils/BCrypt");
 const { userRegisterValidate } = require("../Utils/userValidate");
 const { OTPVerificationEmail } = require("../Utils/EmailsToSend");
 const { generateJwtToken } = require("../Utils/Jwt");
+const { StoreDetailModal } = require("../Models/StoreDetailModal");
 
 app.use(express.json());
 
@@ -92,8 +93,6 @@ module.exports = {
       }
 
       const otp = generateOtp();
-      console.log(otp);
-
       user.otp = await generateHash(otp);
       user.otpExpiration = OTP_EXPIRATION_TIME;
       user.lastOtpSentAt = now;
@@ -152,7 +151,13 @@ module.exports = {
 
       const token = generateJwtToken({ _id: savedUser._id });
 
-      await SeedDefaultData(user.brandName);
+      const storeDetail = new StoreDetailModal({
+        brand_Id: savedUser.brand_Id,
+        brandName: savedUser.brandName,
+      });
+      await storeDetail.save();
+
+      await SeedDefaultData(savedUser.brandName);
 
       return res.status(200).json({
         token,
@@ -167,7 +172,6 @@ module.exports = {
     }
   },
 
-  
   loginUser: async (req, res) => {
     try {
       const { email, password } = req.body;

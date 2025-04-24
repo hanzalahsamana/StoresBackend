@@ -6,7 +6,6 @@ const renameCollection = async () => {
       renameCollection: "HannanFabrics.products", //From Name
       to: "HannanFabrics.HannanFabrics_products", //To Name
     });
-    console.log("Collection renamed:", result);
   } catch (err) {
     console.error("Error renaming collection:", err);
   }

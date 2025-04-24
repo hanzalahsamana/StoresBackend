@@ -1,4 +1,34 @@
+const express = require("express");
 const multer = require("multer");
+
+// Middlewares
+const tokenChecker = require("../middlewear/TokenChecker");
+
+// Utils
+const { uploadSingleImage, uploadMultipleImages } = require("../Utils/ImageUpload");
+const { userLoginValidate, userRegisterValidate } = require("../Utils/userValidate");
+const importSiteData = require("../Utils/ImportSite");
+
+// Controllers
+const {
+  loginUser,
+  sendOtp,
+  verifyOtp,
+  getUserFromToken,
+  registerUser,
+} = require("../Controler/user");
+const {
+  postProductData,
+  getProductData,
+  editProduct,
+  deleteProduct,
+} = require("../Controler/product");
+const {
+  postCategory,
+  getCategory,
+  deleteCategory,
+  editCategory,
+} = require("../Controler/category");
 const {
   addCarts,
   getCartData,
@@ -10,44 +40,29 @@ const {
   editOrderData,
 } = require("../Controler/Order");
 const {
-  postProductData,
-  getProductData,
-  editProduct,
-  deleteProduct,
-} = require("../Controler/product");
-const express = require("express");
+  addReview,
+  getReviews,
+} = require("../Controler/reviews");
 const {
-  userLoginValidate,
-  userRegisterValidate,
-} = require("../Utils/userValidate");
+  getAnalyticsData,
+} = require("../Controler/analytics");
 const {
-  loginUser,
-  sendOtp,
-  verifyOtp,
-  getUserFromToken,
-  registerUser,
-} = require("../Controler/user");
-const { addReview, getReviews } = require("../Controler/reviews");
-const { getAnalyticsData } = require("../Controler/analytics");
-const { getPages, updatePage } = require("../Controler/pages");
+  getPages,
+  updatePage,
+} = require("../Controler/pages");
 const {
-  postCategory,
-  getCategory,
-  deleteCategory,
-  editCategory,
-} = require("../Controler/category");
-const { postConatctForm } = require("../Controler/Contact");
+  postConatctForm,
+} = require("../Controler/Contact");
 const {
   handleDomainRequest,
   automateDomainSetup,
   fetchSiteByDomain,
   removeDomainFromDatabase,
 } = require("../Controler/domain");
-const { uploadSingle, uploadMultiple } = require("../Controler/imageUpload");
 const {
-  uploadSingleImage,
-  uploadMultipleImages,
-} = require("../Utils/ImageUpload");
+  uploadSingle,
+  uploadMultiple,
+} = require("../Controler/imageUpload");
 const {
   getSections,
   updateSection,
@@ -55,17 +70,29 @@ const {
   deleteSection,
   updateSectionOrder,
 } = require("../Controler/Sections");
-const tokenChecker = require("../middlewear/TokenChecker");
-const { addTheme, getTheme } = require("../Controler/Theme");
-const { exportSite } = require("../Controler/migration");
-const importSiteData = require("../Utils/ImportSite");
+const {
+  addTheme,
+} = require("../Controler/Theme");
+const {
+  exportSite,
+} = require("../Controler/migration");
+const {
+  deleteVariation,
+  addVariation,
+  editVariation,
+} = require("../Controler/variation");
+const {
+  getStoreDetails,
+} = require("../Controler/StoreDetail");
 
+// Multer setup
 const upload = multer({ dest: "/tmp" });
 
+// Routers
 const withParams = express.Router();
 const withoutParams = express.Router();
 
-// post apis
+// POST routes (with params)
 withParams.post("/addProduct", postProductData);
 withParams.post("/addCategory", postCategory);
 withParams.post("/addCart", addCarts);
@@ -77,26 +104,20 @@ withParams.post("/uploadMultiple", uploadMultiple, uploadMultipleImages);
 withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/addSection", createSection);
 withParams.post("/genrateSSl", automateDomainSetup);
-withoutParams.post("/setTheme", tokenChecker, addTheme);
-withoutParams.post(
-  "/importSiteData",
-  tokenChecker,
-  upload.single("file"),
-  importSiteData
-);
 
+// POST routes (without params)
+withoutParams.post("/setTheme", tokenChecker, addTheme);
+withoutParams.post("/addVariation", tokenChecker, addVariation);
+withoutParams.post("/importSiteData", tokenChecker, upload.single("file"), importSiteData);
 withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
 withoutParams.post("/register", userRegisterValidate, registerUser);
-
 withoutParams.post("/jazzresponse", (req, res) => {
   console.log("Here you will receive payment token", req.body);
 });
 
-// get apis
-// withParams.get("/verifyDomain", verifyDomain);
-
+// GET routes (with params)
 withParams.get("/getProducts", getProductData);
 withParams.get("/getCategory", getCategory);
 withParams.get("/getCartData", getCartData);
@@ -105,28 +126,33 @@ withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
 withParams.get("/getSections", getSections);
-withParams.get("/getTheme", getTheme);
+withParams.get("/getStoreDetails", getStoreDetails);
+
+// GET routes (without params)
 withoutParams.get("/exportSiteData", tokenChecker, exportSite);
 withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
-
 withoutParams.get("/ping", (req, res) => {
   res.status(200).send("OK");
 });
 
-// delete apis
+// DELETE routes
 withParams.delete("/deleteCartProduct", deleteCartProduct);
 withParams.delete("/deleteCategory", deleteCategory);
 withParams.delete("/deleteProduct", deleteProduct);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
 withParams.delete("/deleteSection", deleteSection);
+withoutParams.delete("/deleteVariation", deleteVariation);
 
-//  edit product
+// PUT/PATCH routes
 withParams.put("/editProduct", editProduct);
 withParams.put("/editCategory", editCategory);
 withParams.put("/editOrder", editOrderData);
+
 withParams.patch("/editPage", updatePage);
 withParams.patch("/editSection", updateSection);
 withParams.patch("/editSectionOrder", updateSectionOrder);
+withParams.patch("/editVariation", editVariation);
 
+// Export routers
 module.exports = { withParams, withoutParams };

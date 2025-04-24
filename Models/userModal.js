@@ -71,11 +71,6 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    theme: {
-      required: true,
-      type: Object,
-      default: {},
-    },
   },
   {
     timestamps: true,

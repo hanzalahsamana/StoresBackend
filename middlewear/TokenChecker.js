@@ -22,8 +22,6 @@ const tokenChecker = async (req, res, next) => {
     }
     
     req.query.userId = decoded._id;
-    console.log(decoded);
-    
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {
