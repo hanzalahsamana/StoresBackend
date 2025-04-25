@@ -1,4 +1,3 @@
-const multer = require("multer");
 const fs = require("fs/promises");
 const getModel = require("./GetModel");
 const { categorySchema } = require("../Models/CategoryModal");
@@ -7,7 +6,6 @@ const {orderSchema} = require("../Models/OrderModal");
 const { pageSchema } = require("../Models/PagesModel");
 const { UserModal } = require("../Models/userModal");
 const { SectionSchema } = require("../Models/SectionsModal");
-const { log } = require("console");
 
 const importSiteData = async (req, res) => {
   try {
@@ -125,7 +123,7 @@ const importSiteData = async (req, res) => {
         const existing = await ContentModel.findOne({ type });
         if (existing) {
           importActions.push(ContentModel.updateOne({ type }, { $set: rest }));
-        } else {
+        } else {  
           importActions.push(ContentModel.create({ type, ...rest }));
         }
       }
