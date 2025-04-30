@@ -142,7 +142,7 @@ withParams.delete("/deleteCategory", deleteCategory);
 withParams.delete("/deleteProduct", deleteProduct);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
 withParams.delete("/deleteSection", deleteSection);
-withoutParams.delete("/deleteVariation", deleteVariation);
+withoutParams.delete("/deleteVariation",tokenChecker, deleteVariation);
 
 // PUT/PATCH routes
 withParams.put("/editProduct", editProduct);
@@ -152,7 +152,7 @@ withParams.put("/editOrder", editOrderData);
 withParams.patch("/editPage", updatePage);
 withParams.patch("/editSection", updateSection);
 withParams.patch("/editSectionOrder", updateSectionOrder);
-withParams.patch("/editVariation", editVariation);
+withoutParams.patch("/editVariation",tokenChecker, editVariation);
 
 // Export routers
 module.exports = { withParams, withoutParams };

@@ -1,4 +1,5 @@
 const { StoreDetailModal } = require("../Models/StoreDetailModal");
+const { UserModal } = require("../Models/userModal");
 
 const addVariation = async (req, res) => {
   const { userId } = req.query;
@@ -43,7 +44,7 @@ const addVariation = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding variation:", error);
-    return res.status(500).json({ error: "Internal server error." });
+    return res.status(500).json({ message: error?.message });
   }
 };
 
@@ -88,12 +89,13 @@ const editVariation = async (req, res) => {
       .json({ message: "Variation updated successfully.", data: savedStore });
   } catch (error) {
     console.error("Error editing variation:", error);
-    return res.status(500).json({ error: "Internal server error." });
+    return res.status(500).json({ message: error?.message });
   }
 };
 
 const deleteVariation = async (req, res) => {
   const { userId, variationId } = req.query;
+console.log(userId, variationId);
 
   if (!userId || !variationId) {
     return res.status(400).json({ error: "Missing required fields." });
@@ -123,7 +125,7 @@ const deleteVariation = async (req, res) => {
       .json({ message: "Variation deleted successfully.", data: savedStore });
   } catch (error) {
     console.error("Error deleting variation:", error);
-    return res.status(500).json({ error: "Internal server error." });
+    return res.status(500).json({ message: error?.message });
   }
 };
 

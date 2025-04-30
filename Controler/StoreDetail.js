@@ -2,7 +2,6 @@ const { StoreDetailModal } = require("../Models/StoreDetailModal");
 const { UserModal } = require("../Models/userModal");
 
 const getStoreDetails = async (req, res) => {
-  console.log("WOW🥎🥎🥎");
   const type = req.collectionType;
 
   try {
