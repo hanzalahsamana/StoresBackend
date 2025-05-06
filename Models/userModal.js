@@ -34,6 +34,7 @@ const userSchema = new Schema(
       default: null,
     },
 
+    
     isDomainVerified: {
       type: Boolean,
       default: false,
