@@ -23,6 +23,7 @@ const userSchema = new Schema(
       },
     },
 
+    
     subDomain: {
       type: String,
       unique: true,
