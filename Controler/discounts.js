@@ -6,6 +6,7 @@ const addDiscount = async (req, res) => {
   const { userId } = req.query;
   const { discount } = req.body;
 
+  
   if (
     !userId ||
     !discount ||
