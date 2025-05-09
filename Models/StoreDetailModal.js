@@ -19,10 +19,12 @@ const storeDetailSchema = new Schema(
           name: {
             type: String,
             required: true,
+            unique: true,
           },
           options: {
             type: [String],
             required: true,
+            unique: true,
             validate: [arrayLimit, "At least one option is required."],
           },
         },
@@ -42,23 +44,22 @@ const storeDetailSchema = new Schema(
       type: Object,
       default: {},
     },
-    Discounts: {
+    discounts: {
       type: [
         {
-          name: { type: String, required: true }, // e.g., "NEWYEAR2025"
-          description: { type: String },
+          name: { type: String, required: true, unique: true }, // e.g., "NEWYEAR2025"
 
           // Type of discount trigger
           discountType: {
             type: String,
-            enum: ["coupon", "auto"],
+            enum: ["coupon", "global"],
             required: true,
           },
 
           // Who can use this discount
           access: {
             type: String,
-            enum: ["all", "subscription", "non-subscription"],
+            enum: ["all", "subscription"],
             default: "all",
           },
 
@@ -70,19 +71,14 @@ const storeDetailSchema = new Schema(
           },
           amount: { type: Number, required: true }, // e.g., 10 or 15%
 
-          // Validity period
-          startDate: { type: Date, required: true },
-          endDate: { type: Date, required: true },
-
-          // Usage limits
-          usageLimit: { type: Number }, // Max number of times this discount can be used
-          usageCount: { type: Number, default: 0 }, // Internal tracking
-
-          // Minimum cart value for discount to apply
-          minCartValue: { type: Number, default: 0 },
-
           // Whether the discount is active
           isActive: { type: Boolean, default: true },
+
+          expiryDate: {
+            type: Date,
+            required: true,
+            default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // default to one week from now
+          },
         },
       ],
       default: [],

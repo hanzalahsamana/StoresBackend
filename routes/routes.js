@@ -84,6 +84,8 @@ const {
 const {
   getStoreDetails,
 } = require("../Controler/StoreDetail");
+const { addDiscount, deleteDiscount, editDiscount } = require("../Controler/discounts");
+const { default: mongoose } = require("mongoose");
 
 // Multer setup
 const upload = multer({ dest: "/tmp" });
@@ -108,6 +110,7 @@ withParams.post("/genrateSSl", automateDomainSetup);
 // POST routes (without params)
 withoutParams.post("/setTheme", tokenChecker, addTheme);
 withoutParams.post("/addVariation", tokenChecker, addVariation);
+withoutParams.post("/addDiscount", tokenChecker, addDiscount);
 withoutParams.post("/importSiteData", tokenChecker, upload.single("file"), importSiteData);
 withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
@@ -132,8 +135,14 @@ withParams.get("/getStoreDetails", getStoreDetails);
 withoutParams.get("/exportSiteData", tokenChecker, exportSite);
 withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
-withoutParams.get("/ping", (req, res) => {
-  res.status(200).send("OK");
+withoutParams.get("/ping", async (req, res) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    res.status(200).send("OK");
+  } catch (err) {
+    console.error("MongoDB connection error:", err.message);
+    res.status(503).send("MongoDB Unreachable");
+  }
 });
 
 // DELETE routes
@@ -143,6 +152,7 @@ withParams.delete("/deleteProduct", deleteProduct);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
 withParams.delete("/deleteSection", deleteSection);
 withoutParams.delete("/deleteVariation",tokenChecker, deleteVariation);
+withoutParams.delete("/deleteDiscount",tokenChecker, deleteDiscount);
 
 // PUT/PATCH routes
 withParams.put("/editProduct", editProduct);
@@ -153,6 +163,7 @@ withParams.patch("/editPage", updatePage);
 withParams.patch("/editSection", updateSection);
 withParams.patch("/editSectionOrder", updateSectionOrder);
 withoutParams.patch("/editVariation",tokenChecker, editVariation);
+withoutParams.patch("/editDiscount",tokenChecker, editDiscount);
 
 // Export routers
 module.exports = { withParams, withoutParams };

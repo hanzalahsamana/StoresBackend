@@ -6,7 +6,6 @@ const addDiscount = async (req, res) => {
   const { userId } = req.query;
   const { discount } = req.body;
 
-  
   if (
     !userId ||
     !discount ||
@@ -14,9 +13,7 @@ const addDiscount = async (req, res) => {
     !discount.amount ||
     !discount.amountType ||
     !discount.discountType ||
-    !discount.access ||
-    !discount.startDate ||
-    !discount.endDate
+    !discount.expiryDate
   ) {
     return res.status(400).json({
       error: "Missing required discount fields.",
@@ -32,6 +29,24 @@ const addDiscount = async (req, res) => {
     const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ error: "Store not found." });
+    }
+
+    if (
+      discount.discountType === "global" &&
+      store.discounts.some((d) => d.discountType === "global")
+    ) {
+      return res.status(400).json({
+        error:
+          "A global discount already exists. Only one global discount is allowed.",
+      });
+    }
+
+    const expiry = new Date(discount?.expiryDate);
+    const now = new Date();
+    if (expiry <= now) {
+      return res.status(400).json({
+        error: "Expiry date must be in the future",
+      });
     }
 
     store.discounts.push(discount);
@@ -60,9 +75,7 @@ const editDiscount = async (req, res) => {
     !updatedDiscount.amount ||
     !updatedDiscount.amountType ||
     !updatedDiscount.discountType ||
-    !updatedDiscount.access ||
-    !updatedDiscount.startDate ||
-    !updatedDiscount.endDate
+    !updatedDiscount.expiryDate
   ) {
     return res.status(400).json({ error: "Missing or invalid fields." });
   }
@@ -81,6 +94,26 @@ const editDiscount = async (req, res) => {
     const discount = store.discounts.id(discountId);
     if (!discount) {
       return res.status(404).json({ error: "Discount not found." });
+    }
+
+    if (
+      updatedDiscount.discountType === "global" &&
+      store.discounts.some(
+        (d) => d._id.toString() !== discountId && d.discountType === "global"
+      )
+    ) {
+      return res.status(400).json({
+        error:
+          "A global discount already exists. Only one global discount is allowed.",
+      });
+    }
+
+    const expiry = new Date(updatedDiscount?.expiryDate);
+    const now = new Date();
+    if (expiry <= now) {
+      return res.status(400).json({
+        error: "Expiry date must be in the future",
+      });
     }
 
     Object.assign(discount, updatedDiscount);

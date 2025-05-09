@@ -12,7 +12,7 @@ const getStoreDetails = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: `No document found with brandName: ${userId}`,
+        message: `No document found with brandName: ${type}`,
       });
     }
 
