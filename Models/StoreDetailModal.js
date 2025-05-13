@@ -62,6 +62,7 @@ const storeDetailSchema = new Schema(
             enum: ["all", "subscription"],
             default: "all",
           },
+          
 
           // Value of discount
           amountType: {
