@@ -63,7 +63,6 @@ const storeDetailSchema = new Schema(
             default: "all",
           },
           
-
           // Value of discount
           amountType: {
             type: String,
