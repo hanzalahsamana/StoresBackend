@@ -84,6 +84,10 @@ const storeDetailSchema = new Schema(
       default: [],
       required: true,
     },
+    // announcements:{
+      
+    // }
+    
   },
   {
     timestamps: true,
