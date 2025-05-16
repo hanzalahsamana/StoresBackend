@@ -221,6 +221,9 @@ const defaultCategories = [
   },
 ];
 
+
+
+
 const SeedDefaultData = async (type) => {
   try {
     const PageModel = mongoose.model(

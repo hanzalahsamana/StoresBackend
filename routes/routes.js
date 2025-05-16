@@ -86,6 +86,8 @@ const {
 } = require("../Controler/StoreDetail");
 const { addDiscount, deleteDiscount, editDiscount } = require("../Controler/discounts");
 const { default: mongoose } = require("mongoose");
+const { addAnnouncement, deleteAnnouncement } = require("../Controler/announcement");
+const addSubscriber = require("../Controler/subscribe");
 
 // Multer setup
 const upload = multer({ dest: "/tmp" });
@@ -106,10 +108,12 @@ withParams.post("/uploadMultiple", uploadMultiple, uploadMultipleImages);
 withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/addSection", createSection);
 withParams.post("/genrateSSl", automateDomainSetup);
+withParams.post("/addSubscriber", addSubscriber);
 
 // POST routes (without params)
 withoutParams.post("/setTheme", tokenChecker, addTheme);
 withoutParams.post("/addVariation", tokenChecker, addVariation);
+withoutParams.post("/addAnnouncement", tokenChecker, addAnnouncement);
 withoutParams.post("/addDiscount", tokenChecker, addDiscount);
 withoutParams.post("/importSiteData", tokenChecker, upload.single("file"), importSiteData);
 withoutParams.post("/login", userLoginValidate, loginUser);
@@ -153,6 +157,7 @@ withParams.delete("/deleteDomain", removeDomainFromDatabase);
 withParams.delete("/deleteSection", deleteSection);
 withoutParams.delete("/deleteVariation",tokenChecker, deleteVariation);
 withoutParams.delete("/deleteDiscount",tokenChecker, deleteDiscount);
+withoutParams.delete("/deleteAnnouncement",tokenChecker, deleteAnnouncement);
 
 // PUT/PATCH routes
 withParams.put("/editProduct", editProduct);

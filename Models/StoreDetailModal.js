@@ -62,32 +62,47 @@ const storeDetailSchema = new Schema(
             enum: ["all", "subscription"],
             default: "all",
           },
-          
+
           // Value of discount
           amountType: {
             type: String,
-            enum: ["fixed", "percent"], // fixed: $10, percent: 10%
+            enum: ["fixed", "percent"], // fixed: ₹100, percent: 10%
             required: true,
           },
-          amount: { type: Number, required: true }, // e.g., 10 or 15%
+          amount: { type: Number, required: true }, // e.g., 100 or 15%
 
-          // Whether the discount is active
+          // Optional: Max discount cap (only applies to percent discounts)
+
+          // Minimum order value to apply this discount
+          minOrderAmount: { type: Number, default: 0 }, // in rupees
+
+          // Discount validity
           isActive: { type: Boolean, default: true },
 
           expiryDate: {
             type: Date,
             required: true,
-            default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // default to one week from now
+            default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // default to 1 week
           },
+
+          // Usage limits
+          usageLimit: { type: Number, default: null }, // total uses allowed
+          usagePerUser: { type: Number, default: null }, // limit per user
+
+          // Optional: Notes
+          description: { type: String, default: "" },
+
+          createdAt: { type: Date, default: Date.now },
+          updatedAt: { type: Date, default: Date.now },
         },
       ],
       default: [],
       required: true,
     },
+
     // announcements:{
-      
+
     // }
-    
   },
   {
     timestamps: true,
