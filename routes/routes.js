@@ -84,7 +84,7 @@ const {
 const {
   getStoreDetails,
 } = require("../Controler/StoreDetail");
-const { addDiscount, deleteDiscount, editDiscount } = require("../Controler/discounts");
+const { addDiscount, deleteDiscount, editDiscount, applyCoupon } = require("../Controler/discounts");
 const { default: mongoose } = require("mongoose");
 const { addAnnouncement, deleteAnnouncement } = require("../Controler/announcement");
 const addSubscriber = require("../Controler/subscribe");
@@ -109,6 +109,7 @@ withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/addSection", createSection);
 withParams.post("/genrateSSl", automateDomainSetup);
 withParams.post("/addSubscriber", addSubscriber);
+withParams.post("/applyCoupon", applyCoupon);
 
 // POST routes (without params)
 withoutParams.post("/setTheme", tokenChecker, addTheme);

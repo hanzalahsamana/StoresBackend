@@ -4,6 +4,9 @@ const subscriberSchema = require("../Models/SubscriberModal");
 const addSubscriber = async (req, res) => {
   try {
     const type = req.collectionType;
+
+    console.log(type);
+    
     const { email } = req.body;
 
     if (!email) {
