@@ -140,6 +140,7 @@ const deleteDiscount = async (req, res) => {
     return res.status(400).json({ message: "Missing required fields." });
   }
 
+  
   try {
     const user = await UserModal.findById(userId).select("-password");
     if (!user) {
