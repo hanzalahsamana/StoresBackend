@@ -16,6 +16,7 @@ const {
   verifyOtp,
   getUserFromToken,
   registerUser,
+  googleLogin,
 } = require("../Controler/user");
 const {
   postProductData,
@@ -118,6 +119,7 @@ withoutParams.post("/addAnnouncement", tokenChecker, addAnnouncement);
 withoutParams.post("/addDiscount", tokenChecker, addDiscount);
 withoutParams.post("/importSiteData", tokenChecker, upload.single("file"), importSiteData);
 withoutParams.post("/login", userLoginValidate, loginUser);
+withoutParams.post("/googleLogin", googleLogin);
 withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
 withoutParams.post("/register", userRegisterValidate, registerUser);

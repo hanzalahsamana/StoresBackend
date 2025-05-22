@@ -23,7 +23,6 @@ const userSchema = new Schema(
       },
     },
 
-    
     subDomain: {
       type: String,
       unique: true,
@@ -35,7 +34,6 @@ const userSchema = new Schema(
       default: null,
     },
 
-    
     isDomainVerified: {
       type: Boolean,
       default: false,
@@ -72,6 +70,12 @@ const userSchema = new Schema(
     verified: {
       type: Boolean,
       default: false,
+    },
+    provider: {
+      type: String,
+      enum: ["manual", "google"],
+      required: true,
+      default: "manual",
     },
   },
   {

@@ -119,6 +119,10 @@ const storeDetailSchema = new Schema(
             type: Date,
             default: Date.now,
           },
+          usedBy: {
+            type: Number,
+            default: 0,
+          },
         },
       ],
       default: [],
@@ -151,9 +155,7 @@ storeDetailSchema.pre("save", function (next) {
     const options = variation.options.map((opt) => opt.toLowerCase().trim());
     if (new Set(options).size !== options.length) {
       return next(
-        new Error(
-          `Options for variation '${variation.name}' must be unique.`
-        )
+        new Error(`Options for variation '${variation.name}' must be unique.`)
       );
     }
   }

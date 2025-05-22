@@ -3,6 +3,7 @@ const { StoreDetailModal } = require("../Models/StoreDetailModal");
 const { UserModal } = require("../Models/userModal");
 const moment = require("moment");
 const subscriberSchema = require("../Models/SubscriberModal");
+const { orderSchema } = require("../Models/OrderModal");
 
 // Add Discount
 const addDiscount = async (req, res) => {
@@ -171,12 +172,11 @@ const deleteDiscount = async (req, res) => {
 
 const applyCoupon = async (req, res) => {
   try {
+    console.log(req.body);
+    
     const { email, couponCode, totalAmount } = req.body;
     const type = req.collectionType;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required." });
-    }
     if (!couponCode) {
       return res.status(400).json({ message: "Coupon code is required." });
     }
@@ -238,7 +238,50 @@ const applyCoupon = async (req, res) => {
         .json({ message: "expired or inactive coupon code." });
     }
 
+    if (discount.usageLimit && discount?.usedBy >= discount?.usageLimit) {
+      return res.status(400).json({
+        message: `Coupon valid only for first ${discount?.usageLimit} customers.`,
+      });
+    }
+
+    if (
+      discount.minOrderAmount &&
+      discount.minOrderAmount > 0 &&
+      totalAmount < discount.minOrderAmount
+    ) {
+      return res.status(400).json({
+        message: `Minimum order amount of Rs. ${discount.minOrderAmount} is required to use this coupon.`,
+      });
+    }
+
+    if (discount.usagePerUser && discount.usagePerUser > 0) {
+      if (!email) {
+        return res.status(400).json({ message: "Please fill email first." });
+      }
+      const OrderModel = mongoose.model(
+        type + "_Orders",
+        orderSchema,
+        type + "_Orders"
+      );
+
+      const userOrderCount = await OrderModel.countDocuments({
+        "customerInfo.email": email.toLowerCase(),
+      });
+
+      // If the user already used coupon 'usagePerUser' times or more, block it
+      if (userOrderCount >= discount.usagePerUser) {
+        return res.status(400).json({
+          message: `Coupon valid only for first ${
+            discount.usagePerUser > 1 && discount.usagePerUser
+          } order(s).`,
+        });
+      }
+    }
+
     if (discount.access && discount.access === "subscription") {
+      if (!email) {
+        return res.status(400).json({ message: "Please fill email first." });
+      }
       const SubscriberModel = mongoose.model(
         `${type}_subscribers`,
         subscriberSchema,
@@ -255,45 +298,10 @@ const applyCoupon = async (req, res) => {
       }
     }
 
-    if (
-      discount.minOrderAmount &&
-      discount.minOrderAmount > 0 &&
-      totalAmount < discount.minOrderAmount
-    ) {
-      return res.status(400).json({
-        message: `Minimum order amount of Rs. ${discount.minOrderAmount} is required to use this coupon.`,
-      });
-    }
-
-    if (discount.isFirstOrderOnly) {
-      const existingOrders = await Order.findOne({
-        email: email.toLowerCase(),
-      });
-      if (existingOrders) {
-        return res.status(400).json({
-          message: "Coupon valid only for first order customers.",
-        });
-      }
-    }
-
-    // TODO: Check usageLimit and usagePerUser if you want to implement limits
-
-    // Calculate discount amount
-    const discountAmount =
-      discount.amountType === "percent"
-        ? (totalAmount * discount.amount) / 100
-        : discount.amount;
-
-    // Optionally cap discount amount if you add maxDiscount field
-
     return res.status(200).json({
       success: true,
       message: `Coupon applied successfully.`,
-      discount: {
-        type: discount.amountType,
-        amount: discount.amount,
-        discountAmount: discountAmount,
-      },
+      discount,
     });
   } catch (error) {
     console.error("applyCoupon message:", error);

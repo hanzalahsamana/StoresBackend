@@ -1,17 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const app = express();
-const jwt = require("jsonwebtoken");
 const { UserModal } = require("../Models/userModal");
 const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 const { generateOtp } = require("../Utils/Otp");
 const { generateHash, compareHash } = require("../Utils/BCrypt");
-const { userRegisterValidate } = require("../Utils/userValidate");
 const { OTPVerificationEmail } = require("../Utils/EmailsToSend");
 const { generateJwtToken } = require("../Utils/Jwt");
 const { StoreDetailModal } = require("../Models/StoreDetailModal");
-
-app.use(express.json());
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -194,6 +192,65 @@ module.exports = {
         .json({ token, user, message: "Login successfully!" });
     } catch (error) {
       return res.status(500).json({ message: error.message });
+    }
+  },
+
+  googleLogin: async (req, res) => {
+    const { token } = req.body;
+
+    try {
+      if (!token) {
+        return res.status(400).json({ message: "Google token is required." });
+      }
+
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      const { email, name, sub } = payload;
+
+      let user = await UserModal.findOne({ email });
+
+      if (!user) {
+        // Generate brand name and subdomain from name
+        const brandName = name.trim().replace(/\s+/g, "-").toLowerCase();
+        const subDomain = brandName + "-" + Math.floor(Math.random() * 10000);
+
+        user = new UserModal({
+          email,
+          brandName,
+          subDomain,
+          verified: true,
+          isGoogleUser: true,
+          password: sub, // not used, but stored
+        });
+
+        await user.save();
+
+        // Store setup
+        const storeDetail = new StoreDetailModal({
+          brand_Id: user.brand_Id,
+          brandName: user.brandName,
+        });
+        await storeDetail.save();
+
+        await SeedDefaultData(user.brandName);
+      }
+
+      const jwtToken = generateJwtToken({ _id: user._id });
+
+      user.password = undefined;
+
+      return res.status(200).json({
+        token: jwtToken,
+        user,
+        message: "Google login successful",
+      });
+    } catch (error) {
+      console.error("Google Login Error:", error);
+      return res.status(500).json({ message: "Internal server error." });
     }
   },
 
