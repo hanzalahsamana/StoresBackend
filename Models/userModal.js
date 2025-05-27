@@ -23,7 +23,6 @@ const userSchema = new Schema(
       },
     },
 
-    
     subDomain: {
       type: String,
       unique: true,
@@ -35,11 +34,11 @@ const userSchema = new Schema(
       default: null,
     },
 
-    
     isDomainVerified: {
       type: Boolean,
       default: false,
     },
+
     email: {
       type: String,
       required: true,
@@ -72,6 +71,12 @@ const userSchema = new Schema(
     verified: {
       type: Boolean,
       default: false,
+    },
+
+    method: {
+      type: String,
+      enum: ["email", "google"],
+      default: "email",
     },
   },
   {

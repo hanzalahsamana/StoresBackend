@@ -5,8 +5,14 @@ const multer = require("multer");
 const tokenChecker = require("../middlewear/TokenChecker");
 
 // Utils
-const { uploadSingleImage, uploadMultipleImages } = require("../Utils/ImageUpload");
-const { userLoginValidate, userRegisterValidate } = require("../Utils/userValidate");
+const {
+  uploadSingleImage,
+  uploadMultipleImages,
+} = require("../Utils/ImageUpload");
+const {
+  userLoginValidate,
+  userRegisterValidate,
+} = require("../Utils/userValidate");
 const importSiteData = require("../Utils/ImportSite");
 
 // Controllers
@@ -16,6 +22,9 @@ const {
   verifyOtp,
   getUserFromToken,
   registerUser,
+  validateEmailAndPassword,
+  signUpWithGoogle,
+  signInWithGoogle,
 } = require("../Controler/user");
 const {
   postProductData,
@@ -39,30 +48,17 @@ const {
   getOrders,
   editOrderData,
 } = require("../Controler/Order");
-const {
-  addReview,
-  getReviews,
-} = require("../Controler/reviews");
-const {
-  getAnalyticsData,
-} = require("../Controler/analytics");
-const {
-  getPages,
-  updatePage,
-} = require("../Controler/pages");
-const {
-  postConatctForm,
-} = require("../Controler/Contact");
+const { addReview, getReviews } = require("../Controler/reviews");
+const { getAnalyticsData } = require("../Controler/analytics");
+const { getPages, updatePage } = require("../Controler/pages");
+const { postConatctForm } = require("../Controler/Contact");
 const {
   handleDomainRequest,
   automateDomainSetup,
   fetchSiteByDomain,
   removeDomainFromDatabase,
 } = require("../Controler/domain");
-const {
-  uploadSingle,
-  uploadMultiple,
-} = require("../Controler/imageUpload");
+const { uploadSingle, uploadMultiple } = require("../Controler/imageUpload");
 const {
   getSections,
   updateSection,
@@ -70,23 +66,25 @@ const {
   deleteSection,
   updateSectionOrder,
 } = require("../Controler/Sections");
-const {
-  addTheme,
-} = require("../Controler/Theme");
-const {
-  exportSite,
-} = require("../Controler/migration");
+const { addTheme } = require("../Controler/Theme");
+const { exportSite } = require("../Controler/migration");
 const {
   deleteVariation,
   addVariation,
   editVariation,
 } = require("../Controler/variation");
+const { getStoreDetails } = require("../Controler/StoreDetail");
 const {
-  getStoreDetails,
-} = require("../Controler/StoreDetail");
-const { addDiscount, deleteDiscount, editDiscount, applyCoupon } = require("../Controler/discounts");
+  addDiscount,
+  deleteDiscount,
+  editDiscount,
+  applyCoupon,
+} = require("../Controler/discounts");
 const { default: mongoose } = require("mongoose");
-const { addAnnouncement, deleteAnnouncement } = require("../Controler/announcement");
+const {
+  addAnnouncement,
+  deleteAnnouncement,
+} = require("../Controler/announcement");
 const addSubscriber = require("../Controler/subscribe");
 
 // Multer setup
@@ -116,11 +114,19 @@ withoutParams.post("/setTheme", tokenChecker, addTheme);
 withoutParams.post("/addVariation", tokenChecker, addVariation);
 withoutParams.post("/addAnnouncement", tokenChecker, addAnnouncement);
 withoutParams.post("/addDiscount", tokenChecker, addDiscount);
-withoutParams.post("/importSiteData", tokenChecker, upload.single("file"), importSiteData);
+withoutParams.post(
+  "/importSiteData",
+  tokenChecker,
+  upload.single("file"),
+  importSiteData
+);
 withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
 withoutParams.post("/register", userRegisterValidate, registerUser);
+withoutParams.post("/validateEmailAndPassword", validateEmailAndPassword);
+withoutParams.post("/signUpWithGoogle", signUpWithGoogle);
+withoutParams.post("/signInWithGoogle", signInWithGoogle);
 withoutParams.post("/jazzresponse", (req, res) => {
   console.log("Here you will receive payment token", req.body);
 });
@@ -142,7 +148,7 @@ withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
 withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
 withoutParams.get("/ping", async (req, res) => {
   try {
-    await mongoose.connection.db.admin().ping();
+    // await mongoose.connection.db.admin().ping();
     res.status(200).send("OK");
   } catch (err) {
     console.error("MongoDB connection error:", err.message);
@@ -156,9 +162,9 @@ withParams.delete("/deleteCategory", deleteCategory);
 withParams.delete("/deleteProduct", deleteProduct);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
 withParams.delete("/deleteSection", deleteSection);
-withoutParams.delete("/deleteVariation",tokenChecker, deleteVariation);
-withoutParams.delete("/deleteDiscount",tokenChecker, deleteDiscount);
-withoutParams.delete("/deleteAnnouncement",tokenChecker, deleteAnnouncement);
+withoutParams.delete("/deleteVariation", tokenChecker, deleteVariation);
+withoutParams.delete("/deleteDiscount", tokenChecker, deleteDiscount);
+withoutParams.delete("/deleteAnnouncement", tokenChecker, deleteAnnouncement);
 
 // PUT/PATCH routes
 withParams.put("/editProduct", editProduct);
@@ -168,8 +174,8 @@ withParams.put("/editOrder", editOrderData);
 withParams.patch("/editPage", updatePage);
 withParams.patch("/editSection", updateSection);
 withParams.patch("/editSectionOrder", updateSectionOrder);
-withoutParams.patch("/editVariation",tokenChecker, editVariation);
-withoutParams.patch("/editDiscount",tokenChecker, editDiscount);
+withoutParams.patch("/editVariation", tokenChecker, editVariation);
+withoutParams.patch("/editDiscount", tokenChecker, editDiscount);
 
 // Export routers
 module.exports = { withParams, withoutParams };
