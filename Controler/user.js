@@ -1,59 +1,12 @@
 const { UserModal } = require("../Models/userModal");
-const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 const { generateOtp } = require("../Utils/Otp");
 const { generateHash, compareHash } = require("../Utils/BCrypt");
 const { OTPVerificationEmail } = require("../Utils/EmailsToSend");
 const { generateJwtToken } = require("../Utils/Jwt");
-const { StoreDetailModal } = require("../Models/StoreDetailModal");
-
-const { OAuth2Client } = require("google-auth-library");
-const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID
-  // process.env.GOOGLE_CLIENT_SECRET
-);
 
 module.exports = {
-  validateEmailAndPassword: async (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required." });
-    }
-
-    try {
-      const user = await UserModal.findOne({ email });
-
-      if (user) {
-        if (user.verified) {
-          return res.status(400).json({ message: "User already exists." });
-        } else {
-          return res.status(200).json({
-            message: "User exists but not verified. Please verify via OTP.",
-            email,
-          });
-        }
-      }
-
-      // Password format check (optional)
-      if (!/^[\w!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/.test(password)) {
-        return res.status(400).json({
-          message:
-            "Password must be at least 6 characters and must not contain spaces.",
-        });
-      }
-
-      // ✅ If everything is fine
-      res.status(200).json({ message: "Email and password are valid." });
-    } catch (error) {
-      console.error("Validation Error:", error);
-      res.status(500).json({ message: "Internal server error." });
-    }
-  },
-
   registerUser: async (req, res) => {
-    const { email, brandName, password, subDomain } = req.body;
+    const { email, password } = req.body;
 
     try {
       let user = await UserModal.findOne({ email });
@@ -73,8 +26,6 @@ module.exports = {
       const newUser = new UserModal({
         email,
         password: hashedPassword,
-        brandName,
-        subDomain,
       });
 
       await newUser.save();
@@ -194,14 +145,6 @@ module.exports = {
 
       const token = generateJwtToken({ _id: savedUser._id });
 
-      const storeDetail = new StoreDetailModal({
-        brand_Id: savedUser.brand_Id,
-        brandName: savedUser.brandName,
-      });
-      await storeDetail.save();
-
-      await SeedDefaultData(savedUser.brandName);
-
       return res.status(200).json({
         token,
         user: savedUser,
@@ -256,8 +199,8 @@ module.exports = {
     }
   },
 
-  signUpWithGoogle: async (req, res) => {
-    const { googleToken: accessToken, brandName, subDomain } = req.body;
+  authWithGoogle: async (req, res) => {
+    const { googleToken: accessToken } = req.body;
 
     try {
       if (!accessToken) {
@@ -294,89 +237,6 @@ module.exports = {
 
       if (user) {
         if (user.method === "google") {
-          return res.status(400).json({
-            message: "User already exists. Please log in instead.",
-            errorCode: "UserAlreadyExists",
-          });
-        } else {
-          return res.status(400).json({
-            message: "User already exists with a different login method.",
-            errorCode: "UserExistsWithDifferentMethod",
-          });
-        }
-      }
-
-      // New user - register
-      const newUser = new UserModal({
-        email,
-        password: "google-user", // default password, you may keep empty or random
-        brandName,
-        subDomain,
-        verified: true,
-        method: "google",
-      });
-
-      const savedUser = await newUser.save();
-      savedUser.password = undefined;
-
-      const token = generateJwtToken({ _id: savedUser._id });
-      console.log(token, savedUser?._id);
-
-      const storeDetail = new StoreDetailModal({
-        brand_Id: savedUser.brand_Id,
-        brandName: savedUser.brandName,
-      });
-      await storeDetail.save();
-
-      // await SeedDefaultData(savedUser.brandName);
-
-      return res.status(200).json({
-        token,
-        user: savedUser,
-        message: "Email verified successfully!",
-      });
-    } catch (error) {
-      console.error("Google Auth Error:", error);
-      res.status(500).json({ message: "Google authentication failed." });
-    }
-  },
-  signInWithGoogle: async (req, res) => {
-    const { googleToken: accessToken } = req.body;
-
-    try {
-      if (!accessToken) {
-        return res
-          .status(400)
-          .json({ message: "Google access token required" });
-      }
-
-      // Call Google userinfo endpoint with access token to get user profile
-      const response = await fetch(
-        "https://www.googleapis.com/oauth2/v3/userinfo",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        return res.status(401).json({ message: "Invalid Google access token" });
-      }
-
-      const payload = await response.json();
-
-      const email = payload.email;
-      if (!email) {
-        return res
-          .status(400)
-          .json({ message: "Unable to retrieve user from Google" });
-      }
-
-      let user = await UserModal.findOne({ email });
-
-      if (user) {
-        if (user.method === "google") {
           const token = await generateJwtToken({ _id: user._id });
 
           const userObj = user.toObject();
@@ -393,12 +253,35 @@ module.exports = {
             errorCode: "UserExistsWithDifferentMethod",
           });
         }
-      } else {
-        return res.status(404).json({
-          message: "User not found. Please sign up first.",
-          errorCode: "UserNotFound",
-        });
       }
+
+      // New user - register
+      const newUser = new UserModal({
+        email,
+        password: "google-user", // default password, you may keep empty or random
+        verified: true,
+        method: "google",
+      });
+
+      const savedUser = await newUser.save();
+      savedUser.password = undefined;
+
+      const token = generateJwtToken({ _id: savedUser._id });
+      console.log(token, savedUser?._id);
+
+      // const storeDetail = new StoreDetailModal({
+      //   brand_Id: savedUser.brand_Id,
+      //   brandName: savedUser.brandName,
+      // });
+      // await storeDetail.save();
+
+      // await SeedDefaultData(savedUser.brandName);
+
+      return res.status(200).json({
+        token,
+        user: savedUser,
+        message: "Registered successfully!",
+      });
     } catch (error) {
       console.error("Google Auth Error:", error);
       res.status(500).json({ message: "Google authentication failed." });

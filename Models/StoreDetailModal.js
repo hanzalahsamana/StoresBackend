@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const { v4: uuidv4 } = require("uuid");
+
 
 // Custom validator to ensure array has at least one element
 function arrayLimit(val) {
@@ -15,16 +17,63 @@ function uniqueOptionsValidator(options) {
 
 const storeDetailSchema = new Schema(
   {
+    userRef: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
+
     brandName: {
       type: String,
       required: true,
       unique: true,
+      validate: {
+        validator: async function (value) {
+          if (this.isNew || this.isModified("brandName")) {
+            const existingBrand = await this.constructor.findOne({
+              brandName: { $regex: new RegExp(`^${value}$`, "i") },
+            });
+            return !existingBrand;
+          }
+          return true;
+        },
+        message: "Brand name already exists",
+      },
     },
+
     brand_Id: {
       type: String,
-      required: true,
+      default: uuidv4,
       unique: true,
     },
+
+    brandType: {
+      type: String,
+      required: true,
+    },
+
+    discoverySource: {
+      type: String,
+      required: true,
+      default: "",
+    },
+
+    subDomain: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+
+    customDomain: {
+      type: String,
+      default: null,
+    },
+
+    isDomainVerified: {
+      type: Boolean,
+      default: false,
+    },
+
     variations: {
       type: [
         {
@@ -54,11 +103,13 @@ const storeDetailSchema = new Schema(
         message: "Each variation name must be unique.",
       },
     },
+
     theme: {
       required: true,
       type: Object,
       default: {},
     },
+
     discounts: {
       type: [
         {
@@ -151,9 +202,7 @@ storeDetailSchema.pre("save", function (next) {
     const options = variation.options.map((opt) => opt.toLowerCase().trim());
     if (new Set(options).size !== options.length) {
       return next(
-        new Error(
-          `Options for variation '${variation.name}' must be unique.`
-        )
+        new Error(`Options for variation '${variation.name}' must be unique.`)
       );
     }
   }

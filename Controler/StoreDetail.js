@@ -1,6 +1,31 @@
 const { StoreDetailModal } = require("../Models/StoreDetailModal");
 const { UserModal } = require("../Models/userModal");
 
+
+const addStoreDetails = async (req, res) => {
+  const { userId } = req.query;
+  const { brandName , brandType , hereAboutUs} = req.body;
+
+  try {
+    const newStore = new StoreDetailModal({
+      brandName,
+      brand_Id,
+    });
+    const savedStore = await newStore.save();
+    return res.status(201).json({
+      success: true,
+      data: savedStore,
+    });
+  } catch (error) {
+    console.error("Error adding store details:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 const getStoreDetails = async (req, res) => {
   const type = req.collectionType;
 

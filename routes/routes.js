@@ -1,10 +1,7 @@
 const express = require("express");
 const multer = require("multer");
-
-// Middlewares
 const tokenChecker = require("../middlewear/TokenChecker");
 
-// Utils
 const {
   uploadSingleImage,
   uploadMultipleImages,
@@ -15,16 +12,13 @@ const {
 } = require("../Utils/userValidate");
 const importSiteData = require("../Utils/ImportSite");
 
-// Controllers
 const {
   loginUser,
   sendOtp,
   verifyOtp,
   getUserFromToken,
   registerUser,
-  validateEmailAndPassword,
-  signUpWithGoogle,
-  signInWithGoogle,
+  authWithGoogle,
 } = require("../Controler/user");
 const {
   postProductData,
@@ -80,7 +74,6 @@ const {
   editDiscount,
   applyCoupon,
 } = require("../Controler/discounts");
-const { default: mongoose } = require("mongoose");
 const {
   addAnnouncement,
   deleteAnnouncement,
@@ -124,12 +117,7 @@ withoutParams.post("/login", userLoginValidate, loginUser);
 withoutParams.post("/sendOtp", sendOtp);
 withoutParams.post("/verifyOtp", verifyOtp);
 withoutParams.post("/register", userRegisterValidate, registerUser);
-withoutParams.post("/validateEmailAndPassword", validateEmailAndPassword);
-withoutParams.post("/signUpWithGoogle", signUpWithGoogle);
-withoutParams.post("/signInWithGoogle", signInWithGoogle);
-withoutParams.post("/jazzresponse", (req, res) => {
-  console.log("Here you will receive payment token", req.body);
-});
+withoutParams.post("/authWithGoogle", authWithGoogle);
 
 // GET routes (with params)
 withParams.get("/getProducts", getProductData);
