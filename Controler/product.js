@@ -1,88 +1,93 @@
-const { productSchema } = require("../Models/ProductModal");
+const { ProductModel } = require("../Models/ProductModel");
 const { mongoose } = require("mongoose");
 
 module.exports = {
   // add product
-  
-  postProductData: async (req, res) => {
-    const type = req.collectionType;
+  addProduct: async (req, res) => {
+    const { storeId } = req.params;
 
-    const ProductModel = mongoose.model(
-      type + "_products",
-      productSchema,
-      type + "_products"
-    );
-
-    
-    const newProduct = new ProductModel(req.body);
+    const newProduct = new ProductModel({ ...req.body, storeRef: storeId });
     try {
       const savedProduct = await newProduct.save();
-      // if (req.files && req.files.length > 0) {
-      //   const paths = req.files.map((file) => file.path);
-      //   savedProduct.images = paths;
-      // }
-      return res.status(201).json(savedProduct);
-    } catch (e) {
-      return res.status(500).json({ message: Object.values(e.errors)[0] });
+      return res.status(201).json({
+        success: true,
+        data: savedProduct,
+      });
+    } catch (error) {
+      console.error("Error adding product:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
     }
   },
 
   // get product
-  getProductData: async (req, res) => {
-    const collectionName = req.query.collection;
-    const type = req.collectionType;
+  getProducts: async (req, res) => {
+    const { storeId } = req.params;
+    const { collection, productId } = req.query;
+
     try {
-      const ProductModel = mongoose.model(
-        type + "_products",
-        productSchema,
-        type + "_products"
-      );
-      if (collectionName) {
-        const productData = await ProductModel.find({
-          collectionName: collectionName,
-        });
-        return res.status(200).json(productData);
-      } else {
-        const productData = await ProductModel.find();
-        return res.status(200).json(productData);
+      // Validate storeId
+      if (!mongoose.Types.ObjectId.isValid(storeId)) {
+        return res.status(400).json({ error: "Invalid store ID format" });
       }
-    } catch (e) {
-      return res
-        .status(500)
-        .json({ message: e.message || "An error occurred" });
+
+      const query = { storeRef: storeId };
+
+      // Filter by collection ID
+      if (collection) {
+        if (!mongoose.Types.ObjectId.isValid(collection)) {
+          return res
+            .status(400)
+            .json({ error: "Invalid collection ID format" });
+        }
+        query.collections = collection;
+      }
+
+      // Filter by product ID
+      if (productId) {
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return res.status(400).json({ error: "Invalid product ID format" });
+        }
+        query._id = productId;
+      }
+
+      const productData = await ProductModel.find(query);
+
+      return res.status(200).json({
+        success: true,
+        data: productData,
+      });
+    } catch (error) {
+      console.error("Error fetching product data:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
     }
   },
 
   // edit product
   editProduct: async (req, res) => {
+    const { storeId } = req.params;
     const productID = req.query.id;
-    const type = req.collectionType;
-
-    if (!mongoose.isValidObjectId(productID) || !productID) {
-      return res
-        .status(400)
-        .json({ message: "Invalid id OR id is not defined" });
-    }
 
     try {
-      const ProductModel = mongoose.model(
-        type + "_products",
-        productSchema,
-        type + "_products"
-      );
-      const product = await ProductModel.findById(productID);
+      const product = await ProductModel.findOne({
+        _id: productID,
+        storeRef: storeId,
+      });
 
       if (!product) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ message: "Product not found for this store" });
       }
 
-      const updatedFields = req.body;
-
-      if (!updatedFields || Object.keys(updatedFields).length === 0) {
-        return res.status(400).json({ message: "Data is required" });
-      }
-
-      Object.assign(product, updatedFields);
+      Object.assign(product, req.body);
 
       await product.save();
 
@@ -95,28 +100,27 @@ module.exports = {
   // delete product
   deleteProduct: async (req, res) => {
     const productID = req.query.id;
-    const type = req.collectionType;
+    const { storeId } = req.params;
 
     if (!mongoose.isValidObjectId(productID) || !productID) {
       return res
         .status(400)
-        .json({ message: "Invalid id OR id is not defined" });
+        .json({ message: "Invalid product ID or ID is not defined" });
     }
 
     try {
-      const ProductModel = mongoose.model(
-        type + "_products",
-        productSchema,
-        type + "_products"
-      );
-
-      const product = await ProductModel.deleteOne({ _id: productID });
+      const product = await ProductModel.deleteOne({
+        _id: productID,
+        storeRef: storeId,
+      });
 
       if (product.deletedCount === 0) {
-        return res.status(404).json({ message: "Product not found" });
+        return res
+          .status(404)
+          .json({ message: "Product not found or unauthorized" });
       }
 
-      res.status(200).json({ message: "Product Deleted Successfully" });
+      res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

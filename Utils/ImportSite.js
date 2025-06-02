@@ -1,11 +1,11 @@
 const fs = require("fs/promises");
 const getModel = require("./GetModel");
-const { categorySchema } = require("../Models/CategoryModal");
-const { productSchema } = require("../Models/ProductModal");
+const { categorySchema } = require("../Models/CollectionModel");
+const { productSchema } = require("../Models/ProductModel");
 const {orderSchema} = require("../Models/OrderModal");
 const { pageSchema } = require("../Models/PagesModel");
 const { UserModal } = require("../Models/userModal");
-const { SectionSchema } = require("../Models/SectionsModal");
+const { SectionSchema } = require("../Models/SectionsModel");
 
 const importSiteData = async (req, res) => {
   try {

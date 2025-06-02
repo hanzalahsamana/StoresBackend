@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const { StoreDetailModal } = require("../Models/StoreDetailModal");
+const { StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
 const moment = require("moment");
 const subscriberSchema = require("../Models/SubscriberModal");
@@ -29,7 +29,7 @@ const addDiscount = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ message: "Store not found." });
     }
@@ -89,7 +89,7 @@ const editDiscount = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ message: "Store not found." });
     }
@@ -147,7 +147,7 @@ const deleteDiscount = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ message: "Store not found." });
     }
@@ -206,7 +206,7 @@ const applyCoupon = async (req, res) => {
       });
     }
 
-    const Store = await StoreDetailModal.findOne({ brandName: String(type) });
+    const Store = await StoreModal.findOne({ brandName: String(type) });
 
     // Find store discounts (you might have a different way to get discounts)
     if (!Store || !Store.discounts || Store.discounts.length === 0) {

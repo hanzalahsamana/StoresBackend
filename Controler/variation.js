@@ -1,4 +1,4 @@
-const { StoreDetailModal } = require("../Models/StoreDetailModal");
+const { StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
 
 const addVariation = async (req, res) => {
@@ -27,7 +27,7 @@ const addVariation = async (req, res) => {
       });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user?.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user?.brand_Id });
 
     if (!store) {
       return res
@@ -69,7 +69,7 @@ const editVariation = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ error: "Store not found." });
     }
@@ -95,7 +95,7 @@ const editVariation = async (req, res) => {
 
 const deleteVariation = async (req, res) => {
   const { userId, variationId } = req.query;
-console.log(userId, variationId);
+  console.log(userId, variationId);
 
   if (!userId || !variationId) {
     return res.status(400).json({ error: "Missing required fields." });
@@ -107,7 +107,7 @@ console.log(userId, variationId);
       return res.status(404).json({ error: "User not found." });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ error: "Store not found." });
     }

@@ -1,6 +1,6 @@
 const { mongoose } = require("mongoose");
 const { CartSchema } = require("../Models/CartModal");
-const { productSchema } = require("../Models/ProductModal");
+const { productSchema } = require("../Models/ProductModel");
 
 // add cart data function
 const addCarts = async (req, res) => {

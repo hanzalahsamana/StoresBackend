@@ -1,41 +1,74 @@
 const { default: mongoose } = require("mongoose");
-const { SectionSchema } = require("../Models/SectionsModal");
+const { SectionModel } = require("../Models/SectionsModel");
 
-const getSections = async (req, res) => {
-  const type = req.collectionType;
+const addSection = async (req, res) => {
+  const { storeId } = req.params;
+  const sectionToAdd = req.body;
+
+  if (!sectionToAdd || Object.keys(sectionToAdd).length === 0) {
+    return res.status(400).json({ message: "Data is required" });
+  }
+
+  const { order } = sectionToAdd;
+
+  if (!order || typeof order !== "number") {
+    return res.status(400).json({ message: "Order must be a valid number" });
+  }
+
   try {
-    const SectionModel = mongoose.model(
-      type + "_section",
-      SectionSchema,
-      type + "_section"
+    // Shift orders for the same store
+    await SectionModel.updateMany(
+      { storeRef: storeId, order: { $gte: order } },
+      { $inc: { order: 1 } }
     );
 
-    const sections = await SectionModel.find().sort({ order: 1 });
+    const section = new SectionModel({
+      ...sectionToAdd,
+      storeRef: storeId,
+    });
 
-    return res.status(200).json(sections);
+    await section.save();
+
+    const allSections = await SectionModel.find({ storeRef: storeId }).sort({
+      order: 1,
+    });
+
+    return res.status(200).json(allSections);
   } catch (e) {
     return res.status(500).json({ message: e.message || "An error occurred" });
   }
 };
 
-const updateSection = async (req, res) => {
-  const type = req.collectionType;
-  const sectionID = req.query.id;
+const getSections = async (req, res) => {
+  const { storeId } = req.params;
 
   try {
-    if (!mongoose.isValidObjectId(sectionID) || !sectionID) {
-      return res
-        .status(400)
-        .json({ message: "Invalid id OR id is not defined" });
-    }
+    const sections = await SectionModel.find({ storeRef: storeId }).sort({
+      order: 1,
+    });
+    return res.status(200).json({
+      success: true,
+      data: sections,
+    });
+  } catch (e) {
+    console.error("Error fetching sections:", e);
+    return res.status(500).json({ message: e.message || "An error occurred" });
+  }
+};
 
-    const SectionModel = mongoose.model(
-      type + "_section",
-      SectionSchema,
-      type + "_section"
-    );
+const editSection = async (req, res) => {
+  const { storeId } = req.params;
+  const sectionID = req.query.id;
 
-    const section = await SectionModel.findById(sectionID);
+  if (!mongoose.isValidObjectId(sectionID) || !sectionID) {
+    return res.status(400).json({ message: "Invalid id OR id is not defined" });
+  }
+
+  try {
+    const section = await SectionModel.findOne({
+      _id: sectionID,
+      storeRef: storeId,
+    });
 
     if (!section) {
       return res.status(404).json({ message: "Section not found" });
@@ -51,70 +84,44 @@ const updateSection = async (req, res) => {
     section.markModified("content");
     await section.save();
 
-    return res.status(200).json(section);
-  } catch (e) {
-    return res.status(500).json({ message: e.message || "An error occurred" });
-  }
-};
-
-const createSection = async (req, res) => {
-  const type = req.collectionType;
-  const sectionToAdd = req.body;
-  const { order } = sectionToAdd;
-
-  try {
-    const SectionModel = mongoose.model(
-      type + "_section",
-      SectionSchema,
-      type + "_section"
-    );
-
-    await SectionModel.updateMany(
-      { order: { $gte: order } },
-      { $inc: { order: 1 } }
-    );
-
-    const section = new SectionModel(sectionToAdd);
-    await section.save();
-
-    const allSections = await SectionModel.find().sort({ order: 1 });
-
-    return res.status(200).json(allSections);
+    return res.status(200).json({
+      success: true,
+      section,
+    });
   } catch (e) {
     return res.status(500).json({ message: e.message || "An error occurred" });
   }
 };
 
 const deleteSection = async (req, res) => {
-  const type = req.collectionType;
+  const { storeId } = req.params;
   const sectionId = req.query.id;
 
   try {
-    const SectionModel = mongoose.model(
-      type + "_section",
-      SectionSchema,
-      type + "_section"
-    );
+    if (!mongoose.isValidObjectId(sectionId)) {
+      return res.status(400).json({ message: "Invalid section ID" });
+    }
 
-    // Find the section to be deleted
-    const sectionToDelete = await SectionModel.findById(sectionId);
+    const sectionToDelete = await SectionModel.findOne({
+      _id: sectionId,
+      storeRef: storeId,
+    });
     if (!sectionToDelete) {
       return res.status(404).json({ message: "Section not found" });
     }
 
     const deletedOrder = sectionToDelete.order;
 
-    // Delete the section
-    await SectionModel.findByIdAndDelete(sectionId);
+    await SectionModel.deleteOne({ _id: sectionId });
 
-    // Shift orders for sections that come after the deleted one
     await SectionModel.updateMany(
-      { order: { $gt: deletedOrder } },
-      { $inc: { order: -1 } } // Decrease order by 1
+      { storeRef: storeId, order: { $gt: deletedOrder } },
+      { $inc: { order: -1 } }
     );
 
-    // Return updated sections
-    const updatedSections = await SectionModel.find().sort({ order: 1 });
+    const updatedSections = await SectionModel.find({ storeRef: storeId }).sort(
+      { order: 1 }
+    );
 
     return res.status(200).json(updatedSections);
   } catch (e) {
@@ -123,36 +130,36 @@ const deleteSection = async (req, res) => {
 };
 
 const updateSectionOrder = async (req, res) => {
-  const type = req.collectionType;
+  const { storeId } = req.params;
   const sectionId = req.query.id;
-  const {newOrder} = req.body;
-console.log(type , sectionId , newOrder);
+  const { newOrder } = req.body;
 
   try {
-    const SectionModel = mongoose.model(
-      `${type}_section`,
-      SectionSchema,
-      `${type}_section`
-    );
+    if (!mongoose.isValidObjectId(sectionId)) {
+      throw new Error("Invalid section ID");
+    }
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    const sectionToMove = await SectionModel.findById(sectionId).session(
-      session
-    );
+    const sectionToMove = await SectionModel.findOne({
+      _id: sectionId,
+      storeRef: storeId,
+    }).session(session);
     if (!sectionToMove) throw new Error("Section not found");
 
     const currentOrder = sectionToMove.order;
 
     if (newOrder < 1) throw new Error("Invalid order position");
 
-    const totalSections = await SectionModel.countDocuments().session(session);
+    const totalSections = await SectionModel.countDocuments({
+      storeRef: storeId,
+    }).session(session);
     if (newOrder > totalSections) throw new Error("Invalid order position");
 
-    // Update affected sections efficiently
     await SectionModel.updateMany(
       {
+        storeRef: storeId,
         order: {
           $gte: Math.min(currentOrder, newOrder),
           $lte: Math.max(currentOrder, newOrder),
@@ -180,7 +187,6 @@ console.log(type , sectionId , newOrder);
       ]
     ).session(session);
 
-    // Update the moved section
     await SectionModel.findByIdAndUpdate(sectionId, {
       order: newOrder,
     }).session(session);
@@ -188,8 +194,9 @@ console.log(type , sectionId , newOrder);
     await session.commitTransaction();
     session.endSession();
 
-    // Fetch updated sections sorted by order
-    const updatedSections = await SectionModel.find().sort({ order: 1 });
+    const updatedSections = await SectionModel.find({ storeRef: storeId }).sort(
+      { order: 1 }
+    );
 
     return res.status(200).json({
       success: true,
@@ -202,4 +209,10 @@ console.log(type , sectionId , newOrder);
   }
 };
 
-module.exports = { getSections, updateSection, createSection, deleteSection , updateSectionOrder };
+module.exports = {
+  getSections,
+  addSection,
+  editSection,
+  deleteSection,
+  updateSectionOrder,
+};

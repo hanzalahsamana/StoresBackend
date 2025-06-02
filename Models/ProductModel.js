@@ -1,18 +1,24 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const productSchema = new Schema({
+const ProductSchema = new Schema({
   name: { type: String, required: true },
-  alt: { type: String, required: true },
-  brand: { type: String, required: true },
-  originalPrice: { type: Number, required: true },
-  discountedPrice: { type: Number, required: true },
-  discount: { type: Number },
-  images: [String],
-  collectionName: { type: String, required: true },
+  vendor: { type: String },
+  price: { type: Number, required: true },
+  comparedAtPrice: { type: Number },
+  displayImage: { type: String, required: true },
+  gallery: [String],
+  collections: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Collection",
+    },
+  ],
   stock: { type: Number, required: true },
-  type: { type: String },
+  status: { type: String, enum: ["active", "inactive"], default: "active" },
   description: { type: String },
+  metaTitle: { type: String },
+  metaDescription: { type: String },
 
   variations: {
     type: [
@@ -24,14 +30,9 @@ const productSchema = new Schema({
         options: {
           type: [String],
           required: true,
-          validate: [
-            (val) => val.length > 0,
-            "At least one option is required.",
-          ],
         },
       },
     ],
-    required: true,
     default: [],
     validate: {
       validator: function (variations) {
@@ -41,8 +42,6 @@ const productSchema = new Schema({
       message: "Each variation name must be unique.",
     },
   },
-
-  // ✅ Specific variant combinations (e.g., Red / M)
   variants: {
     type: [
       {
@@ -59,6 +58,13 @@ const productSchema = new Schema({
     ],
     default: [],
   },
+  storeRef: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Store",
+    required: true,
+  },
 });
 
-module.exports = { productSchema };
+const ProductModel = mongoose.model("Product", ProductSchema);
+
+module.exports = { ProductModel };

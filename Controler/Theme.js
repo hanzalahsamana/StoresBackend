@@ -1,4 +1,4 @@
-const { StoreDetailModal } = require("../Models/StoreDetailModal");
+const { StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
 
 const addTheme = async (req, res) => {
@@ -15,7 +15,7 @@ const addTheme = async (req, res) => {
       });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user?.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user?.brand_Id });
 
     if (!store) {
       return res

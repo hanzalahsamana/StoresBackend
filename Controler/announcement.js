@@ -1,4 +1,4 @@
-const { StoreDetailModal } = require("../Models/StoreDetailModal");
+const {  StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
 
 // Add Announcement
@@ -22,7 +22,7 @@ const addAnnouncement = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ error: "Store not found." });
     }
@@ -54,7 +54,7 @@ const deleteAnnouncement = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    const store = await StoreDetailModal.findOne({ brand_Id: user.brand_Id });
+    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
     if (!store) {
       return res.status(404).json({ error: "Store not found." });
     }

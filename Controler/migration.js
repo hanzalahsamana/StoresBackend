@@ -1,8 +1,8 @@
-const { categorySchema } = require("../Models/CategoryModal");
+const { categorySchema } = require("../Models/CollectionModel");
 const {orderSchema} = require("../Models/OrderModal");
 const { pageSchema } = require("../Models/PagesModel");
-const { productSchema } = require("../Models/ProductModal");
-const { SectionSchema } = require("../Models/SectionsModal");
+const { productSchema } = require("../Models/ProductModel");
+const { SectionSchema } = require("../Models/SectionsModel");
 const { UserModal } = require("../Models/userModal");
 const getModel = require("../Utils/GetModel");
 

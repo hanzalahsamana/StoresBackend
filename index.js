@@ -9,11 +9,11 @@ const app = express();
 
 const corsOptions = {
   origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   preflightContinue: false,
-  optionsSuccessStatus: 204, 
+  optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
@@ -27,15 +27,9 @@ app.get("/", (req, res) => {
   res.send("Hello from the backend");
 });
 
-app.use("/api/v1/:type", (req, res, next) => {
-  const type = req.params.type;
-  req.collectionType = type;
-  next();
-});
 
-app.use("/api/v1/:type", withParams);
+app.use("/api/v1/:storeId", withParams);
 app.use("/api/v1", withoutParams);
-
 
 if (process.env.NODE_ENV !== "production") {
   const PORT = process.env.PORT || 1234;

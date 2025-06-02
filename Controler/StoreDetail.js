@@ -1,15 +1,28 @@
-const { StoreDetailModal } = require("../Models/StoreDetailModal");
+const { StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
+const generateSlug = require("../Utils/generateSlug");
+const { generateStoreValidation } = require("../Utils/ValidatePayloads");
 
 
-const addStoreDetails = async (req, res) => {
+const generateStore = async (req, res) => {
   const { userId } = req.query;
-  const { brandName , brandType , hereAboutUs} = req.body;
+  const { storeName, storeType } = req.body;
 
   try {
-    const newStore = new StoreDetailModal({
-      brandName,
-      brand_Id,
+    const error = generateStoreValidation(req.body);
+    if (!error.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: error.errors,
+      });
+    }
+
+    const newStore = new StoreModal({
+      storeName,
+      storeType,
+      subDomain: generateSlug(storeName),
+      userRef: userId,
     });
     const savedStore = await newStore.save();
     return res.status(201).json({
@@ -41,11 +54,11 @@ const getStoreDetails = async (req, res) => {
       });
     }
 
-    const Store = await StoreDetailModal.findOne({ brandName: String(type) });
+    const Store = await StoreModal.findOne({ brandName: String(type) });
 
     if (!Store) {
       console.log(`store ${type} not found.`);
-      const storeDetail = StoreDetailModal({
+      const storeDetail = StoreModal({
         brandName: user.brandName,
         brand_Id: user.brand_Id,
       });
@@ -70,4 +83,4 @@ const getStoreDetails = async (req, res) => {
   }
 };
 
-module.exports = { getStoreDetails };
+module.exports = { getStoreDetails, generateStore };
