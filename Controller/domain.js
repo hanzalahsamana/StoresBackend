@@ -1,5 +1,5 @@
 const { exec } = require("child_process");
-const { checkDomainDNS } = require("../Utils/CheckDomainDns");
+const { checkDomainDNS } = require("../Helpers/CheckDomainDns");
 const { UserModal } = require("../Models/userModal");
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 const frontendIP = "18.198.243.219";

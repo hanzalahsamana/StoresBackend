@@ -4,17 +4,12 @@ const reviewSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
   name: {
     type: String,
     required: true,
   },
   message: {
-    type: String,
-    required: true,
-  },
-  productId: {
     type: String,
     required: true,
   },
@@ -26,8 +21,21 @@ const reviewSchema = new mongoose.Schema({
   },
   reviewTitle: {
     type: String,
+    default: "",
+  },
+  productId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+    required: true,
+  },
+  storeRef: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Store",
     required: true,
   },
 });
 
-module.exports = reviewSchema;
+reviewSchema.index({ email: 1, productId: 1, storeRef: 1 }, { unique: true });
+
+const ReviewModel = mongoose.model("Review", reviewSchema);
+module.exports = { ReviewModel };

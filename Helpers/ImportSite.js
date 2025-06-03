@@ -1,11 +1,11 @@
 const fs = require("fs/promises");
-const getModel = require("./GetModel");
 const { categorySchema } = require("../Models/CollectionModel");
 const { productSchema } = require("../Models/ProductModel");
 const {orderSchema} = require("../Models/OrderModal");
-const { pageSchema } = require("../Models/PagesModel");
 const { UserModal } = require("../Models/userModal");
 const { SectionSchema } = require("../Models/SectionsModel");
+const getModel = require("../Utils/GetModel");
+const { ContentModel } = require("../Models/ContentModel");
 
 const importSiteData = async (req, res) => {
   try {
@@ -117,7 +117,7 @@ const importSiteData = async (req, res) => {
 
     // Handle Pages/Contents
     if (selectedKeys.includes("contents") && jsonData.contents?.length) {
-      const ContentModel = getModel(siteName, "contents", pageSchema);
+      const ContentModel = getModel(siteName, "contents", ContentModel);
       for (const incomingContent of jsonData.contents) {
         const { type, _id, ...rest } = incomingContent;
         const existing = await ContentModel.findOne({ type });

@@ -3,7 +3,7 @@ const { CartSchema } = require("../Models/CartModal");
 const { productSchema } = require("../Models/ProductModel");
 
 // add cart data function
-const addCarts = async (req, res) => {
+const addToCart = async (req, res) => {
   const id = req.query.id;
   const type = req.collectionType;
   const { _id: productId, quantity, selectedSize } = req.body;
@@ -139,4 +139,4 @@ const deleteCartProduct = async (req, res) => {
   }
 };
 
-module.exports = { addCarts, getCartData, deleteCartProduct };
+module.exports = { addToCart, getCartData, deleteCartProduct };

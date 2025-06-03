@@ -3,7 +3,7 @@ const { orderSchema } = require("../Models/OrderModal");
 const {
   customerOrderDetail,
   adminOrderDetail,
-} = require("../Utils/EmailsToSend");
+} = require("../Helpers/EmailsToSend");
 const { UserModal } = require("../Models/userModal");
 
 const addOrderData = async (req, res) => {

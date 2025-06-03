@@ -1,4 +1,4 @@
-const { formatDate } = require("./FormatDate");
+const { formatDate } = require("../Utils/FormatDate");
 
 function generateOrderDetailsTemplate(admin, order) {
   const { from, to, customerInfo, orderData, orderInfo } = order;

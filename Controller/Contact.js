@@ -3,7 +3,7 @@ const { UserModal } = require("../Models/userModal");
 const {
   customerContactResponse,
   adminContactResponse,
-} = require("../Utils/EmailsToSend");
+} = require("../Helpers/EmailsToSend");
 const { contactSchema } = require("../Models/ContactModel");
 
 const postConatctForm = async (req, res) => {

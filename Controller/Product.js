@@ -1,5 +1,6 @@
 const { ProductModel } = require("../Models/ProductModel");
 const { mongoose } = require("mongoose");
+const { ReviewModel } = require("../Models/ReviewModel");
 
 module.exports = {
   // add product
@@ -119,6 +120,11 @@ module.exports = {
           .status(404)
           .json({ message: "Product not found or unauthorized" });
       }
+
+      await ReviewModel.deleteMany({
+        productId: productID,
+        storeRef: storeId,
+      });
 
       res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {

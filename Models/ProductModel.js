@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -19,7 +20,6 @@ const ProductSchema = new Schema({
   description: { type: String },
   metaTitle: { type: String },
   metaDescription: { type: String },
-
   variations: {
     type: [
       {
@@ -62,6 +62,11 @@ const ProductSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Store",
     required: true,
+  },
+  wantsCustomerReview: { type: Boolean, default: true, required: true },
+  ratings: {
+    average: { type: Number, default: 0 },
+    count: { type: Number, default: 0 },
   },
 });
 

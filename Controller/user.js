@@ -1,8 +1,8 @@
 const { UserModal } = require("../Models/userModal");
 const { generateOtp } = require("../Utils/Otp");
 const { generateHash, compareHash } = require("../Utils/BCrypt");
-const { OTPVerificationEmail } = require("../Utils/EmailsToSend");
 const { generateJwtToken } = require("../Utils/Jwt");
+const { OTPVerificationEmail } = require("../Helpers/EmailsToSend");
 
 module.exports = {
   registerUser: async (req, res) => {
@@ -94,6 +94,8 @@ module.exports = {
       await user.save();
       await OTPVerificationEmail(user, otp);
 
+      console.log(`OTP sent to ${email}: ${otp}`); // For debugging purposes, remove in production
+
       return res.status(200).json({
         message: "OTP sent successfully to your email!",
         remainingTime: COOLDOWN_PERIOD / 1000,
@@ -143,7 +145,7 @@ module.exports = {
       const savedUser = await user.save();
       savedUser.password = undefined;
 
-      const token = generateJwtToken({ _id: savedUser._id });
+      const token = await generateJwtToken({ _id: savedUser._id });
 
       return res.status(200).json({
         token,
@@ -201,6 +203,8 @@ module.exports = {
 
   authWithGoogle: async (req, res) => {
     const { googleToken: accessToken } = req.body;
+
+    console.log("Google Token:", accessToken);
 
     try {
       if (!accessToken) {
@@ -266,7 +270,7 @@ module.exports = {
       const savedUser = await newUser.save();
       savedUser.password = undefined;
 
-      const token = generateJwtToken({ _id: savedUser._id });
+      const token = await generateJwtToken({ _id: savedUser._id });
       console.log(token, savedUser?._id);
 
       // const storeDetail = new StoreDetailModal({

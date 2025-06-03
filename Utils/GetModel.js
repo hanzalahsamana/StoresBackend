@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-
-// utils/getModel.js
 const getModel = (siteName, modelName, schema) => {
   const collectionName = `${siteName}_${modelName}`;
   return (

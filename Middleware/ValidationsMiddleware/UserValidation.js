@@ -2,16 +2,6 @@ const Joi = require("joi");
 
 const userRegisterValidate = (req, res, next) => {
   const schema = Joi.object({
-    brandName: Joi.string().min(3).max(100).required().messages({
-      "any.required": "Brand name is required",
-      "string.min": "Brand name must be at least 3 characters",
-      "string.max": "Brand name cannot exceed 100 characters",
-    }),
-    subDomain: Joi.string().min(3).max(100).required().messages({
-      "any.required": "Subdomain is required",
-      "string.min": "Subdomain must be at least 3 characters",
-      "string.max": "Subdomain cannot exceed 100 characters",
-    }),
     email: Joi.string().email().required().pattern(/^\S+$/).messages({
       "any.required": "Email is required",
       "string.email": "Invalid email format",

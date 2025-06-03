@@ -16,7 +16,6 @@ const addSection = async (req, res) => {
   }
 
   try {
-    // Shift orders for the same store
     await SectionModel.updateMany(
       { storeRef: storeId, order: { $gte: order } },
       { $inc: { order: 1 } }
@@ -58,10 +57,12 @@ const getSections = async (req, res) => {
 
 const editSection = async (req, res) => {
   const { storeId } = req.params;
-  const sectionID = req.query.id;
+  const sectionID = req.query.sectionId;
 
   if (!mongoose.isValidObjectId(sectionID) || !sectionID) {
-    return res.status(400).json({ message: "Invalid id OR id is not defined" });
+    return res
+      .status(400)
+      .json({ message: "Invalid section id OR id is not defined" });
   }
 
   try {
@@ -95,7 +96,7 @@ const editSection = async (req, res) => {
 
 const deleteSection = async (req, res) => {
   const { storeId } = req.params;
-  const sectionId = req.query.id;
+  const sectionId = req.query.sectionId;
 
   try {
     if (!mongoose.isValidObjectId(sectionId)) {
@@ -129,14 +130,17 @@ const deleteSection = async (req, res) => {
   }
 };
 
-const updateSectionOrder = async (req, res) => {
+const changeSectionOrder = async (req, res) => {
   const { storeId } = req.params;
-  const sectionId = req.query.id;
+  const sectionId = req.query.sectionId;
   const { newOrder } = req.body;
 
   try {
     if (!mongoose.isValidObjectId(sectionId)) {
       throw new Error("Invalid section ID");
+    }
+    if (!newOrder || typeof newOrder !== "number") {
+      throw new Error("New order must be a valid number");
     }
 
     const session = await mongoose.startSession();
@@ -214,5 +218,5 @@ module.exports = {
   addSection,
   editSection,
   deleteSection,
-  updateSectionOrder,
+  changeSectionOrder,
 };

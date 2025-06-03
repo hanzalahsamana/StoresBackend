@@ -2,7 +2,8 @@ const Joi = require("joi");
 const JoiObjectId = require("joi-objectid")(Joi);
 const { CollectionModel } = require("../../Models/CollectionModel");
 
-const productValidationSchema = Joi.object({
+// Add product schema
+const addProductValidationSchema = Joi.object({
   name: Joi.string().required(),
   vendor: Joi.string().allow("").optional(),
   price: Joi.number().required(),
@@ -15,7 +16,6 @@ const productValidationSchema = Joi.object({
   description: Joi.string().allow("").optional(),
   metaTitle: Joi.string().allow("").optional(),
   metaDescription: Joi.string().allow("").optional(),
-
   variations: Joi.array()
     .items(
       Joi.object({
@@ -23,11 +23,8 @@ const productValidationSchema = Joi.object({
         options: Joi.array().items(Joi.string()).min(1).required(),
       })
     )
-    .unique(
-      (a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim()
-    )
+    .unique((a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim())
     .optional(),
-
   variants: Joi.array()
     .items(
       Joi.object({
@@ -39,26 +36,35 @@ const productValidationSchema = Joi.object({
       })
     )
     .optional(),
+  ratings: Joi.object({
+    average: Joi.number(),
+    count: Joi.number(),
+  }).optional(),
+  wantsCustomerReview: Joi.boolean().optional(),
 });
 
-// Middleware for validation:
-const validateProduct = (isEdit = true) => {
+// Edit product schema (all optional, but at least one field required)
+const editProductValidationSchema = addProductValidationSchema.fork(
+  Object.keys(addProductValidationSchema.describe().keys),
+  (schema) => schema.optional()
+).min(1);
+
+const validateProduct = (isEdit = false) => {
   return async (req, res, next) => {
     const { storeId } = req.params;
     const productID = req.query.id;
 
     if (isEdit) {
-      if (
-        !productID ||
-        !JoiObjectId().validate(productID).error === undefined
-      ) {
+      if (!productID || JoiObjectId().validate(productID).error) {
         return res
           .status(400)
           .json({ error: "Invalid or missing product ID in query" });
       }
     }
 
-    const { error, value } = productValidationSchema.validate(req.body, {
+    const schema = isEdit ? editProductValidationSchema : addProductValidationSchema;
+
+    const { error, value } = schema.validate(req.body, {
       abortEarly: false,
     });
 
@@ -68,6 +74,7 @@ const validateProduct = (isEdit = true) => {
         .json({ errors: error.details.map((e) => e.message) });
     }
 
+    // Validate collections if provided
     if (value.collections && value.collections.length > 0) {
       const validCollections = await CollectionModel.find({
         _id: { $in: value.collections },
