@@ -123,6 +123,7 @@ withoutParams.post("/authWithGoogle", authWithGoogle);
 withParams.get("/getProducts", getProductData);
 withParams.get("/getCategory", getCategory);
 withParams.get("/getCartData", getCartData);
+
 withParams.get("/getOrders", getOrders);
 withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
