@@ -19,12 +19,12 @@ const { getCartData, deleteCartProduct, addToCart } = require("../Controller/car
 const { addOrderData, getOrders, editOrderData } = require("../Controller/Order");
 const { getAnalyticsData } = require("../Controller/analytics");
 const { postConatctForm } = require("../Controller/Contact");
-const { handleDomainRequest, automateDomainSetup, fetchSiteByDomain, removeDomainFromDatabase } = require("../Controller/domain");
+const { handleDomainRequest, automateDomainSetup, removeDomainFromDatabase, getStoreByDomain } = require("../Controller/domain");
 const { uploadSingle, uploadMultiple } = require("../Controller/imageUpload");
 const { addTheme } = require("../Controller/Theme");
 const { exportSite } = require("../Controller/migration");
 const { deleteVariation, addVariation, editVariation } = require("../Controller/variation");
-const { getStoreDetails, generateStore } = require("../Controller/StoreDetail");
+const { generateStore, getAllStores, getStore } = require("../Controller/StoreDetail");
 const { addDiscount, deleteDiscount, editDiscount, applyCoupon } = require("../Controller/discounts");
 const { addAnnouncement, deleteAnnouncement } = require("../Controller/announcement");
 const addSubscriber = require("../Controller/subscribe");
@@ -54,6 +54,11 @@ withoutParams.post("/register", userRegisterValidate, registerUser);
 withoutParams.post("/authWithGoogle", authWithGoogle);
 withoutParams.get("/getUserFromToken", tokenChecker, getUserFromToken);
 
+// --- Store ROUTE ---
+withoutParams.post("/generateStore", tokenChecker, generateStore);
+withParams.get("/getStore", ValidStoreChecker, getStore);
+withoutParams.get("/getAllStores", tokenChecker, getAllStores);
+
 // --- PRODUCT ROUTES ---
 withParams.post("/addProduct", tokenChecker, validOwnerChecker, validateProduct, addProduct);
 withParams.get("/getProducts", ValidStoreChecker, getProducts);
@@ -82,6 +87,8 @@ withParams.patch("/changeSectionOrder", tokenChecker, validOwnerChecker , change
 withParams.get("/getContents", ValidStoreChecker, getContents);
 withParams.patch("/editContent", tokenChecker, validOwnerChecker, ValidatContent, editContent);
 
+
+
 // --- ORDER ROUTES ---
 withParams.post("/addOrderData", addOrderData);
 withParams.get("/getOrders", ValidStoreChecker, getOrders);
@@ -95,7 +102,6 @@ withParams.delete("/deleteCartProduct", deleteCartProduct);
 // --- STORE / THEME / ANALYTICS ROUTES ---
 withoutParams.post("/setTheme", tokenChecker, addTheme);
 withParams.get("/getAnalytics", ValidStoreChecker, getAnalyticsData);
-withParams.get("/getStoreDetails", ValidStoreChecker, getStoreDetails);
 
 // --- UPLOAD ROUTES ---
 withParams.post("/uploadSingle", uploadSingle, uploadSingleImage);
@@ -107,7 +113,7 @@ withoutParams.get("/exportSiteData", tokenChecker, exportSite);
 withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/genrateSSl", automateDomainSetup);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
-withoutParams.get("/fetchSiteByDomain", fetchSiteByDomain);
+withoutParams.get("/getStoreByDomain", getStoreByDomain);
 
 // --- DISCOUNT ROUTES ---
 withoutParams.post("/addDiscount", tokenChecker, addDiscount);
@@ -127,7 +133,7 @@ withoutParams.patch("/editVariation", tokenChecker, editVariation);
 withParams.post("/addSubscriber", addSubscriber);
 
 // --- MISC / UTILITIES ---
-withoutParams.post("/generateStore", tokenChecker, generateStore);
+
 withParams.get("/ping", async (req, res) => {
   try {
     res.status(200).send("OK");

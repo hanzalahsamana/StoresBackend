@@ -1,20 +1,21 @@
 const { exec } = require("child_process");
 const { checkDomainDNS } = require("../Helpers/CheckDomainDns");
 const { UserModal } = require("../Models/userModal");
+const { StoreModal } = require("../Models/StoreModal");
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
 const frontendIP = "18.198.243.219";
 const privateKeyPath = "/home/ubuntu/saasweb.pem";
 const frontendUser = "ubuntu";
 
-const isDomainAlreadyInUse = async (sitename, domain) => {
+const isDomainAlreadyInUse = async (storeId, domain) => {
   try {
-    const existingUser = await UserModal.findOne({
+    const existingStore = await StoreModal.findOne({
       customDomain: domain,
       isDomainVerified: true,
-      brandName: { $ne: sitename }, // Ensure brandName is NOT the given sitename
+      _id: { $ne: storeId }, // Ensure _id is NOT the given storeId
     });
 
-    return !!existingUser; // Returns true if a verified domain exists with a different site name, else false
+    return !!existingStore; // Returns true if a verified domain exists with a different storeId, else false
   } catch (error) {
     console.error("Error checking domain:", error);
     return false; // In case of error, return false to avoid breaking logic
@@ -141,6 +142,37 @@ const handleDomainRequest = async (req, res) => {
   }
 };
 
+const getStoreByDomain = async (req, res) => {
+  try {
+    const { domain, subDomain } = req.query;
+
+    if (!domain && !subDomain) {
+      return res.status(400).json({ error: "Domain or Subdomain is required" });
+    }
+
+    let query = {};
+
+    if (subDomain) {
+      query = { subDomain: { $regex: `^${subDomain}$`, $options: "i" } }; // Exact match (case-insensitive)
+    } else if (domain) {
+      query = { customDomain: { $regex: `^${domain}$`, $options: "i" } }; // Exact match (case-insensitive)
+    }
+
+    const store = await StoreModal.findOne(query);
+
+    console.log(query);
+    if (!store) {
+      return res.status(404).json({ message: "store not found" });
+    }
+    console.log("Querying store with:", store);
+
+    res.json({ storeId: store._id });
+  } catch (error) {
+    console.error("Error fetching site:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const automateDomainSetup = async (req, res) => {
   const { userDomain } = req.body;
 
@@ -153,16 +185,16 @@ const automateDomainSetup = async (req, res) => {
 
   try {
     const command = `ssh -T -o StrictHostKeyChecking=no -i "${privateKeyPath}" ${frontendUser}@${frontendIP} << 'ENDSSH'
-        echo "🔹 Connected to frontend server..."
-        
-        # Install Certbot if not installed
-        sudo apt-get update && sudo apt-get install -y certbot python3-certbot-nginx
-        
-        # Issue SSL Certificate
-        sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com
-        
-        # Configure Nginx
-        sudo bash -c 'cat <<EOF_NGINX > /etc/nginx/sites-available/${userDomain}
+echo "🔹 Connected to frontend server..."
+
+# Install Certbot if not installed
+sudo apt-get update && sudo apt-get install -y certbot python3-certbot-nginx
+
+# Issue SSL Certificate
+sudo certbot certonly --nginx -d ${userDomain} --non-interactive --agree-tos --email youremail@example.com
+
+# Configure Nginx
+sudo bash -c 'cat <<EOF_NGINX > /etc/nginx/sites-available/${userDomain}
 server {
     listen 443 ssl;
     server_name ${userDomain};
@@ -185,17 +217,19 @@ server {
     }
 }
 EOF_NGINX'
-        
-        # Enable site & reload Nginx
-        sudo ln -sf /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/
-        
-        # Test Nginx config
-        sudo nginx -t
-        
-        # Restart Nginx
-        sudo systemctl restart nginx
-      
-        echo "✅ SSL setup complete for ${userDomain}!"ENDSSH`;
+
+# Enable site & reload Nginx
+sudo ln -sf /etc/nginx/sites-available/${userDomain} /etc/nginx/sites-enabled/
+
+# Test Nginx config
+sudo nginx -t
+
+# Restart Nginx
+sudo systemctl restart nginx
+
+echo "✅ SSL setup complete for ${userDomain}!"
+ENDSSH`;
+
     exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error(`❌ Error issuing SSL certificate: ${stderr}`);
@@ -219,41 +253,9 @@ EOF_NGINX'
   }
 };
 
-// Fetch site by domain or subdomain
-const fetchSiteByDomain = async (req, res) => {
-  try {
-    const { domain, subDomain } = req.query;
-
-    if (!domain && !subDomain) {
-      return res.status(400).json({ error: "Domain or Subdomain is required" });
-    }
-    console.log(req.query);
-    
-    let query = {};
-
-    if (subDomain) {
-      query = { subDomain: { $regex: `^${subDomain}$`, $options: "i" } }; // Exact match (case-insensitive)
-    } else if (domain) {
-      query = { customDomain: { $regex: `^${domain}$`, $options: "i" } }; // Exact match (case-insensitive)
-    }
-
-    const site = await UserModal.findOne(query);
-
-    if (!site) {
-      return res.status(404).json({ message: "Site not found" });
-    }
-    console.log(site);
-    
-    res.json({ siteName: site.brandName });
-  } catch (error) {
-    console.error("Error fetching site:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
 module.exports = {
   handleDomainRequest,
   automateDomainSetup,
-  fetchSiteByDomain,
+  getStoreByDomain,
   removeDomainFromDatabase,
 };

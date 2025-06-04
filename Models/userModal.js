@@ -36,6 +36,12 @@ const userSchema = new Schema(
       enum: ["email", "google"],
       default: "email",
     },
+
+    lastOpenedStore: {
+      type: Schema.Types.ObjectId,
+      ref: "Store",
+      default: null,
+    },
   },
   {
     timestamps: true,
