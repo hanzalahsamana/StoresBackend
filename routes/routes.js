@@ -124,7 +124,7 @@ withParams.get("/getProducts", getProductData);
 withParams.get("/getCategory", getCategory);
 withParams.get("/getCartData", getCartData);
 
-withParams.get("/getOrders", getOrders);
+withParams.get("/getOrders", getOrders)
 withParams.get("/getReviews", getReviews);
 withParams.get("/getAnalytics", getAnalyticsData);
 withParams.get("/getPages", getPages);
