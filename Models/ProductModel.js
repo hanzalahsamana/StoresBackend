@@ -9,17 +9,23 @@ const ProductSchema = new Schema({
   comparedAtPrice: { type: Number },
   displayImage: { type: String, required: true },
   gallery: [String],
+  stock: { type: Number, required: true },
+  status: { type: String, enum: ["active", "inactive"], default: "active" },
+  description: { type: String },
+  metaTitle: { type: String },
+  metaDescription: { type: String },
+  wantsCustomerReview: { type: Boolean, default: true, required: true },
+  note: {type:String},
   collections: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Collection",
     },
   ],
-  stock: { type: Number, required: true },
-  status: { type: String, enum: ["active", "inactive"], default: "active" },
-  description: { type: String },
-  metaTitle: { type: String },
-  metaDescription: { type: String },
+  ratings: {
+    average: { type: Number, default: 0 },
+    count: { type: Number, default: 0 },
+  },
   variations: {
     type: [
       {
@@ -62,11 +68,6 @@ const ProductSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Store",
     required: true,
-  },
-  wantsCustomerReview: { type: Boolean, default: true, required: true },
-  ratings: {
-    average: { type: Number, default: 0 },
-    count: { type: Number, default: 0 },
   },
 });
 

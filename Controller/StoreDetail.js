@@ -3,6 +3,7 @@ const { StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
 const generateSlug = require("../Utils/generateSlug");
 const { generateStoreValidation } = require("../Utils/ValidatePayloads");
+const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 
 const generateStore = async (req, res) => {
   const { userId } = req.query;
@@ -25,6 +26,7 @@ const generateStore = async (req, res) => {
       userRef: userId,
     });
     const savedStore = await newStore.save();
+    await SeedDefaultData(savedStore?._id);
     return res.status(201).json({
       success: true,
       data: savedStore,

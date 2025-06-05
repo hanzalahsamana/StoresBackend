@@ -1,10 +1,9 @@
-const mongoose = require("mongoose");
-const { pageSchema } = require("../Models/PagesModel");
-const { categorySchema } = require("../Models/CategoryModal");
-const { productSchema } = require("../Models/ProductModal");
-const { SectionSchema } = require("../Models/SectionsModal");
+const { ProductModel } = require("../Models/ProductModel");
+const { ContentModel } = require("../Models/ContentModel");
+const { SectionModel } = require("../Models/SectionsModel");
+const { CollectionModel } = require("../Models/CollectionModel");
 
-const defaultPages = [
+const defaultContents = [
   {
     title: "Site Logo",
     type: "Site Logo",
@@ -147,147 +146,192 @@ const defaultSections = [
 
 const defaultProducts = [
   {
-    name: "Tshirt 1",
-    alt: "Tshirt 1",
-    brand: "vendor name",
-    originalPrice: 4500,
-    discountedPrice: 2925,
-    discount: 35,
-    images: [
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
-    ],
+    name: "Classic Cotton T-Shirt",
+    vendor: "UrbanWear",
+    price: 25,
+    comparedAtPrice: 35,
+    displayImage: "/images/products/tshirt-main.jpg",
+    gallery: ["/images/products/tshirt-1.jpg", "/images/products/tshirt-2.jpg"],
+    collections: ["60f7f3a5b6a0e024b0d0abcd"],
     stock: 100,
-    size: ["S", "M", "L", "XL"],
-    collectionName: "tshirts",
-    type: "Unstiched",
+    status: "active",
+    description: "Soft and breathable cotton T-shirt, perfect for daily wear.",
+    metaTitle: "Cotton T-Shirt",
+    metaDescription: "Premium quality cotton t-shirt for everyday comfort.",
+    note:"Wash dark colors separately to avoid color bleeding.",
+    variations: [
+      {
+        name: "Color",
+        options: ["Red", "Blue", "Black"],
+      },
+      {
+        name: "Size",
+        options: ["S", "M", "L", "XL"],
+      },
+    ],
+    variants: [
+      {
+        sku: "TSHIRT-RED-M",
+        options: {
+          Color: "Red",
+          Size: "M",
+        },
+        stock: 10,
+        price: 25,
+        image: "/images/products/tshirt-red-m.jpg",
+      },
+    ],
+    storeRef: "60f7f3a5b6a0e024b0d0aaaa",
+    wantsCustomerReview: true,
   },
   {
-    name: "Tshirt 2",
-    alt: "Tshirt 2",
-    brand: "vendor name",
-    originalPrice: 4500,
-    discountedPrice: 2925,
-    discount: 35,
-    images: [
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
-    ],
-    stock: 100,
-    size: ["S", "M", "L", "XL"],
-    collectionName: "tshirts",
-    type: "Unstiched",
+    name: "Genuine Leather Wallet",
+    vendor: "ClassicGoods",
+    price: 45,
+    comparedAtPrice: 60,
+    displayImage: "/images/products/wallet-main.jpg",
+    gallery: ["/images/products/wallet-1.jpg"],
+    collections: ["60f7f3a5b6a0e024b0d0abcf"],
+    stock: 50,
+    status: "active",
+    description: "Premium handmade leather wallet with multiple compartments.",
+    metaTitle: "Leather Wallet",
+    metaDescription: "Durable leather wallet with elegant design.",
+    variations: [],
+    variants: [],
+    storeRef: "60f7f3a5b6a0e024b0d0aaaa",
+    note:"Due to high demand, slight delays in delivery may occur. We appreciate your patience.",
+    wantsCustomerReview: true,
   },
   {
-    name: "Tshirt 3",
-    alt: "Tshirt 3",
-    brand: "vendor name",
-    originalPrice: 4500,
-    discountedPrice: 2925,
-    discount: 35,
-    images: [
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
+    name: "Running Sneakers",
+    vendor: "SprintX",
+    price: 85,
+    comparedAtPrice: 100,
+    displayImage: "/images/products/sneakers-main.jpg",
+    gallery: [
+      "/images/products/sneakers-side.jpg",
+      "/images/products/sneakers-top.jpg",
     ],
-    stock: 100,
-    size: ["S", "M", "L", "XL"],
-    collectionName: "tshirts",
-    type: "Unstiched",
+    collections: [],
+    stock: 200,
+    status: "active",
+    description: "Comfortable running shoes with breathable mesh upper.",
+    metaTitle: "SprintX Running Shoes",
+    metaDescription: "High-performance running shoes for all terrains.",
+    variations: [
+      {
+        name: "Size",
+        options: ["8", "9", "10"],
+      },
+    ],
+    variants: [
+      {
+        sku: "SNEAKERS-9",
+        options: {
+          Size: "9",
+        },
+        stock: 40,
+        price: 85,
+        image: "/images/products/sneakers-9.jpg",
+      },
+    ],
+    storeRef: "60f7f3a5b6a0e024b0d0aaaa",
+    wantsCustomerReview: false,
   },
   {
-    name: "Tshirt 4",
-    alt: "Tshirt 4",
-    brand: "vendor name",
-    originalPrice: 4500,
-    discountedPrice: 2925,
-    discount: 35,
-    images: [
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
-      "https://tenant-web.s3.eu-north-1.amazonaws.com/uploads/1742471124275_rkdgzq1yy8_yellow-t-shirt-with-yellow-t-shirt-it_410516-78878-removebg-preview.png",
+    name: "Motivational Ceramic Mug",
+    vendor: "MugLife",
+    price: 15,
+    comparedAtPrice: 20,
+    displayImage: "/images/products/mug-main.jpg",
+    gallery: [],
+    collections: ["60f7f3a5b6a0e024b0d0abcd"],
+    stock: 120,
+    status: "active",
+    description: "Stylish ceramic mug with inspiring quote print.",
+    metaTitle: "Motivational Mug",
+    metaDescription: "Start your day right with this motivational mug.",
+    variations: [
+      {
+        name: "Color",
+        options: ["White", "Black"],
+      },
     ],
-    stock: 100,
-    size: ["S", "M", "L", "XL"],
-    collectionName: "tshirts",
-    type: "Unstiched",
+    variants: [
+      {
+        sku: "MUG-WHITE",
+        options: {
+          Color: "White",
+        },
+        stock: 60,
+        price: 15,
+        image: "/images/products/mug-white.jpg",
+      },
+    ],
+    storeRef: "60f7f3a5b6a0e024b0d0aaaa",
+    wantsCustomerReview: true,
   },
 ];
 
-const defaultCategories = [
+const defaultCollections = [
   {
     name: "Tshirts",
     image:
       "https://res.cloudinary.com/duaxitxph/image/upload/v1742551330/sc88u7bpbwiqeuwb40dv.png",
-    link: "tshirts",
+    slug: "tshirts",
   },
 ];
 
-
-
-
-const SeedDefaultData = async (type) => {
+const SeedDefaultData = async (storeId) => {
   try {
-    const PageModel = mongoose.model(
-      type + "_pages",
-      pageSchema,
-      type + "_pages"
-    );
-    for (const page of defaultPages) {
-      let existingPage = await PageModel.findOne({ type: page.type });
+    if (!storeId) throw new Error("storeId is required");
 
-      if (!existingPage) {
-        const newPage = new PageModel(page);
-        await newPage.save();
+    for (const content of defaultContents) {
+      let existingContent = await ContentModel.findOne({
+        type: content.type,
+        storeRef: storeId,
+      });
+
+      if (!existingContent) {
+        const newContent = new ContentModel({ ...content, storeRef: storeId });
+        await newContent.save();
       }
     }
 
-    const SectionModel = mongoose.model(
-      type + "_sections",
-      SectionSchema,
-      type + "_section"
-    );
     for (const section of defaultSections) {
       let existingSection = await SectionModel.findOne({
         order: section?.order,
+        storeRef: storeId,
       });
 
       if (!existingSection) {
-        const newSection = new SectionModel(section);
+        const newSection = new SectionModel({ ...section, storeRef: storeId });
         await newSection.save();
       }
     }
 
-    const CategoryModel = mongoose.model(
-      type + "_category",
-      categorySchema,
-      type + "_category"
-    );
-    for (const category of defaultCategories) {
-      let existingCategory = await CategoryModel.findOne({
-        link: category.link,
+    for (const collection of defaultCollections) {
+      let existingCollection = await CollectionModel.findOne({
+        name: collection.name,
       });
 
-      if (!existingCategory) {
-        const newCategory = new CategoryModel(category);
-        await newCategory.save();
+      if (!existingCollection) {
+        const newCollection = new CollectionModel({
+          ...collection,
+          storeRef: storeId,
+        });
+        await newCollection.save();
       }
     }
 
-    const ProductModel = mongoose.model(
-      type + "_products",
-      productSchema,
-      type + "_products"
-    );
-
     for (const product of defaultProducts) {
-      let existingProduct = await ProductModel.findOne({ name: product.name });
-
-      if (!existingProduct) {
-        const newProduct = new ProductModel(product);
-        await newProduct.save();
-      }
+      const newProduct = new ProductModel({ ...product, storeRef: storeId });
+      await newProduct.save();
     }
   } catch (error) {
     console.error("Error seeding default data:", error);
+    throw new Error("Error seeding default data:");
   }
 };
 
