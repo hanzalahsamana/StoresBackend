@@ -7,6 +7,7 @@ const { SectionSchema } = require("../Models/SectionsModal");
 const defaultPages = [
   {
     title: "Site Logo",
+    
     type: "Site Logo",
     image:
       "https://res.cloudinary.com/duaxitxph/image/upload/v1742809504/u2vrwclfq3pe1tzxwl7k.png",
