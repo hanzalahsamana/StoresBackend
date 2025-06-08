@@ -16,6 +16,7 @@ const addProductValidationSchema = Joi.object({
   description: Joi.string().allow("").optional(),
   metaTitle: Joi.string().allow("").optional(),
   metaDescription: Joi.string().allow("").optional(),
+  note: Joi.string().allow("").optional(),
   variations: Joi.array()
     .items(
       Joi.object({
