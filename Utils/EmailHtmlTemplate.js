@@ -3,6 +3,7 @@ const { formatDate } = require("./FormatDate");
 function generateOrderDetailsTemplate(admin, order) {
   const { from, to, customerInfo, orderData, orderInfo } = order;
 
+  
   const productsHTML = orderData
     .map(
       (product) => `
