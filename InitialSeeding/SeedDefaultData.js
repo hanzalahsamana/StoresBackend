@@ -158,15 +158,24 @@ const defaultProducts = [
     description: "Soft and breathable cotton T-shirt, perfect for daily wear.",
     metaTitle: "Cotton T-Shirt",
     metaDescription: "Premium quality cotton t-shirt for everyday comfort.",
-    note:"Wash dark colors separately to avoid color bleeding.",
+    note: "Wash dark colors separately to avoid color bleeding.",
     variations: [
       {
-        name: "Color",
-        options: ["Red", "Blue", "Black"],
+        name: "Condition",
+        options: ["Brand New", "Used", "Refurbished"],
       },
       {
-        name: "Size",
-        options: ["S", "M", "L", "XL"],
+        name: "Color",
+        options: [
+          "coral red",
+          "sunny yellow",
+          "mint green",
+          "sky blue",
+          "purple haze",
+          "soft pink",
+          "light salmon",
+          "teal green",
+        ],
       },
     ],
     variants: [
@@ -182,10 +191,14 @@ const defaultProducts = [
       },
     ],
     storeRef: "60f7f3a5b6a0e024b0d0aaaa",
+    ratings: {
+      average: 4,
+      count: 32,
+    },
     wantsCustomerReview: true,
   },
   {
-    name: "Genuine Leather Wallet",
+    name: "Simple Modern Minimalist Nordic Dining Chair for Home or Kitchen",
     vendor: "ClassicGoods",
     price: 45,
     comparedAtPrice: 60,
@@ -200,7 +213,7 @@ const defaultProducts = [
     variations: [],
     variants: [],
     storeRef: "60f7f3a5b6a0e024b0d0aaaa",
-    note:"Due to high demand, slight delays in delivery may occur. We appreciate your patience.",
+    note: "Due to high demand, slight delays in delivery may occur. We appreciate your patience.",
     wantsCustomerReview: true,
   },
   {
