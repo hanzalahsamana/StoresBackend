@@ -272,6 +272,7 @@ const SeedDefaultData = async (type) => {
         await newCategory.save();
       }
     }
+    
 
     const ProductModel = mongoose.model(
       type + "_products",
