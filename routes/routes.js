@@ -102,6 +102,7 @@ withParams.post("/genrateSSl", automateDomainSetup);
 withParams.post("/addSubscriber", addSubscriber);
 withParams.post("/applyCoupon", applyCoupon);
 
+
 // POST routes (without params)
 withoutParams.post("/setTheme", tokenChecker, addTheme);
 withoutParams.post("/addVariation", tokenChecker, addVariation);
