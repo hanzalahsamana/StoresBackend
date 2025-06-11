@@ -13,6 +13,9 @@ const addProductValidationSchema = Joi.object({
   collections: Joi.array().items(JoiObjectId()).optional(),
   stock: Joi.number().required(),
   status: Joi.string().valid("active", "inactive").optional(),
+  showStock: Joi.boolean().optional(),
+  pronouce: Joi.string().allow("").optional(),
+  wantsCustomerReview: Joi.boolean().optional(),
   description: Joi.string().allow("").optional(),
   metaTitle: Joi.string().allow("").optional(),
   metaDescription: Joi.string().allow("").optional(),
@@ -24,31 +27,30 @@ const addProductValidationSchema = Joi.object({
         options: Joi.array().items(Joi.string()).min(1).required(),
       })
     )
-    .unique((a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim())
+    .unique(
+      (a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim()
+    )
     .optional(),
-  variants: Joi.array()
+  variantRules: Joi.array()
     .items(
-      Joi.object({
-        sku: Joi.string().required(),
-        options: Joi.object().pattern(Joi.string(), Joi.string()).required(),
-        stock: Joi.number().required(),
-        price: Joi.number().required(),
-        image: Joi.string().optional(),
-      })
+      Joi.object().pattern(
+        Joi.string(),
+        Joi.alternatives().try(Joi.string(), Joi.number())
+      )
     )
     .optional(),
   ratings: Joi.object({
     average: Joi.number(),
     count: Joi.number(),
   }).optional(),
-  wantsCustomerReview: Joi.boolean().optional(),
 });
 
 // Edit product schema (all optional, but at least one field required)
-const editProductValidationSchema = addProductValidationSchema.fork(
-  Object.keys(addProductValidationSchema.describe().keys),
-  (schema) => schema.optional()
-).min(1);
+const editProductValidationSchema = addProductValidationSchema
+  .fork(Object.keys(addProductValidationSchema.describe().keys), (schema) =>
+    schema.optional()
+  )
+  .min(1);
 
 const validateProduct = (isEdit = false) => {
   return async (req, res, next) => {
@@ -63,7 +65,9 @@ const validateProduct = (isEdit = false) => {
       }
     }
 
-    const schema = isEdit ? editProductValidationSchema : addProductValidationSchema;
+    const schema = isEdit
+      ? editProductValidationSchema
+      : addProductValidationSchema;
 
     const { error, value } = schema.validate(req.body, {
       abortEarly: false,

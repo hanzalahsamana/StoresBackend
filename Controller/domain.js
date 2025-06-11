@@ -160,12 +160,9 @@ const getStoreByDomain = async (req, res) => {
 
     const store = await StoreModal.findOne(query);
 
-    console.log(query);
     if (!store) {
       return res.status(404).json({ message: "store not found" });
     }
-    console.log("Querying store with:", store);
-
     res.json({ storeId: store._id });
   } catch (error) {
     console.error("Error fetching site:", error);

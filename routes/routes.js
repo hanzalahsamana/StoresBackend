@@ -15,7 +15,6 @@ const validOwnerChecker = require("../Middleware/ValidOwnerChecker");
 const ValidStoreChecker = require("../Middleware/ValidStoreChecker");
 
 const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle } = require("../Controller/user");
-const { getCartData, deleteCartProduct, addToCart } = require("../Controller/carts");
 const { addOrderData, getOrders, editOrderData } = require("../Controller/Order");
 const { getAnalyticsData } = require("../Controller/analytics");
 const { postConatctForm } = require("../Controller/Contact");
@@ -28,11 +27,12 @@ const { generateStore, getAllStores, getStore } = require("../Controller/StoreDe
 const { addDiscount, deleteDiscount, editDiscount, applyCoupon } = require("../Controller/discounts");
 const { addAnnouncement, deleteAnnouncement } = require("../Controller/announcement");
 const addSubscriber = require("../Controller/subscribe");
-const { addProduct, deleteProduct, editProduct, getProducts } = require("../Controller/product");
+const { addProduct, deleteProduct, editProduct, getProducts } = require("../Controller/Product");
 const { addCollection, getCollections, deleteCollection, editCollection } = require("../Controller/Collection");
 const { addSection, getSections, deleteSection, editSection, changeSectionOrder } = require("../Controller/Sections");
 const { addReview, getReviews, deleteReview } = require("../Controller/Reviews");
 const { getContents, editContent } = require("../Controller/Content");
+const { addToCart, deleteCartProduct, getCartdata } = require("../Controller/Cart");
 
 
 // Multer setup
@@ -95,8 +95,8 @@ withParams.get("/getOrders", ValidStoreChecker, getOrders);
 withParams.put("/editOrder", editOrderData);
 
 // --- CART ROUTES ---
-withParams.post("/addCart", addToCart);
-withParams.get("/getCartData", ValidStoreChecker, getCartData);
+withParams.post("/addToCart",ValidStoreChecker, addToCart);
+withParams.get("/getCartdata", ValidStoreChecker, getCartdata);
 withParams.delete("/deleteCartProduct", deleteCartProduct);
 
 // --- STORE / THEME / ANALYTICS ROUTES ---

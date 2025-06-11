@@ -30,14 +30,9 @@ module.exports = {
     const { collection, productId } = req.query;
 
     try {
-      // Validate storeId
-      if (!mongoose.Types.ObjectId.isValid(storeId)) {
-        return res.status(400).json({ error: "Invalid store ID format" });
-      }
 
       const query = { storeRef: storeId };
 
-      // Filter by collection ID
       if (collection) {
         if (!mongoose.Types.ObjectId.isValid(collection)) {
           return res

@@ -10,12 +10,14 @@ const ProductSchema = new Schema({
   displayImage: { type: String, required: true },
   gallery: [String],
   stock: { type: Number, required: true },
+  showStock: { type: Boolean, default: true, required: true },
+  pronouce: { type: String, default: "piece" },
   status: { type: String, enum: ["active", "inactive"], default: "active" },
   description: { type: String },
   metaTitle: { type: String },
   metaDescription: { type: String },
   wantsCustomerReview: { type: Boolean, default: true, required: true },
-  note: {type:String},
+  note: { type: String },
   collections: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -40,26 +42,12 @@ const ProductSchema = new Schema({
       },
     ],
     default: [],
-    validate: {
-      validator: function (variations) {
-        const names = variations.map((v) => v.name.toLowerCase().trim());
-        return names.length === new Set(names).size;
-      },
-      message: "Each variation name must be unique.",
-    },
   },
-  variants: {
+  variantRules: {
     type: [
       {
-        sku: { type: String, required: true },
-        options: {
-          type: Map,
-          of: String, // Example: { Color: 'Red', Size: 'M' }
-          required: true,
-        },
-        stock: { type: Number, required: true },
-        price: { type: Number, required: true },
-        image: { type: String }, // Optional: image specific to variant
+        type: mongoose.Schema.Types.Mixed,
+        default: {},
       },
     ],
     default: [],
