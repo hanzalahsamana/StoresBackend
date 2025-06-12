@@ -32,7 +32,7 @@ const { addCollection, getCollections, deleteCollection, editCollection } = requ
 const { addSection, getSections, deleteSection, editSection, changeSectionOrder } = require("../Controller/Sections");
 const { addReview, getReviews, deleteReview } = require("../Controller/Reviews");
 const { getContents, editContent } = require("../Controller/Content");
-const { addToCart, deleteCartProduct, getCartdata } = require("../Controller/Cart");
+const { addToCart, getCartdata, deleteCartData } = require("../Controller/Cart");
 
 
 // Multer setup
@@ -95,9 +95,9 @@ withParams.get("/getOrders", ValidStoreChecker, getOrders);
 withParams.put("/editOrder", editOrderData);
 
 // --- CART ROUTES ---
-withParams.post("/addToCart",ValidStoreChecker, addToCart);
+withParams.post("/addToCart", ValidStoreChecker, addToCart);
 withParams.get("/getCartdata", ValidStoreChecker, getCartdata);
-withParams.delete("/deleteCartProduct", deleteCartProduct);
+withParams.delete("/deleteCartData", ValidStoreChecker, deleteCartData);
 
 // --- STORE / THEME / ANALYTICS ROUTES ---
 withoutParams.post("/setTheme", tokenChecker, addTheme);

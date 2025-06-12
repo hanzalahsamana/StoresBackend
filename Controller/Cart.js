@@ -2,6 +2,7 @@ const { mongoose } = require("mongoose");
 const { productSchema, ProductModel } = require("../Models/ProductModel");
 const { getValidVariant } = require("../Utils/getValidVariant");
 const { CartModel } = require("../Models/CartModel");
+const EnrichedCartProducts = require("../Helpers/EnrichedCartProducts");
 
 // add cart data function
 const addToCart = async (req, res) => {
@@ -67,6 +68,8 @@ const addToCart = async (req, res) => {
         isSameVariant(p.selectedVariant, selectedVariant)
     );
 
+    console.log(existingProduct, "🍭🍭🍭");
+
     const maximumStock = getValidVariant(productData, selectedVariant);
 
     const maxQty = maximumStock?.stock ?? 0;
@@ -77,7 +80,6 @@ const addToCart = async (req, res) => {
         .json({ message: "Invalid quantity or stock not available" });
     }
 
-    console.log(existingProduct);
     const totalQuantity = existingProduct
       ? existingProduct.quantity + quantity
       : quantity;
@@ -98,8 +100,10 @@ const addToCart = async (req, res) => {
       });
     }
 
-    await cart.save();
-    return res.status(200).json(cart);
+    const savedCart = await cart.save();
+    const validCart = await EnrichedCartProducts(savedCart);
+
+    return res.status(200).json(validCart);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -123,83 +127,62 @@ const getCartdata = async (req, res) => {
       return res.status(404).json({ message: "Cart not found" });
     }
 
-    const enrichedProducts = await Promise.all(
-      cart.products.map(async (item) => {
-        const productData = await ProductModel.findById(item.productId).lean();
+    const validCart = await EnrichedCartProducts(cart);
 
-        if (!productData) {
-          return null;
-        }
-
-        const productDataAccToVariant = getValidVariant(
-          productData,
-          item?.selectedVariant
-        );
-
-        return {
-          _id: item._id,
-          productId: item._id,
-          quantity: item.quantity,
-          selectedVariant: item.selectedVariant,
-          name: productData.name,
-          price: productDataAccToVariant.price,
-          image: productDataAccToVariant.image,
-        };
-      })
-    );
-
-    const validProducts = enrichedProducts.filter((p) => p !== null);
-
-    return res.status(200).json({
-      cartId: cart.cartId,
-      products: validProducts,
-    });
+    return res.status(200).json(validCart);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
 // delete cart product
-const deleteCartProduct = async (req, res) => {
-  const productId = req.query.productId;
-  const id = req.query.id;
-  const type = req.collectionType;
+
+const deleteCartData = async (req, res) => {
+  const { storeId } = req.params;
+  const { cartId } = req.query;
+  const { cartProductId } = req.query;
+
+  if (!cartId || !mongoose.Types.ObjectId.isValid(cartId)) {
+    return res.status(400).json({ message: "undefiened Or Invalid cartId" });
+  }
 
   try {
-    const CartModel = mongoose.model(
-      type + "_Cart",
-      CartSchema,
-      type + "_Cart"
-    );
-    if (!productId) {
-      const cart = await CartModel.findOneAndDelete({ cartId: id });
-      return res.status(200).json(!cart ? [] : cart);
-    } else if (!id) {
-      return res.status(400).json({ message: "ID is required" });
-    }
-
-    const cart = await CartModel.findOne({ cartId: id });
+    const cart = await CartModel.findOne({
+      _id: cartId,
+      storeRef: storeId,
+    });
 
     if (!cart) {
       return res.status(404).json({ message: "Cart not found" });
     }
 
-    const productIndex = cart.products.findIndex(
-      (product) => product.productId.toString() === productId
+    if (!cartProductId) {
+      await CartModel.findByIdAndDelete(cartId);
+      return res.status(200).json({ message: "Cart deleted" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(cartProductId)) {
+      return res.status(400).json({ message: "Invalid cartProductId" });
+    }
+
+    const index = cart.products.findIndex(
+      (p) => p._id?.toString() === cartProductId
     );
 
-    if (productIndex === -1) {
+    if (index === -1) {
       return res.status(404).json({ message: "Product not found in the cart" });
     }
 
-    cart.products.splice(productIndex, 1);
+    cart.products.splice(index, 1);
+    const savedCart = await cart.save();
 
-    await cart.save();
+    const validCart = await EnrichedCartProducts(savedCart);
 
-    return res.status(200).json(cart);
+    return res.status(200).json(validCart);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Delete Cart Error:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { addToCart, getCartdata, deleteCartProduct };
+module.exports = { addToCart, getCartdata, deleteCartData };

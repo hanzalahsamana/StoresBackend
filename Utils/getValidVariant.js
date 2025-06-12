@@ -9,10 +9,10 @@ const getValidVariant = (product, selectedVariant) => {
     const [matchKey] = Object.keys(rule).filter(
       (k) => !["image", "price", "stock"].includes(k)
     );
+
     const matchValue = rule[matchKey];
 
     if (selectedVariant[matchKey] === matchValue) {
-      console.log(mergedData, rule, "👓👓");
       mergedData = { ...mergedData, ...rule };
     }
   });
@@ -24,4 +24,4 @@ const getValidVariant = (product, selectedVariant) => {
   return mergedData;
 };
 
-module.exports = {getValidVariant}
+module.exports = { getValidVariant };
