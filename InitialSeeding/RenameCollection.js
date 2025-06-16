@@ -10,6 +10,7 @@ const renameCollection = async () => {
     console.error("Error renaming collection:", err);
   }
   
+  
 };
 
 module.exports = renameCollection;
