@@ -1,8 +1,8 @@
 const { default: mongoose } = require("mongoose");
-const { StoreModal } = require("../Models/StoreModal");
-const { UserModal } = require("../Models/userModal");
+const { StoreModal } = require("../../Models/StoreModal");
+const { UserModal } = require("../../Models/userModal");
 const moment = require("moment");
-const subscriberSchema = require("../Models/SubscriberModal");
+const subscriberSchema = require("../../Models/SubscriberModal");
 
 // Add Discount
 const addDiscount = async (req, res) => {

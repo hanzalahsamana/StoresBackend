@@ -1,5 +1,5 @@
-const { StoreModal } = require("../Models/StoreModal");
-const { UserModal } = require("../Models/userModal");
+const { StoreModal } = require("../../Models/StoreModal");
+const { UserModal } = require("../../Models/userModal");
 
 const addVariation = async (req, res) => {
   const { userId } = req.query;

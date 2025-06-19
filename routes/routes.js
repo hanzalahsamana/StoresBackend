@@ -48,7 +48,7 @@ const {
   deleteVariation,
   addVariation,
   editVariation,
-} = require("../Controller/variation");
+} = require("../Controller/StoreConfigurations/variation");
 const {
   generateStore,
   getAllStores,
@@ -59,7 +59,7 @@ const {
   deleteDiscount,
   editDiscount,
   applyCoupon,
-} = require("../Controller/discounts");
+} = require("../Controller/StoreConfigurations/discounts");
 const {
   addAnnouncement,
   deleteAnnouncement,
