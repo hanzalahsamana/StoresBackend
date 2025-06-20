@@ -42,7 +42,6 @@ const {
   getStoreByDomain,
 } = require("../Controller/domain");
 const { uploadSingle, uploadMultiple } = require("../Controller/imageUpload");
-const { addTheme } = require("../Controller/Theme");
 const { exportSite } = require("../Controller/migration");
 const {
   deleteVariation,
@@ -96,6 +95,17 @@ const {
   deleteCartData,
 } = require("../Controller/Cart");
 const { initiateJazzCashPayment } = require("../Controller/payment");
+const { addTheme } = require("../Controller/StoreConfigurations/ThemeSetting");
+const {
+  updatePaymentMethod,
+} = require("../Controller/StoreConfigurations/PaymentMethod");
+const {
+  validatePaymentMethod,
+} = require("../Middleware/ValidationsMiddleware/PaymentMethodValidation");
+const {
+  getAdminConfiguration,
+  getPublicConfiguration,
+} = require("../Controller/StoreConfigurations/Configuration");
 
 // Multer setup
 const upload = multer({ dest: "/tmp" });
@@ -210,6 +220,31 @@ withParams.post("/addToCart", ValidStoreChecker, addToCart);
 withParams.get("/getCartdata", ValidStoreChecker, getCartdata);
 withParams.delete("/deleteCartData", ValidStoreChecker, deleteCartData);
 
+// --- Store Configuration ROUTES ---
+withParams.get(
+  "/getAdminConfiguration",
+  tokenChecker,
+  validOwnerChecker,
+  getAdminConfiguration
+);
+withParams.get(
+  "/getPublicConfiguration",
+  ValidStoreChecker,
+  getPublicConfiguration
+);
+
+// withParams.get("/getCartdata", ValidStoreChecker, getCartdata);
+// withParams.delete("/deleteCartData", ValidStoreChecker, deleteCartData);
+
+// --- PAYMENT METHODS ROUTES ---
+withParams.patch(
+  "/updatePaymentMethod",
+  tokenChecker,
+  validOwnerChecker,
+  validatePaymentMethod,
+  updatePaymentMethod
+);
+
 // --- STORE / THEME / ANALYTICS ROUTES ---
 withoutParams.post("/setTheme", tokenChecker, addTheme);
 withParams.get("/getAnalytics", ValidStoreChecker, getAnalyticsData);
@@ -244,7 +279,6 @@ withoutParams.delete("/deleteAnnouncement", tokenChecker, deleteAnnouncement);
 withoutParams.post("/addVariation", tokenChecker, addVariation);
 withoutParams.delete("/deleteVariation", tokenChecker, deleteVariation);
 withoutParams.patch("/editVariation", tokenChecker, editVariation);
-
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post("/addSubscriber", addSubscriber);

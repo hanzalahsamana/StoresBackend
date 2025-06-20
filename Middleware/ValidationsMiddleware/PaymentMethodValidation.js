@@ -1,37 +1,50 @@
-// middlewares/validatePaymentPayload.js
+const Joi = require("joi");
 
-const allowedFields = {
-  jazzcash: ["merchantId", "pp_Password", "integritySalt"],
-  easypaisa: ["merchantId", "apiKey"],
-  cod: [], // No sensitive fields
+const paymentMethodSchema = {
+  cod: Joi.object({
+    isEnabled: Joi.boolean().required(),
+    credentials: Joi.object().default({}),
+  }),
+
+  jazzcash: Joi.object({
+    isEnabled: Joi.boolean().required(),
+    credentials: Joi.object({
+      merchantId: Joi.string().required().label("Merchant ID"),
+      pp_Password: Joi.string().required().label("Password"),
+      integritySalt: Joi.string().required().label("Integrity Salt"),
+    }).required(),
+  }),
+
+  easypaisa: Joi.object({
+    isEnabled: Joi.boolean().required(),
+    credentials: Joi.object({
+      merchantId: Joi.string().required().label("Merchant ID"),
+      apiKey: Joi.string().required().label("API Key"),
+    }).required(),
+  }),
 };
 
-const validatePaymentPayload = (req, res, next) => {
-  const { key, data } = req.body;
+const validatePaymentMethod = (req, res, next) => {
+  const { method, data } = req.body;
 
-  if (!key || typeof key !== "string") {
-    return res.status(400).json({ message: "Payment method key is required" });
+  if (!method || typeof method !== "string") {
+    return res.status(400).json({ message: "Payment method name is required" });
   }
 
-  if (!data || typeof data !== "object") {
-    return res.status(400).json({ message: "Payment method data is required" });
-  }
+  const schema = paymentMethodSchema[method];
 
-  const fields = allowedFields[key];
-
-  if (!fields) {
+  if (!schema) {
     return res.status(400).json({ message: "Unsupported payment method" });
   }
 
-  const missingFields = fields.filter((f) => !data[f] || data[f].trim() === "");
+  const { error } = schema.validate(data, { abortEarly: false });
 
-  if (missingFields.length > 0) {
-    return res.status(400).json({
-      message: `Missing required fields: ${missingFields.join(", ")}`,
-    });
+  if (error) {
+    const errorMessage = error.details.map((e) => e.message).join(", ");
+    return res.status(400).json({ message: errorMessage });
   }
 
   next();
 };
 
-module.exports = { validatePaymentPayload };
+module.exports = { validatePaymentMethod };

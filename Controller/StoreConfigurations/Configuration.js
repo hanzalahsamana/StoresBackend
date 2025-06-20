@@ -13,13 +13,16 @@ const getPublicConfiguration = async (req, res) => {
     }
 
     // Filter only enabled payment methods without credentials
-    const paymentMethods = config.paymentMethods
-      .filter((method) => method.isEnabled)
-      .map(({ key, label }) => ({ key, label }));
+    const paymentMethods = config.paymentMethods.map(
+      ({ credentials, ...rest }) => rest
+    );
 
     return res.status(200).json({
-      ...config,
-      paymentMethods, // override with filtered safe version
+      message: "cofig fetched successfully",
+      data: {
+        ...config,
+        paymentMethods, // override with filtered safe version
+      },
     });
   } catch (err) {
     return res
@@ -40,14 +43,16 @@ const getAdminConfiguration = async (req, res) => {
       return res.status(404).json({ message: "Store configuration not found" });
     }
 
-    return res.status(200).json(config);
+    console.log(config);
+    return res.status(200).json({
+      message: "cofig fetched successfully",
+      data: config,
+    });
   } catch (err) {
     return res
       .status(500)
       .json({ message: err.message || "Internal server error" });
   }
 };
-
-
 
 module.exports = { getPublicConfiguration, getAdminConfiguration };

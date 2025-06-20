@@ -3,14 +3,14 @@ const { StoreModal } = require("../../Models/StoreModal");
 const { UserModal } = require("../../Models/userModal");
 const moment = require("moment");
 const subscriberSchema = require("../../Models/SubscriberModal");
+const { ConfigurationModel } = require("../../Models/ConfigurationModel");
 
 // Add Discount
 const addDiscount = async (req, res) => {
-  const { userId } = req.query;
+  const { storeId } = req.params;
   const { discount } = req.body;
 
   if (
-    !userId ||
     !discount ||
     !discount.name ||
     !discount.amount ||
@@ -24,19 +24,19 @@ const addDiscount = async (req, res) => {
   }
 
   try {
-    const user = await UserModal.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
+    let configuration = await ConfigurationModel.findOne({
+      storeRef: storeId,
+    }).lean();
 
-    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
-    if (!store) {
-      return res.status(404).json({ message: "Store not found." });
+    if (!configuration) {
+      configuration = new ConfigurationModel({
+        storeRef: storeId,
+      });
     }
 
     if (
       discount.discountType === "global" &&
-      store.discounts.some((d) => d.discountType === "global")
+      configuration?.discounts.some((d) => d.discountType === "global")
     ) {
       return res.status(400).json({
         message:
@@ -52,12 +52,12 @@ const addDiscount = async (req, res) => {
       });
     }
 
-    store.discounts.push(discount);
-    const savedStore = await store.save();
+    configuration.discounts.push(discount);
+    const savedConfiguration = await configuration.save();
 
     return res.status(200).json({
       message: "Discount added successfully.",
-      data: savedStore,
+      data: savedConfiguration?.discounts,
     });
   } catch (error) {
     console.error("Error adding discount:", error);
@@ -67,11 +67,10 @@ const addDiscount = async (req, res) => {
 
 // Edit Discount
 const editDiscount = async (req, res) => {
-  const { userId } = req.query;
+  const { storeId } = req.params;
   const { discountId, updatedDiscount } = req.body;
 
   if (
-    !userId ||
     !discountId ||
     !updatedDiscount ||
     !updatedDiscount.name ||
@@ -84,24 +83,23 @@ const editDiscount = async (req, res) => {
   }
 
   try {
-    const user = await UserModal.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
+    const configuration = await ConfigurationModel.findOne({
+      storeRef: storeId,
+    }).lean();
+    if (!configuration) {
+      return res
+        .status(404)
+        .json({ message: "Store Configuration not found." });
     }
 
-    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
-    if (!store) {
-      return res.status(404).json({ message: "Store not found." });
-    }
-
-    const discount = store.discounts.id(discountId);
+    const discount = configuration.discounts.id(discountId);
     if (!discount) {
       return res.status(404).json({ message: "Discount not found." });
     }
 
     if (
       updatedDiscount.discountType === "global" &&
-      store.discounts.some(
+      configuration.discounts.some(
         (d) => d._id.toString() !== discountId && d.discountType === "global"
       )
     ) {
@@ -120,11 +118,11 @@ const editDiscount = async (req, res) => {
     }
 
     Object.assign(discount, updatedDiscount);
-    const savedStore = await store.save();
+    const savedConfiguration = await configuration.save();
 
     return res.status(200).json({
       message: "Discount updated successfully.",
-      data: savedStore,
+      data: savedConfiguration?.discounts,
     });
   } catch (error) {
     console.error("Error editing discount:", error);
@@ -134,35 +132,34 @@ const editDiscount = async (req, res) => {
 
 // Delete Discount
 const deleteDiscount = async (req, res) => {
-  const { userId, discountId } = req.query;
+  const { discountId } = req.query;
+  const { storeId } = req.params;
 
-  if (!userId || !discountId) {
+  if (!discountId) {
     return res.status(400).json({ message: "Missing required fields." });
   }
 
-  
   try {
-    const user = await UserModal.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
+    const configuration = await ConfigurationModel.findOne({
+      storeRef: storeId,
+    }).lean();
+    if (!configuration) {
+      return res
+        .status(404)
+        .json({ message: "Store Configuration not found." });
     }
 
-    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
-    if (!store) {
-      return res.status(404).json({ message: "Store not found." });
-    }
-
-    const discount = store.discounts.id(discountId);
+    const discount = configuration.discounts.id(discountId);
     if (!discount) {
       return res.status(404).json({ message: "Discount not found." });
     }
 
     discount.deleteOne();
-    const savedStore = await store.save();
+    const savedConfiguration = await configuration.save();
 
     return res.status(200).json({
       message: "Discount deleted successfully.",
-      data: savedStore,
+      data: savedConfiguration?.discounts,
     });
   } catch (error) {
     console.error("Error deleting discount:", error);
@@ -172,8 +169,8 @@ const deleteDiscount = async (req, res) => {
 
 const applyCoupon = async (req, res) => {
   try {
+    const { storeId } = req.params;
     const { email, couponCode, totalAmount } = req.body;
-    const type = req.collectionType;
 
     if (!email) {
       return res.status(400).json({ message: "Email is required." });
@@ -195,26 +192,20 @@ const applyCoupon = async (req, res) => {
         .json({ message: "Total amount must be greater than 0." });
     }
 
-    const user = await UserModal.findOne({ brandName: String(type) }).select(
-      "-password"
-    );
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: `No document found with brandName: ${type}`,
-      });
-    }
-
-    const Store = await StoreModal.findOne({ brandName: String(type) });
-
+    const configuration = await ConfigurationModel.findOne({
+      storeRef: storeId,
+    }).lean();
     // Find store discounts (you might have a different way to get discounts)
-    if (!Store || !Store.discounts || Store.discounts.length === 0) {
+    if (
+      !configuration ||
+      !configuration.discounts ||
+      configuration.discounts.length === 0
+    ) {
       return res.status(404).json({ message: "No discounts configured." });
     }
 
     // Find the coupon discount
-    const discount = Store.discounts.find(
+    const discount = configuration.discounts.find(
       (d) =>
         d.discountType === "coupon" &&
         d.name.toLowerCase() === couponCode.toLowerCase()

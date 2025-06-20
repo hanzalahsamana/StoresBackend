@@ -65,7 +65,7 @@ const DiscountSchema = new Schema({
 
 /* ========== Payment Method Schema ========== */
 const PaymentMethodSchema = new Schema({
-  key: { type: String, required: true }, // e.g. "jazzcash", "easypaisa"
+  method: { type: String, required: true }, // e.g. "jazzcash", "easypaisa"
   isEnabled: { type: Boolean, default: false },
   credentials: {
     type: Map,
