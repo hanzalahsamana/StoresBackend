@@ -43,11 +43,11 @@ const {
 } = require("../Controller/domain");
 const { uploadSingle, uploadMultiple } = require("../Controller/imageUpload");
 const { exportSite } = require("../Controller/migration");
-const {
-  deleteVariation,
-  addVariation,
-  editVariation,
-} = require("../Controller/StoreConfigurations/variation");
+  // const {
+  //   deleteVariation,
+  //   addVariation,
+  //   editVariation,
+  // } = require("../Controller/StoreConfigurations/variation");
 const {
   generateStore,
   getAllStores,
@@ -95,7 +95,7 @@ const {
   deleteCartData,
 } = require("../Controller/Cart");
 const { initiateJazzCashPayment } = require("../Controller/payment");
-const { addTheme } = require("../Controller/StoreConfigurations/ThemeSetting");
+const { addTheme, updateTheme } = require("../Controller/StoreConfigurations/ThemeSetting");
 const {
   updatePaymentMethod,
 } = require("../Controller/StoreConfigurations/PaymentMethod");
@@ -246,7 +246,7 @@ withParams.patch(
 );
 
 // --- STORE / THEME / ANALYTICS ROUTES ---
-withoutParams.post("/setTheme", tokenChecker, addTheme);
+withoutParams.post("/setTheme", tokenChecker, updateTheme);
 withParams.get("/getAnalytics", ValidStoreChecker, getAnalyticsData);
 
 // --- UPLOAD ROUTES ---
@@ -276,9 +276,9 @@ withoutParams.post("/addAnnouncement", tokenChecker, addAnnouncement);
 withoutParams.delete("/deleteAnnouncement", tokenChecker, deleteAnnouncement);
 
 // --- VARIATION ROUTES ---
-withoutParams.post("/addVariation", tokenChecker, addVariation);
-withoutParams.delete("/deleteVariation", tokenChecker, deleteVariation);
-withoutParams.patch("/editVariation", tokenChecker, editVariation);
+// withoutParams.post("/addVariation", tokenChecker, addVariation);
+// withoutParams.delete("/deleteVariation", tokenChecker, deleteVariation);
+// withoutParams.patch("/editVariation", tokenChecker, editVariation);
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post("/addSubscriber", addSubscriber);
