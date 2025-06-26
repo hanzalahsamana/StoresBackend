@@ -1,33 +1,29 @@
 const { mongoose } = require("mongoose");
-const { orderSchema } = require("../Models/OrderModal");
+const { orderSchema, OrderModel } = require("../Models/OrderModal");
 const {
   customerOrderDetail,
   adminOrderDetail,
 } = require("../Helpers/EmailsToSend");
 const { UserModal } = require("../Models/userModal");
 
-const addOrderData = async (req, res) => {
-  const type = req.collectionType;
-  const OrderModel = mongoose.model(
-    type + "_Orders",
-    orderSchema,
-    type + "_Orders"
-  );
+const placeOrder = async (req, res) => {
+  // const type = req.collectionType;
   try {
-    const admin = await UserModal.findOne({ brandName: type });
+    // const admin = await UserModal.findOne({ brandName: type });
 
     const newOrder = new OrderModel(req.body);
     await newOrder.save();
-    await customerOrderDetail(
-      { ...admin.toObject(), logo: newOrder?.to },
-      newOrder?.customerInfo?.email,
-      newOrder
-    );
-    await adminOrderDetail(
-      { ...admin.toObject(), logo: newOrder?.to },
-      admin.email,
-      newOrder
-    );
+    // await customerOrderDetail(
+    //   { ...admin.toObject(), logo: newOrder?.to },
+    //   newOrder?.customerInfo?.email,
+    //   newOrder
+    // );
+
+    // await adminOrderDetail(
+    //   { ...admin.toObject(), logo: newOrder?.to },
+    //   admin.email,
+    //   newOrder
+    // );
     return res.status(201).json(newOrder);
   } catch (e) {
     console.log(e);
@@ -113,4 +109,4 @@ const editOrderData = async (req, res) => {
   }
 };
 
-module.exports = { addOrderData, getOrders, editOrderData };
+module.exports = { placeOrder, getOrders, editOrderData };

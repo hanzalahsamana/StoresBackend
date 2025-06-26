@@ -28,11 +28,7 @@ const {
   registerUser,
   authWithGoogle,
 } = require("../Controller/user");
-const {
-  addOrderData,
-  getOrders,
-  editOrderData,
-} = require("../Controller/Order");
+const { getOrders, editOrderData } = require("../Controller/Order");
 const { getAnalyticsData } = require("../Controller/analytics");
 const { postConatctForm } = require("../Controller/Contact");
 const {
@@ -43,11 +39,11 @@ const {
 } = require("../Controller/domain");
 const { uploadSingle, uploadMultiple } = require("../Controller/imageUpload");
 const { exportSite } = require("../Controller/migration");
-  // const {
-  //   deleteVariation,
-  //   addVariation,
-  //   editVariation,
-  // } = require("../Controller/StoreConfigurations/variation");
+// const {
+//   deleteVariation,
+//   addVariation,
+//   editVariation,
+// } = require("../Controller/StoreConfigurations/variation");
 const {
   generateStore,
   getAllStores,
@@ -95,9 +91,13 @@ const {
   deleteCartData,
 } = require("../Controller/Cart");
 const { initiateJazzCashPayment } = require("../Controller/payment");
-const { addTheme, updateTheme } = require("../Controller/StoreConfigurations/ThemeSetting");
+const {
+  addTheme,
+  updateTheme,
+} = require("../Controller/StoreConfigurations/ThemeSetting");
 const {
   updatePaymentMethod,
+  getHashedPaymentCredential,
 } = require("../Controller/StoreConfigurations/PaymentMethod");
 const {
   validatePaymentMethod,
@@ -211,7 +211,7 @@ withParams.patch(
 );
 
 // --- ORDER ROUTES ---
-withParams.post("/addOrderData", addOrderData);
+// withParams.post("/addOrderData", addOrderData);
 withParams.get("/getOrders", ValidStoreChecker, getOrders);
 withParams.put("/editOrder", editOrderData);
 
@@ -243,6 +243,11 @@ withParams.patch(
   validOwnerChecker,
   validatePaymentMethod,
   updatePaymentMethod
+);
+withParams.get(
+  "/getHashedPaymentCredential",
+  ValidStoreChecker,
+  getHashedPaymentCredential,
 );
 
 // --- STORE / THEME / ANALYTICS ROUTES ---
