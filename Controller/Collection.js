@@ -25,7 +25,7 @@ module.exports = {
       if (products && products.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: products }, storeRef: storeId },
-          { $addToSet: { collections: savedCollection._id } }
+          { $addToSet: { collections: savedCollection._id } },
         );
       }
 
@@ -100,27 +100,27 @@ module.exports = {
       }).select("_id");
 
       const previouslyLinkedIds = previouslyLinkedProducts.map((p) =>
-        p._id.toString()
+        p._id.toString(),
       );
 
       const removedProductIds = previouslyLinkedIds.filter(
-        (id) => !updatedProductIds.includes(id)
+        (id) => !updatedProductIds.includes(id),
       );
       const newlyAddedProductIds = updatedProductIds.filter(
-        (id) => !previouslyLinkedIds.includes(id)
+        (id) => !previouslyLinkedIds.includes(id),
       );
 
       if (removedProductIds.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: removedProductIds }, storeRef: storeId },
-          { $pull: { collections: collectionId } }
+          { $pull: { collections: collectionId } },
         );
       }
 
       if (newlyAddedProductIds.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: newlyAddedProductIds }, storeRef: storeId },
-          { $addToSet: { collections: collectionId } }
+          { $addToSet: { collections: collectionId } },
         );
       }
 
@@ -137,34 +137,38 @@ module.exports = {
   },
 
   // delete category
-deleteCollection: async (req, res) => {
-  const { storeId } = req.params;
-  const collectionId = req.query.collectionId;
+  deleteCollection: async (req, res) => {
+    const { storeId } = req.params;
+    const collectionId = req.query.collectionId;
 
-  if (!mongoose.isValidObjectId(collectionId) || !collectionId) {
-    return res
-      .status(400)
-      .json({ message: "Invalid id OR id is not defined" });
-  }
-
-  try {
-    // Step 1: Delete the collection by ID and storeRef
-    const deleted = await CollectionModel.deleteOne({ _id: collectionId, storeRef: storeId });
-
-    if (deleted.deletedCount === 0) {
-      return res.status(404).json({ message: "Collection not found" });
+    if (!mongoose.isValidObjectId(collectionId) || !collectionId) {
+      return res
+        .status(400)
+        .json({ message: "Invalid id OR id is not defined" });
     }
 
-    // Step 2: Remove collection ref from all products
-    await ProductModel.updateMany(
-      { storeRef: storeId, collections: collectionId },
-      { $pull: { collections: collectionId } }
-    );
+    try {
+      // Step 1: Delete the collection by ID and storeRef
+      const deleted = await CollectionModel.deleteOne({
+        _id: collectionId,
+        storeRef: storeId,
+      });
 
-    return res.status(200).json({ message: "Collection Deleted Successfully" });
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-},
+      if (deleted.deletedCount === 0) {
+        return res.status(404).json({ message: "Collection not found" });
+      }
 
+      // Step 2: Remove collection ref from all products
+      await ProductModel.updateMany(
+        { storeRef: storeId, collections: collectionId },
+        { $pull: { collections: collectionId } },
+      );
+
+      return res
+        .status(200)
+        .json({ message: "Collection Deleted Successfully" });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
 };

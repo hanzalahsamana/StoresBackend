@@ -7,7 +7,7 @@ const getValidVariant = (product, selectedVariant) => {
 
   product?.variantRules?.forEach((rule) => {
     const [matchKey] = Object.keys(rule).filter(
-      (k) => !["image", "price", "stock"].includes(k)
+      (k) => !["image", "price", "stock"].includes(k),
     );
 
     const matchValue = rule[matchKey];

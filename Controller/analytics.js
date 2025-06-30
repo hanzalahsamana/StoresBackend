@@ -1,6 +1,6 @@
-const { BetaAnalyticsDataClient } = require('@google-analytics/data');
-const { calculateDateRange } = require('../Utils/CalculateDateRange');
-require('dotenv').config();
+const { BetaAnalyticsDataClient } = require("@google-analytics/data");
+const { calculateDateRange } = require("../Utils/CalculateDateRange");
+require("dotenv").config();
 
 const {
   GOOGLE_CLOUD_PROJECT_ID,
@@ -22,7 +22,7 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
     type: "service_account",
     project_id: GOOGLE_CLOUD_PROJECT_ID,
     private_key_id: GOOGLE_CLOUD_PRIVATE_KEY_ID,
-    private_key: GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    private_key: GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, "\n"),
     client_email: GOOGLE_CLOUD_CLIENT_EMAIL,
     client_id: GOOGLE_CLOUD_CLIENT_ID,
     auth_uri: GOOGLE_CLOUD_AUTH_URI,
@@ -36,8 +36,18 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
 // 🎯 Helper Functions for Formatting Date/Time
 const formatMonth = (monthIndex) => {
   const months = [
-    "January", "February", "March", "April", "May", "June", 
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   return months[parseInt(monthIndex, 10) - 1] || monthIndex;
 };
@@ -56,41 +66,44 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
-    day: "numeric"
+    day: "numeric",
   });
 };
 
 // 🚀 Get Analytics Data
 const getAnalyticsData = async (req, res) => {
   try {
-    const { dateFilter ,siteName = 'ModestWardrobe' } = req.query;
+    const { dateFilter, siteName = "ModestWardrobe" } = req.query;
 
     if (!PROPERTY_ID) throw new Error("Missing Google Analytics Property ID.");
     if (!dateFilter) throw new Error("Date filter is required.");
 
-    const { startDate, endDate, timeDimension } = calculateDateRange(dateFilter);
+    const { startDate, endDate, timeDimension } =
+      calculateDateRange(dateFilter);
 
-    console.log(`📊 Fetching analytics for "${siteName}" | Date Range: ${startDate} - ${endDate}`);
+    console.log(
+      `📊 Fetching analytics for "${siteName}" | Date Range: ${startDate} - ${endDate}`,
+    );
 
     const [response] = await analyticsDataClient.runReport({
       property: `properties/${PROPERTY_ID}`,
       dateRanges: [{ startDate, endDate }],
       dimensions: [
-        { name: 'pageTitle' },
-        { name: 'country' },
-        { name: 'deviceCategory' },
-        { name: 'newVsReturning' },
-        { name: timeDimension }
+        { name: "pageTitle" },
+        { name: "country" },
+        { name: "deviceCategory" },
+        { name: "newVsReturning" },
+        { name: timeDimension },
       ],
       metrics: [
-        { name: 'screenPageViews' },
-        { name: 'activeUsers' },
-        { name: 'sessions' },
-        { name: 'bounceRate' },
-        { name: 'averageSessionDuration' },
-        { name: 'newUsers' },
-        { name: 'totalUsers' },
-        { name: 'userEngagementDuration' },
+        { name: "screenPageViews" },
+        { name: "activeUsers" },
+        { name: "sessions" },
+        { name: "bounceRate" },
+        { name: "averageSessionDuration" },
+        { name: "newUsers" },
+        { name: "totalUsers" },
+        { name: "userEngagementDuration" },
       ],
     });
 
@@ -111,8 +124,9 @@ const getAnalyticsData = async (req, res) => {
       timeViews: {},
     };
 
-    response.rows.forEach(row => {
-      const [pageTitle, country, deviceType, userType, timeLabel] = row.dimensionValues.map(d => d.value);
+    response.rows.forEach((row) => {
+      const [pageTitle, country, deviceType, userType, timeLabel] =
+        row.dimensionValues.map((d) => d.value);
       const views = parseInt(row.metricValues[0].value, 10);
 
       if (pageTitle === siteName) {
@@ -133,24 +147,29 @@ const getAnalyticsData = async (req, res) => {
 
         // 🕒 Format Time Labels (Month, Hour, Date)
         let formattedTimeLabel = timeLabel;
-        if (timeDimension === "month") formattedTimeLabel = formatMonth(timeLabel);
-        else if (timeDimension === "hour") formattedTimeLabel = formatHour(timeLabel);
-        else if (timeDimension === "date") formattedTimeLabel = formatDate(timeLabel);
+        if (timeDimension === "month")
+          formattedTimeLabel = formatMonth(timeLabel);
+        else if (timeDimension === "hour")
+          formattedTimeLabel = formatHour(timeLabel);
+        else if (timeDimension === "date")
+          formattedTimeLabel = formatDate(timeLabel);
 
         stats.timeViews[formattedTimeLabel] ??= 0;
         stats.timeViews[formattedTimeLabel] += views;
 
-        userType === "new" ? (stats.newViews += views) : (stats.returningUsers += views);
+        userType === "new"
+          ? (stats.newViews += views)
+          : (stats.returningUsers += views);
       }
     });
 
-  //   const avgEngagementPerUser = stats.activeUsers > 0
-  // ? (stats.engagementDuration / stats.activeUsers).toFixed(2)
-  // : "0";
+    //   const avgEngagementPerUser = stats.activeUsers > 0
+    // ? (stats.engagementDuration / stats.activeUsers).toFixed(2)
+    // : "0";
 
-  // const avgEngagementPerUserSeconds = (avgEngagementPerUser > 1000) 
-  // ? (avgEngagementPerUser / 1000).toFixed(2) 
-  // : avgEngagementPerUser;
+    // const avgEngagementPerUserSeconds = (avgEngagementPerUser > 1000)
+    // ? (avgEngagementPerUser / 1000).toFixed(2)
+    // : avgEngagementPerUser;
 
     const formattedStats = {
       store: siteName,
@@ -166,7 +185,7 @@ const getAnalyticsData = async (req, res) => {
       newViews: stats.newViews.toString(),
       totalUsers: stats.totalUsers.toString(),
       deviceViews: stats.deviceViews,
-      timeViews: stats.timeViews
+      timeViews: stats.timeViews,
     };
 
     console.log("✅ Analytics Data:", formattedStats);

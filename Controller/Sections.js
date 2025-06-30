@@ -18,7 +18,7 @@ const addSection = async (req, res) => {
   try {
     await SectionModel.updateMany(
       { storeRef: storeId, order: { $gte: order } },
-      { $inc: { order: 1 } }
+      { $inc: { order: 1 } },
     );
 
     const section = new SectionModel({
@@ -117,11 +117,11 @@ const deleteSection = async (req, res) => {
 
     await SectionModel.updateMany(
       { storeRef: storeId, order: { $gt: deletedOrder } },
-      { $inc: { order: -1 } }
+      { $inc: { order: -1 } },
     );
 
     const updatedSections = await SectionModel.find({ storeRef: storeId }).sort(
-      { order: 1 }
+      { order: 1 },
     );
 
     return res.status(200).json(updatedSections);
@@ -188,7 +188,7 @@ const changeSectionOrder = async (req, res) => {
             },
           },
         },
-      ]
+      ],
     ).session(session);
 
     await SectionModel.findByIdAndUpdate(sectionId, {
@@ -199,7 +199,7 @@ const changeSectionOrder = async (req, res) => {
     session.endSession();
 
     const updatedSections = await SectionModel.find({ storeRef: storeId }).sort(
-      { order: 1 }
+      { order: 1 },
     );
 
     return res.status(200).json({

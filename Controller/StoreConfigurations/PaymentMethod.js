@@ -25,7 +25,7 @@ const updatePaymentMethod = async (req, res) => {
       });
     } else {
       const existingIndex = config.paymentMethods.findIndex(
-        (p) => p.method === method
+        (p) => p.method === method,
       );
 
       if (existingIndex !== -1) {
@@ -77,7 +77,7 @@ const getHashedPaymentCredential = async (req, res) => {
     }
 
     const paymentMethod = config.paymentMethods.find(
-      (method) => method._id.toString() === methodId
+      (method) => method._id.toString() === methodId,
     );
 
     if (!paymentMethod) {

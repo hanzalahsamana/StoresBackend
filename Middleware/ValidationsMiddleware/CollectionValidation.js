@@ -54,7 +54,7 @@ const validateCollection = (isEdit = false) => {
       const validIds = validProducts.map((p) => p._id.toString());
 
       const invalidIds = value.products.filter(
-        (id) => !validIds.includes(id.toString())
+        (id) => !validIds.includes(id.toString()),
       );
 
       if (invalidIds.length > 0) {

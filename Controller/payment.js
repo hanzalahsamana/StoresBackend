@@ -121,8 +121,8 @@ async function generatePaymentToken(amount) {
   // ✅ Filter out empty values and pp_SecureHash
   const filteredPayload = Object.fromEntries(
     Object.entries(payload).filter(
-      ([key, value]) => key !== "pp_SecureHash" && value !== ""
-    )
+      ([key, value]) => key !== "pp_SecureHash" && value !== "",
+    ),
   );
 
   // ✅ Sort keys alphabetically
@@ -149,7 +149,7 @@ async function generatePaymentToken(amount) {
   try {
     const response = await axios.post(
       "https://sandbox.jazzcash.com.pk/ApplicationAPI/API/Payment/DoTransaction",
-      finalPayload
+      finalPayload,
     );
 
     if (response.data?.pp_ResponseCode === "000") {
@@ -210,8 +210,8 @@ const initiateJazzCashPayment = (req, res) => {
           key !== "pp_SecureHash" &&
           value !== "" &&
           value !== null &&
-          value !== undefined
-      )
+          value !== undefined,
+      ),
     );
 
     // ✅ Sort keys alphabetically
@@ -219,7 +219,9 @@ const initiateJazzCashPayment = (req, res) => {
 
     // ✅ Build the string for hash generation
     const stringToHash =
-      integritySalt + "&" + sortedKeys.map((key) => filteredPayload[key]).join("&");
+      integritySalt +
+      "&" +
+      sortedKeys.map((key) => filteredPayload[key]).join("&");
 
     // ✅ Create the secure hash
     const secureHash = crypto
@@ -233,7 +235,9 @@ const initiateJazzCashPayment = (req, res) => {
     res.status(200).json(payload);
   } catch (error) {
     console.error("JazzCash Initiation Error:", error);
-    res.status(500).json({ message: "Something went wrong during payment initiation." });
+    res
+      .status(500)
+      .json({ message: "Something went wrong during payment initiation." });
   }
 };
 

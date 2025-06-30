@@ -8,16 +8,16 @@ const {
 const sendEmail = require("./EmailSender");
 
 const AdminPanel = {
-  email:'hanzalahsamana789@gmail.com',
-  brandName:'Admin Panel',
-}
+  email: "hanzalahsamana789@gmail.com",
+  brandName: "Admin Panel",
+};
 
 const adminContactResponse = async (admin, to, logo, data) => {
   await sendEmail(
     admin,
     to,
     `Contact Form Submitted from ${admin.brandName}`,
-    generateAdminContactTemplate({ ...admin, logo }, data)
+    generateAdminContactTemplate({ ...admin, logo }, data),
   );
 };
 
@@ -26,7 +26,7 @@ const customerContactResponse = async (admin, to, logo, data) => {
     admin,
     to,
     `Contact To ${admin.brandName}`,
-    generateCustomerContactTemplate({ ...admin, logo }, data)
+    generateCustomerContactTemplate({ ...admin, logo }, data),
   );
 };
 
@@ -35,7 +35,7 @@ const adminOrderDetail = async (admin, to, orderDetails) => {
     admin,
     to,
     `Order Summary of ${admin.brandName}`,
-    generateOrderDetailsTemplate(admin, orderDetails)
+    generateOrderDetailsTemplate(admin, orderDetails),
   );
 };
 
@@ -44,7 +44,7 @@ const customerOrderDetail = async (admin, to, orderDetails) => {
     admin,
     to,
     `Order Summary of ${admin.brandName}`,
-    generateOrderConfirmTemplate(admin, orderDetails)
+    generateOrderConfirmTemplate(admin, orderDetails),
   );
 };
 
@@ -53,7 +53,7 @@ const OTPVerificationEmail = async (user, otp) => {
     AdminPanel,
     user.email,
     `OTP Verification`,
-    generateOTPVerificationTemplate(user, otp)
+    generateOTPVerificationTemplate(user, otp),
   );
 };
 

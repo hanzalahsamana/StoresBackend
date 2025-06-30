@@ -30,7 +30,6 @@ module.exports = {
     const { collection, productId } = req.query;
 
     try {
-
       const query = { storeRef: storeId };
 
       if (collection) {

@@ -3,5 +3,4 @@ const generateOtp = () => {
   return otp;
 };
 
-
-module.exports = {generateOtp}
+module.exports = { generateOtp };

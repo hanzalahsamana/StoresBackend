@@ -6,7 +6,7 @@ const addSubscriber = async (req, res) => {
     const type = req.collectionType;
 
     console.log(type);
-    
+
     const { email } = req.body;
 
     if (!email) {
@@ -16,7 +16,7 @@ const addSubscriber = async (req, res) => {
     const SubscriberModel = mongoose.model(
       `${type}_subscribers`,
       subscriberSchema,
-      `${type}_subscribers`
+      `${type}_subscribers`,
     );
 
     const alreadyExists = await SubscriberModel.findOne({ email });

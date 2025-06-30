@@ -77,11 +77,11 @@ module.exports = {
       if (user.lastOtpSentAt && now - user.lastOtpSentAt < COOLDOWN_PERIOD) {
         return res.status(400).json({
           message: `Please wait ${Math.ceil(
-            (COOLDOWN_PERIOD - (now - user.lastOtpSentAt)) / 1000
+            (COOLDOWN_PERIOD - (now - user.lastOtpSentAt)) / 1000,
           )} seconds before requesting a new OTP.`,
           errorCode: "OtpCooldown",
           remainingTime: Math.ceil(
-            (COOLDOWN_PERIOD - (now - user.lastOtpSentAt)) / 1000
+            (COOLDOWN_PERIOD - (now - user.lastOtpSentAt)) / 1000,
           ),
         });
       }
@@ -220,7 +220,7 @@ module.exports = {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {

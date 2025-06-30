@@ -14,7 +14,7 @@ const getPublicConfiguration = async (req, res) => {
 
     // Filter only enabled payment methods without credentials
     const paymentMethods = config.paymentMethods.map(
-      ({ credentials, ...rest }) => rest
+      ({ credentials, ...rest }) => rest,
     );
 
     return res.status(200).json({

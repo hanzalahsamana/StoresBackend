@@ -1,4 +1,4 @@
-const {  StoreModal } = require("../Models/StoreModal");
+const { StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
 
 // Add Announcement
@@ -6,11 +6,7 @@ const addAnnouncement = async (req, res) => {
   const { userId } = req.query;
   const { announcement } = req.body;
 
-  if (
-    !userId ||
-    !announcement ||
-    !announcement.title
-  ) {
+  if (!userId || !announcement || !announcement.title) {
     return res.status(400).json({
       error: "Missing required fields or announcement format is invalid.",
     });

@@ -32,7 +32,7 @@ const StoreSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Ensure subdomain uniqueness and validate fields

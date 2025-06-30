@@ -66,7 +66,7 @@ const DiscountSchema = new Schema({
 /* ========== Payment Method Schema ========== */
 const PaymentMethodSchema = new Schema({
   method: { type: String, required: true }, // e.g. "jazzcash", "easypaisa"
-  label:{ type: String, required: true , default:'Online Payment' },
+  label: { type: String, required: true, default: "Online Payment" },
   isEnabled: { type: Boolean, default: false },
   credentials: {
     type: Map,
@@ -110,7 +110,7 @@ const ConfigurationSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const ConfigurationModel = mongoose.model("Configuration", ConfigurationSchema);

@@ -31,11 +31,10 @@ const SectionSchema = new Schema(
       default: {},
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 SectionSchema.index({ order: 1, storeRef: 1 }, { unique: true });
-
 
 const SectionModel = mongoose.model("Section", SectionSchema);
 

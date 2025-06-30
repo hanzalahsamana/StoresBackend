@@ -15,7 +15,7 @@ const postConatctForm = async (req, res) => {
     const ContactModel = mongoose.model(
       type + "_contactForm",
       contactSchema,
-      type + "_contactForm"
+      type + "_contactForm",
     );
 
     const contactForm = new ContactModel(remain);
@@ -25,13 +25,13 @@ const postConatctForm = async (req, res) => {
       admin.toObject(),
       contactForm.email,
       siteLogo,
-      contactForm
+      contactForm,
     );
     await adminContactResponse(
       admin.toObject(),
       admin.email,
       siteLogo,
-      contactForm
+      contactForm,
     );
 
     return res.status(200).json({ message: "Contact Form Submitted" });
@@ -48,7 +48,7 @@ const getConatctForm = async (req, res) => {
     const ContactModel = mongoose.model(
       type + "_contactForm",
       contactSchema,
-      type + "_contactForm"
+      type + "_contactForm",
     );
 
     const contactForms = await ContactModel.find();

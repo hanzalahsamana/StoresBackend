@@ -40,7 +40,7 @@ const calculateDateRange = (filter) => {
       const firstDayOfMonth = new Date(
         today.getFullYear(),
         today.getMonth(),
-        1
+        1,
       );
       startDate = firstDayOfMonth.toISOString().split("T")[0];
       endDate = today.toISOString().split("T")[0];

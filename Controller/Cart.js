@@ -36,10 +36,10 @@ const addToCart = async (req, res) => {
     if (!productData) {
       const validProductIds = await ProductModel.find({}, "_id");
       const validIdsSet = new Set(
-        validProductIds.map((doc) => doc._id.toString())
+        validProductIds.map((doc) => doc._id.toString()),
       );
       cart.products = cart.products.filter((p) =>
-        validIdsSet.has(p.productId?.toString())
+        validIdsSet.has(p.productId?.toString()),
       );
       cart.markModified("products");
       return res.status(404).json({ message: "Product not found" });
@@ -65,7 +65,7 @@ const addToCart = async (req, res) => {
     const existingProduct = cart.products.find(
       (p) =>
         p.productId?.toString() === productId &&
-        isSameVariant(p.selectedVariant, selectedVariant)
+        isSameVariant(p.selectedVariant, selectedVariant),
     );
 
     console.log(existingProduct, "🍭🍭🍭");
@@ -166,7 +166,7 @@ const deleteCartData = async (req, res) => {
     }
 
     const index = cart.products.findIndex(
-      (p) => p._id?.toString() === cartProductId
+      (p) => p._id?.toString() === cartProductId,
     );
 
     if (index === -1) {

@@ -5,10 +5,10 @@ const collectionSchema = new Schema(
   {
     name: { type: String, required: true },
     image: { type: String, required: true },
-    slug: { type: String, required: true, },
+    slug: { type: String, required: true },
     storeRef: { type: Schema.Types.ObjectId, ref: "Store", required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 collectionSchema.index({ name: 1, storeRef: 1 }, { unique: true });

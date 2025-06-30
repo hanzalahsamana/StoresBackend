@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 const Schema = mongoose.Schema;
 
 const orderItemSchema = new mongoose.Schema(
@@ -14,7 +15,7 @@ const orderItemSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     variant: { type: Object }, // Add if variants exist (e.g. size, color)
   },
-  { _id: false }
+  { _id: false },
 );
 
 const addressSchema = new mongoose.Schema(
@@ -29,43 +30,48 @@ const addressSchema = new mongoose.Schema(
     address: { type: String, required: true },
     apartment: { type: String },
   },
-  { _id: false }
+  { _id: false },
+);
+
+const paymentInfoSchema = new mongoose.Schema(
+  {
+    method: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "pending",
+    },
+    transactionId: {
+      type: String,
+      required: true,
+      default: uuidv4,
+    },
+  },
+  { _id: false },
 );
 
 const OrderSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: false,
-    }, // Optional for guest checkout
-
-    customer: addressSchema,
-    shippingAddress: addressSchema,
+    customerInfo: addressSchema,
 
     orderItems: {
       type: [orderItemSchema],
       required: true,
     },
 
-    paymentMethod: {
-      type: String,
-      enum: ["credit_card", "paypal", "cash_on_delivery", "bank_transfer"],
-      required: true,
-    },
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending",
-    },
+    paymentInfo: paymentInfoSchema,
+
     orderStatus: {
       type: String,
       enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
 
-    taxAmount: { type: Number, default: 0 },
-    shippingFee: { type: Number, default: 0 },
+    tax: { type: Number, default: 0 },
+    shipping: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
 
@@ -86,7 +92,7 @@ const OrderSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const OrderModel = mongoose.model("Order", OrderSchema);

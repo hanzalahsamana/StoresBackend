@@ -35,7 +35,7 @@ const reviewSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 reviewSchema.index({ email: 1, productId: 1, storeRef: 1 }, { unique: true });

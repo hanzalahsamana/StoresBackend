@@ -23,7 +23,7 @@ const CartSchema = new Schema(
     ],
     storeRef: { type: Schema.Types.ObjectId, ref: "Store", required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const CartModel = mongoose.model("Cart", CartSchema);

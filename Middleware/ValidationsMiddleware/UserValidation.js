@@ -14,7 +14,8 @@ const userRegisterValidate = (req, res, next) => {
       .messages({
         "any.required": "Password is required",
         "string.min": "Password must be at least 6 characters",
-        "string.pattern.base": "Password must not contain spaces and should include special characters if needed",
+        "string.pattern.base":
+          "Password must not contain spaces and should include special characters if needed",
       }),
   });
 
@@ -26,7 +27,6 @@ const userRegisterValidate = (req, res, next) => {
 
   next();
 };
-
 
 const userLoginValidate = (req, res, next) => {
   const schema = Joi.object({
@@ -42,7 +42,8 @@ const userLoginValidate = (req, res, next) => {
       .messages({
         "any.required": "Password is required",
         "string.min": "Password must be at least 6 characters",
-        "string.pattern.base": "Password must not contain spaces and should include special characters if needed",
+        "string.pattern.base":
+          "Password must not contain spaces and should include special characters if needed",
       }),
   });
   const { error, value } = schema.validate(req.body);

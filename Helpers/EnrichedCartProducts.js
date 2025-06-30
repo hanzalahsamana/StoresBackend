@@ -12,7 +12,7 @@ const EnrichedCartProducts = async (cart) => {
 
       const productDataAccToVariant = getValidVariant(
         productData,
-        item?.selectedVariant
+        item?.selectedVariant,
       );
 
       return {
@@ -22,9 +22,9 @@ const EnrichedCartProducts = async (cart) => {
         selectedVariant: item.selectedVariant,
         name: productData.name,
         price: productDataAccToVariant.price,
-        image: productDataAccToVariant.image,
+        image: productDataAccToVariant?.image,
       };
-    })
+    }),
   );
 
   const validProducts = enrichedProducts.filter((p) => p !== null);

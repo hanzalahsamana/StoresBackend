@@ -23,7 +23,7 @@ function generateOrderDetailsTemplate(admin, order) {
               product.totalOfProduct
             }</td>
           </tr>
-        `
+        `,
     )
     .join("");
 
@@ -143,7 +143,7 @@ function generateOrderConfirmTemplate(admin, order) {
               product.totalOfProduct
             }</td>
           </tr>
-        `
+        `,
     )
     .join("");
 

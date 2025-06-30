@@ -11,14 +11,14 @@ const contentValidationSchema = Joi.object({
     .uri()
     .optional()
     .default(
-      "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp"
+      "https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp",
     ),
   faqs: Joi.array()
     .items(
       Joi.object({
         Q: Joi.string().required(),
         A: Joi.string().required(),
-      })
+      }),
     )
     .optional(),
   video: Joi.string().allow("").optional(),
@@ -33,7 +33,9 @@ const validateContent = (req, res, next) => {
   const { contentId } = req.query;
 
   if (!contentId || joiObjectid().validate(contentId).error) {
-    return res.status(400).json({ message: "Invalid contentId id OR id is not defined" });
+    return res
+      .status(400)
+      .json({ message: "Invalid contentId id OR id is not defined" });
   }
 
   const { error, value } = contentValidationSchema.validate(req.body, {

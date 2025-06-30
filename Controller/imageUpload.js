@@ -32,14 +32,23 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit 5MB per file
   fileFilter: (req, file, cb) => {
     // Allowed file types
-    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const allowedMimeTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+    ];
     if (allowedMimeTypes.includes(file.mimetype)) {
       console.log(file);
-      
+
       cb(null, true);
     } else {
-      console.log(file , "ghiop");
-      cb(new Error("Invalid file type. Only JPG, PNG, WEBP, and GIF are allowed."));
+      console.log(file, "ghiop");
+      cb(
+        new Error(
+          "Invalid file type. Only JPG, PNG, WEBP, and GIF are allowed.",
+        ),
+      );
     }
   },
 });
