@@ -61,7 +61,7 @@ module.exports = {
         if (!mongoose.Types.ObjectId.isValid(collectionId)) {
           return res
             .status(400)
-            .json({ error: "Invalid collection ID format" });
+            .json({ message: "Invalid collection ID format" });
         }
         query._id = collectionId;
       }

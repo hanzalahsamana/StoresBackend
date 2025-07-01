@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const StoreSchema = new Schema(
   {
     userRef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: 'users',
       required: true,
     },
     storeName: {
@@ -29,20 +29,24 @@ const StoreSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    orderCounter: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 // Ensure subdomain uniqueness and validate fields
-StoreSchema.pre("validate", async function (next) {
-  if (this.isModified("subDomain") && this.subDomain) {
+StoreSchema.pre('validate', async function (next) {
+  if (this.isModified('subDomain') && this.subDomain) {
     const baseSlug = this.subDomain
       .trim()
       .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
 
     let slug = baseSlug;
     let counter = 1;
@@ -57,6 +61,6 @@ StoreSchema.pre("validate", async function (next) {
   next();
 });
 
-const StoreModal = mongoose.model("Store", StoreSchema);
+const StoreModal = mongoose.model('Store', StoreSchema);
 
 module.exports = { StoreModal };

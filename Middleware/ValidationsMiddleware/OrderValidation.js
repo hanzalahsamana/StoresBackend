@@ -27,7 +27,7 @@ const orderValidationSchema = Joi.object({
     status: Joi.string()
       .valid("pending", "paid", "failed", "refunded")
       .optional(),
-    // transactionId removed — server should set it if needed
+    transactionId: Joi.string().optional(),
   }).required(),
 
   // These are now server-calculated, so removed from payload validation

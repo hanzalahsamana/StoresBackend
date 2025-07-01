@@ -25,7 +25,7 @@ const validateCollection = (isEdit = false) => {
       if (!collectionId || JoiObjectId().validate(collectionId).error) {
         return res
           .status(400)
-          .json({ error: "Invalid or missing collectionId in query" });
+          .json({ message: "Invalid or missing collectionId in query" });
       }
     }
 
@@ -60,7 +60,7 @@ const validateCollection = (isEdit = false) => {
       if (invalidIds.length > 0) {
         return res
           .status(400)
-          .json({ error: `Invalid product ID(s): ${invalidIds.join(", ")}` });
+          .json({ message: `Invalid product ID(s): ${invalidIds.join(", ")}` });
       }
     }
 

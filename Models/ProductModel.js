@@ -1,6 +1,31 @@
-const { required } = require("joi");
-const mongoose = require("mongoose");
+const { required } = require('joi');
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+
+const variantSchema = new mongoose.Schema({
+  sku: {
+    type: String,
+    required: true,
+  },
+  options: {
+    type: Map,
+    of: String,
+    required: true,
+  },
+  stock: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  image: {
+    type: String,
+    required: true,
+  },
+});
 
 const ProductSchema = new Schema({
   name: { type: String, required: true },
@@ -9,10 +34,11 @@ const ProductSchema = new Schema({
   comparedAtPrice: { type: Number },
   displayImage: { type: String, required: true },
   gallery: [String],
-  stock: { type: Number, required: true },
-  showStock: { type: Boolean, default: true, required: true },
-  pronouce: { type: String, default: "piece" },
-  status: { type: String, enum: ["active", "inactive"], default: "active" },
+  trackInventory: { type: Boolean, default: false, required: true },
+  stock: { type: Number },
+  showStock: { type: Boolean },
+  pronouce: { type: String, default: 'piece' },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
   description: { type: String },
   metaTitle: { type: String },
   metaDescription: { type: String },
@@ -21,7 +47,7 @@ const ProductSchema = new Schema({
   collections: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Collection",
+      ref: 'Collection',
     },
   ],
   ratings: {
@@ -43,22 +69,17 @@ const ProductSchema = new Schema({
     ],
     default: [],
   },
-  variantRules: {
-    type: [
-      {
-        type: mongoose.Schema.Types.Mixed,
-        default: {},
-      },
-    ],
+  variants: {
+    type: [variantSchema],
     default: [],
   },
   storeRef: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Store",
+    ref: 'Store',
     required: true,
   },
 });
 
-const ProductModel = mongoose.model("Product", ProductSchema);
+const ProductModel = mongoose.model('Product', ProductSchema);
 
 module.exports = { ProductModel };

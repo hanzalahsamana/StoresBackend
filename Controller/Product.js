@@ -36,7 +36,7 @@ module.exports = {
         if (!mongoose.Types.ObjectId.isValid(collection)) {
           return res
             .status(400)
-            .json({ error: "Invalid collection ID format" });
+            .json({ message: "Invalid collection ID format" });
         }
         query.collections = collection;
       }
@@ -44,7 +44,7 @@ module.exports = {
       // Filter by product ID
       if (productId) {
         if (!mongoose.Types.ObjectId.isValid(productId)) {
-          return res.status(400).json({ error: "Invalid product ID format" });
+          return res.status(400).json({ message: "Invalid product ID format" });
         }
         query._id = productId;
       }

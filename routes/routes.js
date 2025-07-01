@@ -152,8 +152,8 @@ withoutParams.post('/setTheme', tokenChecker, updateTheme);
 withParams.get('/getAnalytics', ValidStoreChecker, getAnalyticsData);
 
 // --- UPLOAD ROUTES ---
-withParams.post('/uploadSingle', uploadSingle, uploadSingleImage);
-withParams.post('/uploadMultiple', uploadMultiple, uploadMultipleImages);
+withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingle, uploadSingleImage);
+withParams.post('/uploadMultiple', tokenChecker, validOwnerChecker, uploadMultiple, uploadMultipleImages);
 withoutParams.post('/importSiteData', tokenChecker, upload.single('file'), importSiteData);
 withoutParams.get('/exportSiteData', tokenChecker, exportSite);
 

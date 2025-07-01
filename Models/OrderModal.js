@@ -1,21 +1,21 @@
-const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 const Schema = mongoose.Schema;
 
 const orderItemSchema = new mongoose.Schema(
   {
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      ref: 'Product',
       required: true,
     },
     name: { type: String, required: true },
     image: { type: String },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    variant: { type: Object }, // Add if variants exist (e.g. size, color)
+    selectedVariant: { type: Object }, // Add if variants exist (e.g. size, color)
   },
-  { _id: false },
+  { _id: false }
 );
 
 const addressSchema = new mongoose.Schema(
@@ -30,7 +30,7 @@ const addressSchema = new mongoose.Schema(
     address: { type: String, required: true },
     apartment: { type: String },
   },
-  { _id: false },
+  { _id: false }
 );
 
 const paymentInfoSchema = new mongoose.Schema(
@@ -41,8 +41,8 @@ const paymentInfoSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending",
+      enum: ['unpaid', 'paid', 'failed', 'refunded'],
+      default: 'unpaid',
     },
     transactionId: {
       type: String,
@@ -50,7 +50,7 @@ const paymentInfoSchema = new mongoose.Schema(
       default: uuidv4,
     },
   },
-  { _id: false },
+  { _id: false }
 );
 
 const OrderSchema = new mongoose.Schema(
@@ -66,8 +66,8 @@ const OrderSchema = new mongoose.Schema(
 
     orderStatus: {
       type: String,
-      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
-      default: "pending",
+      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
+      default: 'pending',
     },
 
     tax: { type: Number, default: 0 },
@@ -82,18 +82,21 @@ const OrderSchema = new mongoose.Schema(
     },
 
     notes: { type: String },
-
-    storeRef: {
-      type: Schema.Types.ObjectId,
-      ref: "Store",
+    orderNumber: {
+      type: String,
       required: true,
       unique: true,
+    },
+    storeRef: {
+      type: Schema.Types.ObjectId,
+      ref: 'Store',
+      required: true,
     },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-const OrderModel = mongoose.model("Order", OrderSchema);
+const OrderModel = mongoose.model('Order', OrderSchema);
 module.exports = { OrderModel };

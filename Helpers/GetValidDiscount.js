@@ -71,7 +71,7 @@ const getValidCouponDiscount = async ({ storeId, email, couponCode, totalAmount,
   };
 };
 
-const getValidGlobalDiscount = (discounts, totalAmount) => {
+const getValidGlobalDiscount = ({discounts, totalAmount}) => {
   const globalDiscount = discounts?.find((d) => d.discountType === 'global');
 
   if (globalDiscount) {

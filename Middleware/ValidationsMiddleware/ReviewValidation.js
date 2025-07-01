@@ -15,7 +15,7 @@ const validateReview = (req, res, next) => {
   if (!productId || joiObjectid().validate(productId).error) {
     return res
       .status(400)
-      .json({ error: "Invalid or missing product ID in query" });
+      .json({ message: "Invalid or missing product ID in query" });
   }
 
   const { error } = reviewValidationSchema.validate(req.body);

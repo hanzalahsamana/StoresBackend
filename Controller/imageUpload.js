@@ -20,7 +20,7 @@ const s3Storage = multerS3({
     cb(null, { fieldName: file.fieldname });
   },
   key: (req, file, cb) => {
-    const uniqueFileName = `uploads/${Date.now()}_${Math.random().toString(36).substring(2)}_${file.originalname}`;
+    const uniqueFileName = `/${Date.now()}_${Math.random().toString(36).substring(2)}_${file.originalname}`;
     cb(null, uniqueFileName);
   },
   contentType: multerS3.AUTO_CONTENT_TYPE, // Automatically detect content type

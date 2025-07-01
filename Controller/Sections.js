@@ -87,7 +87,7 @@ const editSection = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      section,
+      data:section,
     });
   } catch (e) {
     return res.status(500).json({ message: e.message || "An error occurred" });

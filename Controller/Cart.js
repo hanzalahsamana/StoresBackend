@@ -1,8 +1,8 @@
-const { mongoose } = require("mongoose");
-const { productSchema, ProductModel } = require("../Models/ProductModel");
-const { getValidVariant } = require("../Utils/getValidVariant");
-const { CartModel } = require("../Models/CartModel");
-const EnrichedCartProducts = require("../Helpers/EnrichedCartProducts");
+const { mongoose } = require('mongoose');
+const { productSchema, ProductModel } = require('../Models/ProductModel');
+const { getValidVariant } = require('../Utils/getValidVariant');
+const { CartModel } = require('../Models/CartModel');
+const EnrichedCartProducts = require('../Helpers/EnrichedCartProducts');
 
 // add cart data function
 const addToCart = async (req, res) => {
@@ -14,44 +14,36 @@ const addToCart = async (req, res) => {
 
   if (cartId) {
     if (!mongoose.Types.ObjectId.isValid(cartId)) {
-      return res.status(400).json({ error: "Invalid format of Cart ID" });
+      return res.status(400).json({ error: 'Invalid format of Cart ID' });
     }
     cart = await CartModel.findOne({ _id: cartId, storeRef: storeId });
-    if (!cart) return res.status(404).json({ message: "Cart not found" });
+    if (!cart) return res.status(404).json({ message: 'Cart not found' });
   } else {
     cart = new CartModel({ storeRef: storeId });
   }
 
   if (!productId || !quantity) {
     return res.status(400).json({
-      message: !quantity ? "Quantity is required" : "Product ID is required",
+      message: !quantity ? 'Quantity is required' : 'Product ID is required',
     });
   }
   if (!mongoose.Types.ObjectId.isValid(productId)) {
-    return res.status(400).json({ error: "Invalid format of Product ID" });
+    return res.status(400).json({ error: 'Invalid format of Product ID' });
   }
 
   try {
     const productData = await ProductModel.findById(productId);
     if (!productData) {
-      const validProductIds = await ProductModel.find({}, "_id");
-      const validIdsSet = new Set(
-        validProductIds.map((doc) => doc._id.toString()),
-      );
-      cart.products = cart.products.filter((p) =>
-        validIdsSet.has(p.productId?.toString()),
-      );
-      cart.markModified("products");
-      return res.status(404).json({ message: "Product not found" });
+      const validProductIds = await ProductModel.find({}, '_id');
+      const validIdsSet = new Set(validProductIds.map((doc) => doc._id.toString()));
+      cart.products = cart.products.filter((p) => validIdsSet.has(p.productId?.toString()));
+      cart.markModified('products');
+      return res.status(404).json({ message: 'Product not found' });
     }
 
-    if (
-      productData?.variations &&
-      productData?.variations?.length >= 1 &&
-      !selectedVariant
-    ) {
+    if (productData?.variations && productData?.variations?.length >= 1 && !selectedVariant) {
       return res.status(400).json({
-        message: "selected Variant is required",
+        message: 'selected Variant is required',
       });
     }
 
@@ -62,32 +54,25 @@ const addToCart = async (req, res) => {
       return keys1.every((k) => v1[k] === v2[k]);
     };
 
-    const existingProduct = cart.products.find(
-      (p) =>
-        p.productId?.toString() === productId &&
-        isSameVariant(p.selectedVariant, selectedVariant),
-    );
+    const existingProduct = cart.products.find((p) => p.productId?.toString() === productId && isSameVariant(p.selectedVariant, selectedVariant));
 
-    console.log(existingProduct, "🍭🍭🍭");
+    console.log(existingProduct, '🍭🍭🍭');
 
-    const maximumStock = getValidVariant(productData, selectedVariant);
+    const totalQuantity = existingProduct ? existingProduct.quantity + quantity : quantity;
+    if (productData?.trackInventory === true) {
+      const maximumStock = getValidVariant(productData, selectedVariant);
 
-    const maxQty = maximumStock?.stock ?? 0;
+      const maxQty = maximumStock?.stock ?? 0;
 
-    if (!maxQty) {
-      return res
-        .status(400)
-        .json({ message: "Invalid quantity or stock not available" });
-    }
+      if (!maxQty) {
+        return res.status(400).json({ message: 'Invalid quantity or stock not available' });
+      }
 
-    const totalQuantity = existingProduct
-      ? existingProduct.quantity + quantity
-      : quantity;
-
-    if (totalQuantity > maxQty) {
-      return res.status(400).json({
-        message: `Only ${maxQty} item(s) availaible in stock`,
-      });
+      if (totalQuantity > maxQty) {
+        return res.status(400).json({
+          message: `Only ${maxQty} item(s) availaible in stock`,
+        });
+      }
     }
 
     if (existingProduct) {
@@ -116,15 +101,13 @@ const getCartdata = async (req, res) => {
 
   try {
     if (!cartId || !mongoose.Types.ObjectId.isValid(cartId)) {
-      return res
-        .status(400)
-        .json({ error: "Cart ID is undefined or invalid format" });
+      return res.status(400).json({ error: 'Cart ID is undefined or invalid format' });
     }
 
     const cart = await CartModel.findOne({ _id: cartId, storeRef: storeId });
 
     if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
+      return res.status(404).json({ message: 'Cart not found' });
     }
 
     const validCart = await EnrichedCartProducts(cart);
@@ -143,7 +126,7 @@ const deleteCartData = async (req, res) => {
   const { cartProductId } = req.query;
 
   if (!cartId || !mongoose.Types.ObjectId.isValid(cartId)) {
-    return res.status(400).json({ message: "undefiened Or Invalid cartId" });
+    return res.status(400).json({ message: 'undefiened Or Invalid cartId' });
   }
 
   try {
@@ -153,24 +136,22 @@ const deleteCartData = async (req, res) => {
     });
 
     if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
+      return res.status(404).json({ message: 'Cart not found' });
     }
 
     if (!cartProductId) {
       await CartModel.findByIdAndDelete(cartId);
-      return res.status(200).json({ message: "Cart deleted" });
+      return res.status(200).json({ message: 'Cart deleted' });
     }
 
     if (!mongoose.Types.ObjectId.isValid(cartProductId)) {
-      return res.status(400).json({ message: "Invalid cartProductId" });
+      return res.status(400).json({ message: 'Invalid cartProductId' });
     }
 
-    const index = cart.products.findIndex(
-      (p) => p._id?.toString() === cartProductId,
-    );
+    const index = cart.products.findIndex((p) => p._id?.toString() === cartProductId);
 
     if (index === -1) {
-      return res.status(404).json({ message: "Product not found in the cart" });
+      return res.status(404).json({ message: 'Product not found in the cart' });
     }
 
     cart.products.splice(index, 1);
@@ -180,7 +161,7 @@ const deleteCartData = async (req, res) => {
 
     return res.status(200).json(validCart);
   } catch (error) {
-    console.error("Delete Cart Error:", error);
+    console.error('Delete Cart Error:', error);
     return res.status(500).json({ message: error.message });
   }
 };

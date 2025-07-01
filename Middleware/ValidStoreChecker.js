@@ -17,7 +17,7 @@ const ValidStoreChecker = async (req, res, next) => {
     if (!store) {
       return res
         .status(404)
-        .json({ error: "No store found with the provided Store ID." });
+        .json({ message: "No store found with the provided Store ID." });
     }
 
     next();

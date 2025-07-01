@@ -6,6 +6,9 @@ const { ConfigurationModel } = require('../Models/ConfigurationModel');
 const { CartModel } = require('../Models/CartModel');
 const { getValidGlobalDiscount, getValidCouponDiscount } = require('../Helpers/getValidDiscount');
 const EnrichedCartProducts = require('../Helpers/EnrichedCartProducts');
+const { ProductModel } = require('../Models/ProductModel');
+const { getValidVariant } = require('../Utils/getValidVariant');
+const { StoreModal } = require('../Models/StoreModal');
 
 const placeOrder = async (req, res) => {
   const { storeId } = req.params;
@@ -25,7 +28,7 @@ const placeOrder = async (req, res) => {
       _id: cartId,
     }).lean();
 
-    if (!cart || cart.items.length === 0) {
+    if (!cart || cart.products?.length === 0) {
       return res.status(400).json({ message: 'Cart is empty or not found.' });
     }
 
@@ -42,49 +45,76 @@ const placeOrder = async (req, res) => {
 
     // 5. ✅ Build orderItems & check product availability
     const orderItems = [];
-    let subTotal = 0;
+    let totalProductCost = 0;
 
-    const totalProductCost = Array.isArray(cartData) ? cartData.reduce((total, product) => total + product.price * product.quantity, 0) : 0;
-    const enrichedCartData = EnrichedCartProducts(cart);
-    for (const item of cart.items) {
-      const product = item.productId;
-      if (!product) {
-        return res.status(400).json({ message: 'Product not found in cart.' });
+    for (const product of cart.products) {
+      console.log(cart, 'Cart Data😂😂😂😂');
+
+      const productData = await ProductModel.findOne({ storeRef: storeId, _id: product.productId }).lean();
+
+      if (!productData) {
+        return res.status(400).json({ message: `Product not found with ${product.productId} ID.` });
       }
-      if (product.stock < item.quantity) {
-        return res.status(400).json({
-          message: `Insufficient stock for ${product.name}`,
-        });
+
+      const productDataAccToVariant = getValidVariant(productData, product?.selectedVariant);
+      if (productData?.trackInventory === true) {
+        const maxQty = productDataAccToVariant?.stock ?? 0;
+
+        if (!maxQty) {
+          return res.status(400).json({ message: `Stock not available for ${product.name}` });
+        }
+
+        if (maxQty < product.quantity) {
+          return res.status(400).json({
+            message: `Only ${maxQty} item(s) available for ${product.name}`,
+          });
+        }
       }
 
       // Update subtotal
-      const itemTotal = product.price * item.quantity;
-      subTotal += itemTotal;
+      const itemTotal = productDataAccToVariant.price * product.quantity;
+      totalProductCost += itemTotal;
 
       // Build order item
       orderItems.push({
-        productId: product._id,
-        name: product.name,
-        image: product.image,
-        quantity: item.quantity,
-        price: product.price,
-        variant: item.variant,
+        productId: product.productId,
+        name: productData.name,
+        quantity: product.quantity,
+        selectedVariant: product.selectedVariant,
+        image: productDataAccToVariant.image,
+        price: productDataAccToVariant.price,
       });
     }
 
     // 2. ✅ Validate discount (optional)
-    // const globalDiscount = discounts?.find((d) => d.discountType === "global");
-    const globalDiscount = getValidGlobalDiscount({ discounts: config.discounts, totalAmount: subTotal });
-    const couponDiscount = couponCode ? getValidCouponDiscount({ email: customerInfo.email, storeId, couponCode, allDiscounts: config.discounts, totalAmount: subTotal }) : null;
+    const globalDiscount = getValidGlobalDiscount({ discounts: config?.discounts, totalAmount: totalProductCost });
+    const couponDiscount = couponCode
+      ? await getValidCouponDiscount({
+          email: customerInfo.email,
+          storeId,
+          couponCode,
+          allDiscounts: config?.discounts,
+          totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
+        })
+      : null;
 
     // 3. ✅ Get tax & shipping from Configuration model
-    const tax = config?.tax || 0;
-    const shipping = config?.shipping || 0;
+    const subTotal = totalProductCost - ((globalDiscount?.discountAmount || 0) + (couponDiscount?.discountAmount || 0));
+    if (subTotal < 0) {
+      return res.status(400).json({ message: 'Total amount cannot be negative after discounts.' });
+    }
+    const tax = config?.tax || 200;
+    const shipping = config?.shipping || 120;
 
     // 6. ✅ Calculate total
-    const totalAmount = subTotal - discountAmount + tax + shipping;
+    const totalAmount = subTotal + tax + shipping;
 
-    // 7. ✅ Create order
+    // 7. ✅ Update order counter in Store model
+
+    const store = await StoreModal.findOneAndUpdate({ _id: storeId }, { $inc: { orderCounter: 1 } }, { new: true });
+    const orderNumber = `#${store.orderCounter.toString().padStart(6, '0')}`;
+
+    // 8. ✅ Create order
     const newOrder = await OrderModel.create({
       customerInfo,
       orderItems,
@@ -92,31 +122,68 @@ const placeOrder = async (req, res) => {
         ...paymentInfo,
         status: 'unpaid',
       },
-      discount: discountAmount,
+      globalDiscount: globalDiscount || null,
+      couponDiscount: couponDiscount || null,
+      totalProductCost,
+      subTotal,
       tax,
       shipping,
       totalAmount,
       status: 'pending',
+      orderNumber,
       storeRef: storeId,
     });
 
-    // 8. ✅ Optionally create customer record
-    const existingCustomer = await CustomerModel.findOne({
-      storeRef: storeId,
-      email: customerInfo.email,
-    });
+    for (const product of cart.products) {
+      const productData = await ProductModel.findOne({ storeRef: storeId, _id: product.productId }).lean();
 
-    if (!existingCustomer) {
-      await CustomerModel.create({
-        storeRef: storeId,
-        ...customerInfo,
-      });
-    }
+      if (productData?.trackInventory === true) {
+        for (const item of orderItems) {
+          const { productId, selectedVariant, quantity } = item;
 
-    // 9. ✅ If COD, trigger email
-    if (paymentInfo.method === 'cod') {
-      await sendOrderConfirmationEmail(customerInfo.email, newOrder);
+          if (selectedVariant && Object.keys(selectedVariant).length > 0) {
+            // Case: Variant selected — update specific variant stock + global stock
+            await ProductModel.updateOne(
+              {
+                _id: productId,
+                'variants.options': selectedVariant,
+              },
+              {
+                $inc: {
+                  'variants.$.stock': -quantity,
+                  stock: -quantity,
+                },
+              }
+            );
+          } else {
+            // Case: No variant — update only global stock
+            await ProductModel.updateOne(
+              { _id: productId },
+              {
+                $inc: { stock: -quantity },
+              }
+            );
+          }
+        }
+      }
     }
+    // 9. ✅ Optionally create customer record
+    // const existingCustomer = await CustomerModel.findOne({
+    //   storeRef: storeId,
+    //   email: customerInfo.email,
+    // });
+
+    // if (!existingCustomer) {
+    //   await CustomerModel.create({
+    //     storeRef: storeId,
+    //     ...customerInfo,
+    //   });
+    // }
+
+    // 10. ✅ If COD, trigger email
+    // if (paymentInfo.method === 'cod') {
+    //   await sendOrderConfirmationEmail(customerInfo.email, newOrder);
+    // }
 
     return res.status(201).json(newOrder);
   } catch (err) {
