@@ -4,11 +4,11 @@ const { customerOrderDetail, adminOrderDetail } = require('../Helpers/EmailsToSe
 const { UserModal } = require('../Models/userModal');
 const { ConfigurationModel } = require('../Models/ConfigurationModel');
 const { CartModel } = require('../Models/CartModel');
-const { getValidGlobalDiscount, getValidCouponDiscount } = require('../Helpers/getValidDiscount');
 const EnrichedCartProducts = require('../Helpers/EnrichedCartProducts');
 const { ProductModel } = require('../Models/ProductModel');
 const { getValidVariant } = require('../Utils/getValidVariant');
 const { StoreModal } = require('../Models/StoreModal');
+const { getValidCouponDiscount, getValidGlobalDiscount } = require('../Helpers/getValidDiscount');
 
 const placeOrder = async (req, res) => {
   const { storeId } = req.params;
