@@ -1,10 +1,8 @@
-const {
-  categorySchema,
-  CollectionModel,
-} = require("../Models/CollectionModel");
+const { CollectionModel } = require("../Models/CollectionModel");
 const { mongoose } = require("mongoose");
 const { ProductModel } = require("../Models/ProductModel");
 const generateSlug = require("../Utils/generateSlug");
+const { paginate } = require("../Helpers/pagination");
 
 module.exports = {
   // add category
@@ -52,32 +50,43 @@ module.exports = {
   // get category
   getCollections: async (req, res) => {
     const { storeId } = req.params;
-    const { collectionId } = req.query;
+    const { collectionId, page = 1, limit = 10 } = req.query;
 
     try {
-      const query = { storeRef: storeId };
+      const query = { storeRef: new mongoose.Types.ObjectId(storeId) };
 
       if (collectionId) {
         if (!mongoose.Types.ObjectId.isValid(collectionId)) {
-          return res
-            .status(400)
-            .json({ message: "Invalid collection ID format" });
+          return res.status(400).json({ message: "Invalid collection ID format" });
         }
-        query._id = collectionId;
+        query._id = new mongoose.Types.ObjectId(collectionId);
       }
 
-      const Collections = await CollectionModel.find(query);
+      const pipeline = [
+        { $match: query },
+        {
+          $lookup: {
+            from: 'products',
+            localField: '_id',
+            foreignField: 'collections',
+            as: 'products',
+          },
+        },
+      ];
 
-      return res.status(200).json({
-        success: true,
-        data: Collections,
-      });
+      const data = await paginate(CollectionModel, {}, {
+        page,
+        limit,
+        sort: { createdAt: -1 },
+      }, pipeline);
+
+      return res.status(200).json({ success: true, data });
     } catch (e) {
-      return res
-        .status(500)
-        .json({ message: e.message || "An error occurred" });
+      return res.status(500).json({ message: e.message || "An error occurred" });
     }
   },
+
+
 
   // edit collection
   editCollection: async (req, res) => {

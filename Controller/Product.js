@@ -1,6 +1,7 @@
 const { ProductModel } = require("../Models/ProductModel");
 const { mongoose } = require("mongoose");
 const { ReviewModel } = require("../Models/ReviewModel");
+const { paginate } = require("../Helpers/pagination");
 
 module.exports = {
   // add product
@@ -27,7 +28,7 @@ module.exports = {
   // get product
   getProducts: async (req, res) => {
     const { storeId } = req.params;
-    const { collection, productId } = req.query;
+    const { collection, productId, page = 0, limit = 0, filter } = req.query;
 
     try {
       const query = { storeRef: storeId };
@@ -48,12 +49,24 @@ module.exports = {
         }
         query._id = productId;
       }
+      
+      let sort = { createdAt: -1 };
+      if (filter === "lowToHigh") {
+        sort = { price: 1 };
+      } else if (filter === "highToLow") {
+        sort = { price: -1 };
+      } else if (filter === "topRated") {
+        sort = { wantsCustomerReview: -1, "ratings.average": -1, "ratings.count": -1 };
+        useAggregation = true;
+      } else if (filter === "inStock") {
+        query.stock = { $gt: 0 };
+      }
 
-      const productData = await ProductModel.find(query);
+      const data = await paginate(ProductModel, query, { page, limit, sort });
 
       return res.status(200).json({
         success: true,
-        data: productData,
+        data,
       });
     } catch (error) {
       console.error("Error fetching product data:", error);

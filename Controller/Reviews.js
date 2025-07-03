@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const { ReviewModel } = require("../Models/ReviewModel");
 const { ProductModel } = require("../Models/ProductModel");
 const updateProductRating = require("../Helpers/UpdateProductRating");
+const { paginate } = require("../Helpers/pagination");
 
 const addReview = async (req, res) => {
   const { storeId } = req.params;
@@ -58,7 +59,7 @@ const addReview = async (req, res) => {
 
 const getReviews = async (req, res) => {
   const { storeId } = req.params;
-  const { productId } = req.query;
+  const { productId, page = 0, limit = 0 } = req.query;
 
   const filter = { storeRef: storeId };
   if (productId) {
@@ -71,9 +72,10 @@ const getReviews = async (req, res) => {
   }
 
   try {
-    const reviews = await ReviewModel.find(filter);
+    // const reviews = await ReviewModel.find(filter);
+    const data = await paginate(ReviewModel, filter, { page, limit, sort: { createdAt: -1 } });
 
-    if (reviews.length === 0) {
+    if (data.length === 0) {
       return res.status(404).json({
         message: productId
           ? "No reviews found for this product"
@@ -83,7 +85,7 @@ const getReviews = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: reviews,
+      data,
     });
   } catch (e) {
     return res.status(500).json({ message: e.message });
