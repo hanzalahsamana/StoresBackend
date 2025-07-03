@@ -34,20 +34,19 @@ module.exports = {
       const query = { storeRef: storeId };
 
       if (collection) {
-        if (!mongoose.Types.ObjectId.isValid(collection)) {
-          return res
-            .status(400)
-            .json({ message: "Invalid collection ID format" });
-        }
-        query.collections = collection;
+        const ids = Array.isArray(collection) ? collection : [collection];
+        const allValid = ids.every(id => mongoose.Types.ObjectId.isValid(id));
+        if (!allValid) res.status(400).json({ message: "Invalid collection ID format" });
+        query.collections = { $in: ids.map(id => new mongoose.Types.ObjectId(id)) };
       }
 
       // Filter by product ID
-      if (productId) {
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
-          return res.status(400).json({ message: "Invalid product ID format" });
-        }
-        query._id = productId;
+      if (productId && productId.length !== 0) {
+        const ids = Array.isArray(productId) ? productId : [productId];
+        const allValid = ids.every(id => mongoose.Types.ObjectId.isValid(id));
+        if (!allValid) res.status(400).json({ message: "Invalid product ID format" });
+        const objectIds = ids.map(id => new mongoose.Types.ObjectId(id));
+        query._id = { $in: objectIds };
       }
 
       let sort = { createdAt: -1 };
