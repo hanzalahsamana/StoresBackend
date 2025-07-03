@@ -8,7 +8,7 @@ const EnrichedCartProducts = require('../Helpers/EnrichedCartProducts');
 const { ProductModel } = require('../Models/ProductModel');
 const { getValidVariant } = require('../Utils/getValidVariant');
 const { StoreModal } = require('../Models/StoreModal');
-const { getValidCouponDiscount, getValidGlobalDiscount } = require('../Helpers/getValidDiscount');
+const { getValidCouponDiscount, getValidGlobalDiscount } = require('../Helpers/GetValidDiscount');
 
 const placeOrder = async (req, res) => {
   const { storeId } = req.params;

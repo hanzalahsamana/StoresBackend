@@ -1,4 +1,4 @@
-const { getValidCouponDiscount } = require('../../Helpers/getValidDiscount');
+const { getValidCouponDiscount } = require('../../Helpers/GetValidDiscount');
 const { ConfigurationModel } = require('../../Models/ConfigurationModel');
 
 // Add Discount
