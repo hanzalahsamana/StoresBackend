@@ -17,12 +17,11 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-app.use(cors());
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options("*", cors(corsOptions));
+
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {

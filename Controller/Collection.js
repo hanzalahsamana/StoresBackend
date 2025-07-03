@@ -74,13 +74,13 @@ module.exports = {
         },
       ];
 
-      const data = await paginate(CollectionModel, {}, {
+      const { data, totalData } = await paginate(CollectionModel, query, {
         page,
         limit,
         sort: { createdAt: -1 },
       }, pipeline);
 
-      return res.status(200).json({ success: true, data });
+      return res.status(200).json({ success: true, data, totalData });
     } catch (e) {
       return res.status(500).json({ message: e.message || "An error occurred" });
     }

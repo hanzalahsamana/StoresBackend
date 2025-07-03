@@ -49,7 +49,7 @@ module.exports = {
         }
         query._id = productId;
       }
-      
+
       let sort = { createdAt: -1 };
       if (filter === "lowToHigh") {
         sort = { price: 1 };
@@ -62,11 +62,12 @@ module.exports = {
         query.stock = { $gt: 0 };
       }
 
-      const data = await paginate(ProductModel, query, { page, limit, sort });
+      const { data, totalData } = await paginate(ProductModel, query, { page, limit, sort });
 
       return res.status(200).json({
         success: true,
         data,
+        totalData
       });
     } catch (error) {
       console.error("Error fetching product data:", error);
