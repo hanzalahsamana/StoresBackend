@@ -19,18 +19,18 @@ module.exports = {
       });
 
       const savedCollection = await newCollection.save();
-      let savedProducts = [];
       if (products && products.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: products }, storeRef: storeId },
           { $addToSet: { collections: savedCollection._id } }
         );
-
-        savedProducts = await ProductModel.find(
-          { _id: { $in: products } },
-          { _id: 1, name: 1 }
-        );
       }
+
+      let savedProducts = [];
+      savedProducts = await ProductModel.find(
+        { _id: { $in: products } },
+        { _id: 1, name: 1 }
+      );
 
       return res.status(201).json({
         success: true,
@@ -139,17 +139,17 @@ module.exports = {
         );
       }
 
-      let savedProducts = []
       if (newlyAddedProductIds.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: newlyAddedProductIds }, storeRef: storeId },
           { $addToSet: { collections: collectionId } },
         );
-        savedProducts = await ProductModel.find(
-          { _id: { $in: newlyAddedProductIds } },
-          { _id: 1, name: 1 }
-        );
       }
+      let savedProducts = []
+      savedProducts = await ProductModel.find(
+        { _id: { $in: [products] } },
+        { _id: 1, name: 1 }
+      );
 
       Object.assign(collection, { name, image, slug: generateSlug(name) });
       const savedCollection = await collection.save();
