@@ -146,7 +146,7 @@ module.exports = {
           { $addToSet: { collections: collectionId } },
         );
         savedProducts = await ProductModel.find(
-          { _id: { $in: products } },
+          { _id: { $in: newlyAddedProductIds } },
           { _id: 1, name: 1 }
         );
       }
