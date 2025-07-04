@@ -8,6 +8,7 @@ const paymentMethodSchema = {
 
   jazzcash: Joi.object({
     isEnabled: Joi.boolean().required(),
+    isTest: Joi.boolean().required().label("Is Test Mode"),
     credentials: Joi.object({
       merchantId: Joi.string().required().label("Merchant ID"),
       pp_Password: Joi.string().required().label("Password"),
@@ -17,11 +18,26 @@ const paymentMethodSchema = {
 
   easypaisa: Joi.object({
     isEnabled: Joi.boolean().required(),
+    isTest: Joi.boolean().required().label("Is Test Mode"),
     credentials: Joi.object({
       merchantId: Joi.string().required().label("Merchant ID"),
       apiKey: Joi.string().required().label("API Key"),
     }).required(),
   }),
+
+  alfalah: Joi.object({
+    isEnabled: Joi.boolean().required(),
+    isTest: Joi.boolean().required().label("Is Test Mode"),
+    credentials: Joi.object({
+      merchantId: Joi.string().required().label("Merchant ID"),
+      storeId: Joi.string().required().label("Store ID"),
+      merchantHash: Joi.string().required().label("Merchant Hash"),
+      merchantUsername: Joi.string().required().label("Merchant Username"),
+      merchantPassword: Joi.string().required().label("Merchant Password"),
+      secretKey: Joi.string().required().label("Secret Key"),
+    }).required()
+  }),
+
 };
 
 const validatePaymentMethod = (req, res, next) => {

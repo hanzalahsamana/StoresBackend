@@ -6,8 +6,6 @@ const updatePaymentMethod = async (req, res) => {
   const { storeId } = req.params;
   const { method, data } = req.body;
 
-  console.log(method, data);
-
   try {
     let config = await ConfigurationModel.findOne({ storeRef: storeId });
 
