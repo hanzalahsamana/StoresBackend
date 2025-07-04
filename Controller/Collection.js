@@ -70,9 +70,18 @@ module.exports = {
             localField: '_id',
             foreignField: 'collections',
             as: 'products',
-          },
-        },
+            pipeline: [
+              {
+                $project: {
+                  _id: 1,
+                  name: 1
+                }
+              }
+            ]
+          }
+        }
       ];
+
 
       const { data, totalData } = await paginate(CollectionModel, query, {
         page,
