@@ -92,10 +92,8 @@ const getHashedPaymentCredential = async (req, res) => {
         .json({ message: `Payment method with Id '${methodId}' is disabled` });
     }
 
-    const credentials = Object.fromEntries(paymentMethod.credentials || []);
-
     return res.status(200).json({
-      data: credentials,
+      data: paymentMethod,
       success: true,
       message: "Credentials fetch successfully",
     });
