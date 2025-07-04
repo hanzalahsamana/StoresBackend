@@ -159,7 +159,7 @@ module.exports = {
       console.error("error fetching product suggestion:", err?.message || err);
       res.status(500).json({ success: false, message: 'Server error' });
     }
-  }
+  },
 
 };
 

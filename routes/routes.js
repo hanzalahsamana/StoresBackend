@@ -30,7 +30,7 @@ const { generateStore, getAllStores, getStore } = require('../Controller/StoreDe
 const { addProduct, deleteProduct, editProduct, getProducts, productSearchSuggestion } = require('../Controller/Product');
 
 // Controllers - Collection
-const { addCollection, getCollections, deleteCollection, editCollection } = require('../Controller/Collection');
+const { addCollection, getCollections, deleteCollection, editCollection, collectionSearchSuggestion } = require('../Controller/Collection');
 
 // Controllers - Section
 const { addSection, getSections, deleteSection, editSection, changeSectionOrder } = require('../Controller/Sections');
@@ -175,6 +175,7 @@ withoutParams.delete('/deleteAnnouncement', tokenChecker, deleteAnnouncement);
 
 // --- SEARCH SUGGESTION ROUTES ---
 withParams.get('/search/products', ValidStoreChecker, productSearchSuggestion);
+withParams.get('/search/collections', ValidStoreChecker, collectionSearchSuggestion);
 
 
 // --- SUBSCRIBER ROUTES ---

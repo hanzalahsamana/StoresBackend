@@ -3,6 +3,7 @@ const { mongoose } = require("mongoose");
 const { ProductModel } = require("../Models/ProductModel");
 const generateSlug = require("../Utils/generateSlug");
 const { paginate } = require("../Helpers/pagination");
+const { searchSuggestion } = require("../Helpers/searchSuggest");
 
 module.exports = {
   // add category
@@ -99,8 +100,6 @@ module.exports = {
     }
   },
 
-
-
   // edit collection
   editCollection: async (req, res) => {
     const { storeId } = req.params;
@@ -196,6 +195,27 @@ module.exports = {
         .json({ message: "Collection Deleted Successfully" });
     } catch (error) {
       return res.status(500).json({ message: error.message });
+    }
+  },
+
+  // search collection
+  collectionSearchSuggestion: async (req, res) => {
+    const { searchQuery } = req.query;
+    const { storeId } = req.params;
+
+    try {
+      const results = await searchSuggestion({
+        Model: CollectionModel,
+        searchTerm: searchQuery,
+        field: 'name',
+        extraQuery: { storeRef: storeId },
+        projection: { _id: 1, name: 1 },
+      });
+
+      res.status(200).json({ success: true, data: results });
+    } catch (err) {
+      console.error("error fetching product suggestion:", err?.message || err);
+      res.status(500).json({ success: false, message: 'Server error' });
     }
   },
 };

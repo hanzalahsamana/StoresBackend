@@ -20,7 +20,7 @@ const placeOrder = async (req, res) => {
     }).lean();
 
     if (!config) {
-      return res.status(404).json({ message: 'Store configuration not found.' });
+      return res.status(404).json({ message: 'Store configuration not found.', success: false });
     }
 
     const cart = await CartModel.findOne({
@@ -90,12 +90,12 @@ const placeOrder = async (req, res) => {
     const globalDiscount = getValidGlobalDiscount({ discounts: config?.discounts, totalAmount: totalProductCost });
     const couponDiscount = couponCode
       ? await getValidCouponDiscount({
-          email: customerInfo.email,
-          storeId,
-          couponCode,
-          allDiscounts: config?.discounts,
-          totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
-        })
+        email: customerInfo.email,
+        storeId,
+        couponCode,
+        allDiscounts: config?.discounts,
+        totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
+      })
       : null;
 
     // 3. ✅ Get tax & shipping from Configuration model
