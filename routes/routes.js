@@ -27,7 +27,7 @@ const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithG
 const { generateStore, getAllStores, getStore } = require('../Controller/StoreDetail');
 
 // Controllers - Product
-const { addProduct, deleteProduct, editProduct, getProducts } = require('../Controller/Product');
+const { addProduct, deleteProduct, editProduct, getProducts, productSearchSuggestion } = require('../Controller/Product');
 
 // Controllers - Collection
 const { addCollection, getCollections, deleteCollection, editCollection } = require('../Controller/Collection');
@@ -172,6 +172,10 @@ withParams.post('/applyCoupon', ValidStoreChecker, applyCoupon);
 // --- ANNOUNCEMENT ROUTES ---
 withoutParams.post('/addAnnouncement', tokenChecker, addAnnouncement);
 withoutParams.delete('/deleteAnnouncement', tokenChecker, deleteAnnouncement);
+
+// --- SEARCH SUGGESTION ROUTES ---
+withParams.get('/search/products', ValidStoreChecker, productSearchSuggestion);
+
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post('/addSubscriber', addSubscriber);

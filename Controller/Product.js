@@ -2,6 +2,7 @@ const { ProductModel } = require("../Models/ProductModel");
 const { mongoose } = require("mongoose");
 const { ReviewModel } = require("../Models/ReviewModel");
 const { paginate } = require("../Helpers/pagination");
+const { searchSuggestion } = require("../Helpers/searchSuggest");
 
 module.exports = {
   // add product
@@ -33,20 +34,20 @@ module.exports = {
     try {
       const query = { storeRef: storeId };
 
+      // Filter by collection
       if (collection) {
-        const ids = Array.isArray(collection) ? collection : [collection];
+        const ids = collection.split(',').map(id => id.trim());
         const allValid = ids.every(id => mongoose.Types.ObjectId.isValid(id));
-        if (!allValid) res.status(400).json({ message: "Invalid collection ID format" });
+        if (!allValid) return res.status(400).json({ message: "Invalid collection ID format" });
         query.collections = { $in: ids.map(id => new mongoose.Types.ObjectId(id)) };
       }
 
       // Filter by product ID
-      if (productId && productId.length !== 0) {
-        const ids = Array.isArray(productId) ? productId : [productId];
+      if (productId) {
+        const ids = productId.split(',').map(id => id.trim());
         const allValid = ids.every(id => mongoose.Types.ObjectId.isValid(id));
-        if (!allValid) res.status(400).json({ message: "Invalid product ID format" });
-        const objectIds = ids.map(id => new mongoose.Types.ObjectId(id));
-        query._id = { $in: objectIds };
+        if (!allValid) return res.status(400).json({ message: "Invalid product ID format" });
+        query._id = { $in: ids.map(id => new mongoose.Types.ObjectId(id)) };
       }
 
       let sort = { createdAt: -1 };
@@ -138,4 +139,31 @@ module.exports = {
       res.status(500).json({ message: error.message });
     }
   },
+
+  productSearchSuggestion: async (req, res) => {
+    const { searchQuery } = req.query;
+    const { storeId } = req.params;
+
+    if (!searchQuery) {
+      return res.status(400).json({ success: false, message: 'Search query is required' });
+    }
+
+    try {
+      const results = await searchSuggestion({
+        Model: ProductModel,
+        searchTerm: searchQuery,
+        field: 'name',
+        extraQuery: { storeRef: storeId },
+        projection: { _id: 1, name: 1 },
+      });
+
+      res.status(200).json({ success: true, data: results });
+    } catch (err) {
+      console.error("error fetching product suggestion:", err?.message || err);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  }
+
 };
+
+
