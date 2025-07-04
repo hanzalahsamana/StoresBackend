@@ -19,17 +19,22 @@ module.exports = {
       });
 
       const savedCollection = await newCollection.save();
-
+      let savedProducts = [];
       if (products && products.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: products }, storeRef: storeId },
-          { $addToSet: { collections: savedCollection._id } },
+          { $addToSet: { collections: savedCollection._id } }
+        );
+
+        savedProducts = await ProductModel.find(
+          { _id: { $in: products } },
+          { _id: 1, name: 1 }
         );
       }
 
       return res.status(201).json({
         success: true,
-        data: savedCollection,
+        data: { ...savedCollection.toObject?.(), products: savedProducts },
       });
     } catch (error) {
       console.error("Error adding collection:", error);
@@ -81,7 +86,6 @@ module.exports = {
           }
         }
       ];
-
 
       const { data, totalData } = await paginate(CollectionModel, query, {
         page,
