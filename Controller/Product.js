@@ -140,13 +140,10 @@ module.exports = {
     }
   },
 
+  // search products 
   productSearchSuggestion: async (req, res) => {
     const { searchQuery } = req.query;
     const { storeId } = req.params;
-
-    if (!searchQuery) {
-      return res.status(400).json({ success: false, message: 'Search query is required' });
-    }
 
     try {
       const results = await searchSuggestion({

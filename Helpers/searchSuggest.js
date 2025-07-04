@@ -1,18 +1,22 @@
-
+// helpers/searchSuggestion.js
 const searchSuggestion = async ({
     Model,
     searchTerm,
     field = 'name',
     extraQuery = {},
     projection = { _id: 1, name: 1 },
-    limit = 0,
+    limit = 0, // 0 means no limit
 }) => {
-    if (!searchTerm) return [];
-
-    const regexStartsWith = new RegExp(`^${searchTerm}`, 'i');
-    const regexIncludes = new RegExp(searchTerm, 'i');
-
     try {
+        if (!searchTerm) {
+            const query = Model.find(extraQuery, projection).sort({ [field]: 1 });
+            if (limit > 0) query.limit(limit);
+            return await query;
+        }
+
+        const regexStartsWith = new RegExp(`^${searchTerm}`, 'i');
+        const regexIncludes = new RegExp(searchTerm, 'i');
+
         const startsWithQuery = Model.find(
             {
                 ...extraQuery,
