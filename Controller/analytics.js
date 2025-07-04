@@ -1,5 +1,6 @@
 const { BetaAnalyticsDataClient } = require("@google-analytics/data");
 const { calculateDateRange } = require("../Utils/CalculateDateRange");
+const { StoreModal } = require("../Models/StoreModal");
 require("dotenv").config();
 
 const {
@@ -73,7 +74,10 @@ const formatDate = (dateString) => {
 // 🚀 Get Analytics Data
 const getAnalyticsData = async (req, res) => {
   try {
-    const { dateFilter, siteName = "ModestWardrobe" } = req.query;
+    const { dateFilter } = req.query;
+    const { storeId } = req.params
+    const store = await StoreModal.findById(storeId);
+    const siteName = store?.storeName
 
     if (!PROPERTY_ID) throw new Error("Missing Google Analytics Property ID.");
     if (!dateFilter) throw new Error("Date filter is required.");

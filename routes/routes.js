@@ -149,7 +149,7 @@ withParams.get('/getHashedPaymentCredential', ValidStoreChecker, getHashedPaymen
 
 // --- THEME / ANALYTICS ROUTES ---
 withoutParams.post('/setTheme', tokenChecker, updateTheme);
-withParams.get('/getAnalytics', ValidStoreChecker, getAnalyticsData);
+withParams.get('/getAnalytics', tokenChecker, validOwnerChecker, getAnalyticsData);
 
 // --- UPLOAD ROUTES ---
 withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingle, uploadSingleImage);
