@@ -1,49 +1,46 @@
-// helpers/searchSuggestion.js
+
 const searchSuggestion = async ({
     Model,
     searchTerm,
     field = 'name',
     extraQuery = {},
     projection = { _id: 1, name: 1 },
-    limit = 0, // 0 means no limit
+    limit = 0,
 }) => {
     if (!searchTerm) return [];
 
     const regexStartsWith = new RegExp(`^${searchTerm}`, 'i');
     const regexIncludes = new RegExp(searchTerm, 'i');
 
-    const query = {
-        $and: [
-            extraQuery,
-            {
-                $or: [
-                    { [field]: regexStartsWith },
-                    { [field]: regexIncludes },
-                ],
-            },
-        ],
-    };
-
     try {
-        let dbQuery = Model.find(query, projection).sort({ [field]: 1 });
+        const startsWithQuery = Model.find(
+            {
+                ...extraQuery,
+                [field]: regexStartsWith,
+            },
+            projection
+        ).sort({ [field]: 1 });
+
+        const includesQuery = Model.find(
+            {
+                ...extraQuery,
+                [field]: {
+                    $regex: regexIncludes,
+                    $not: regexStartsWith,
+                },
+            },
+            projection
+        ).sort({ [field]: 1 });
 
         if (limit > 0) {
-            dbQuery = dbQuery.limit(limit);
+            startsWithQuery.limit(limit);
+            includesQuery.limit(limit);
         }
 
-        const results = await dbQuery;
-
-        // Move "startsWith" matches first
-        const startsWith = [];
-        const includes = [];
-
-        for (let doc of results) {
-            if (regexStartsWith.test(doc[field])) {
-                startsWith.push(doc);
-            } else {
-                includes.push(doc);
-            }
-        }
+        const [startsWith, includes] = await Promise.all([
+            startsWithQuery,
+            includesQuery,
+        ]);
 
         return [...startsWith, ...includes];
     } catch (err) {
