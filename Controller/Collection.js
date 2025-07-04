@@ -139,10 +139,15 @@ module.exports = {
         );
       }
 
+      let savedProducts = []
       if (newlyAddedProductIds.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: newlyAddedProductIds }, storeRef: storeId },
           { $addToSet: { collections: collectionId } },
+        );
+        savedProducts = await ProductModel.find(
+          { _id: { $in: products } },
+          { _id: 1, name: 1 }
         );
       }
 
@@ -151,7 +156,7 @@ module.exports = {
 
       res.status(200).json({
         success: true,
-        data: savedCollection,
+        data: { ...savedCollection.toObject?.(), products: savedProducts },
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
