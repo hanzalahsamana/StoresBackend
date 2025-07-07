@@ -9,14 +9,14 @@ const sendEmail = require("./EmailSender");
 
 const AdminPanel = {
   email: "hanzalahsamana789@gmail.com",
-  brandName: "Admin Panel",
+  storeName: "Admin Panel",
 };
 
 const adminContactResponse = async (admin, to, logo, data) => {
   await sendEmail(
     admin,
     to,
-    `Contact Form Submitted from ${admin.brandName}`,
+    `Contact Form Submitted from ${admin.storeName}`,
     generateAdminContactTemplate({ ...admin, logo }, data),
   );
 };
@@ -25,7 +25,7 @@ const customerContactResponse = async (admin, to, logo, data) => {
   await sendEmail(
     admin,
     to,
-    `Contact To ${admin.brandName}`,
+    `Contact To ${admin.storeName}`,
     generateCustomerContactTemplate({ ...admin, logo }, data),
   );
 };
@@ -34,7 +34,7 @@ const adminOrderDetail = async (admin, to, orderDetails) => {
   await sendEmail(
     admin,
     to,
-    `Order Summary of ${admin.brandName}`,
+    `Order Summary of ${admin.storeName}`,
     generateOrderDetailsTemplate(admin, orderDetails),
   );
 };
@@ -43,7 +43,7 @@ const customerOrderDetail = async (admin, to, orderDetails) => {
   await sendEmail(
     admin,
     to,
-    `Order Summary of ${admin.brandName}`,
+    `Order Summary of ${admin.storeName}`,
     generateOrderConfirmTemplate(admin, orderDetails),
   );
 };

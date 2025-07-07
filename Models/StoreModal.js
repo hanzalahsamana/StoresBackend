@@ -5,7 +5,7 @@ const StoreSchema = new Schema(
   {
     userRef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'users',
+      ref: 'User',
       required: true,
     },
     storeName: {

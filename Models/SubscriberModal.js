@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const subscriberSchema = new mongoose.Schema({
+  storeRef: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Store",
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -9,4 +14,6 @@ const subscriberSchema = new mongoose.Schema({
   subscribedAt: { type: Date, default: Date.now },
 });
 
-module.exports = subscriberSchema;
+const SubscriberModel = mongoose.model("subscribers", subscriberSchema);
+
+module.exports = { SubscriberModel }; 

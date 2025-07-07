@@ -77,9 +77,10 @@ const { exportSite } = require('../Controller/migration');
 
 // Controllers - Analytics / Contact
 const { getAnalyticsData } = require('../Controller/analytics');
-const { postConatctForm } = require('../Controller/Contact');
+const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
 const { getHomePageData } = require('../Controller/pages/homePage');
 const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
+const { deleteStore } = require('../Controller/StoreConfigurations/deleteStore');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -182,8 +183,15 @@ withParams.get('/search/collections', ValidStoreChecker, collectionSearchSuggest
 // --- Home Page ROUTES ---
 withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
 
+// --- Profile Page ROUTES ---
+withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
+
 // --- SUBSCRIBER ROUTES ---
-withParams.post('/addSubscriber', addSubscriber);
+withParams.post('/addSubscriber', ValidStoreChecker, addSubscriber);
+
+// --- Contact ROUTES ---
+withParams.post('/contact-us', ValidStoreChecker, postConatctForm);
+withParams.get('/contacted-users', ValidStoreChecker, getContactedUsers);
 
 // --- MISC / UTILITIES ---
 withParams.get('/ping', async (req, res) => {

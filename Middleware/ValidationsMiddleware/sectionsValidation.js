@@ -1,14 +1,4 @@
 const Joi = require("joi");
-const mongoose = require("mongoose");
-
-// Custom ObjectId validation
-const objectId = () =>
-    Joi.string().custom((value, helpers) => {
-        if (!mongoose.Types.ObjectId.isValid(value)) {
-            return helpers.error("any.invalid");
-        }
-        return value;
-    }, "ObjectId Validation");
 
 const validateSection = (req, res, next) => {
     const schema = Joi.object({
