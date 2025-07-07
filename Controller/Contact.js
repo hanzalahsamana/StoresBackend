@@ -15,18 +15,18 @@ const postConatctForm = async (req, res) => {
     if (!admin) {
       return res.status(404).json({ message: "Invalid storeId", success: false })
     }
-
+    const data = { ...admin?.userRef, storeName: admin?.storeName }
     const contactForm = new ContactModel({ ...remain, storeRef: storeId });
 
     await contactForm.save();
     await customerContactResponse(
-      admin?.userRef,
+      data,
       contactForm.email,
       siteLogo,
       contactForm,
     );
     await adminContactResponse(
-      admin?.userRef,
+      data,
       admin?.userRef?.email,
       siteLogo,
       contactForm,
