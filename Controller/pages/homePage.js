@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const { SectionModel } = require("../../Models/SectionsModel");
 const { ProductModel } = require("../../Models/ProductModel");
 const { CollectionModel } = require("../../Models/CollectionModel");

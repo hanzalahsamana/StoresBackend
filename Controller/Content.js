@@ -3,17 +3,17 @@ const { ContentModel } = require("../Models/ContentModel");
 
 const getContents = async (req, res) => {
   const { storeId } = req.params;
-  const { contentId } = req.query;
+  const { type } = req.query;
 
   try {
     const filter = { storeRef: storeId };
-    if (contentId) {
-      filter._id = contentId;
+    if (type) {
+      filter.type = type;
     }
 
     const contents = await ContentModel.find(filter);
 
-    if (contentId && contents.length === 0) {
+    if (type && contents.length === 0) {
       return res.status(404).json({ message: "Content not found" });
     }
 
