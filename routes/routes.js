@@ -79,6 +79,7 @@ const { exportSite } = require('../Controller/migration');
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm } = require('../Controller/Contact');
 const { getHomePageData } = require('../Controller/pages/homePage');
+const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -120,7 +121,7 @@ withParams.get('/getReviews', ValidStoreChecker, getReviews);
 withParams.delete('/deleteReview', tokenChecker, validOwnerChecker, deleteReview);
 
 // --- SECTION ROUTES ---
-withParams.post('/addSection', tokenChecker, validOwnerChecker, addSection);
+withParams.post('/addSection', tokenChecker, validOwnerChecker, validateSection, addSection);
 withParams.get('/getSections', ValidStoreChecker, getSections);
 withParams.delete('/deleteSection', tokenChecker, validOwnerChecker, deleteSection);
 withParams.patch('/editSection', tokenChecker, validOwnerChecker, editSection);
