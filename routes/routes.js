@@ -81,6 +81,7 @@ const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
 const { getHomePageData } = require('../Controller/pages/homePage');
 const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
 const { deleteStore } = require('../Controller/StoreConfigurations/deleteStore');
+const { deleteAccount } = require('../Controller/StoreConfigurations/deleteAccount');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -185,6 +186,7 @@ withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
 
 // --- Profile Page ROUTES ---
 withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
+withParams.delete('/delete/account', tokenChecker, deleteAccount);
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post('/addSubscriber', ValidStoreChecker, addSubscriber);

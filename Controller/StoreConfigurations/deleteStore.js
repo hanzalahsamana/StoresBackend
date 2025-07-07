@@ -11,6 +11,7 @@ const { OrderModel } = require("../../Models/OrderModal");
 const { ReviewModel } = require("../../Models/ReviewModel");
 const { SubscriberModel } = require("../../Models/SubscriberModal");
 const { compareHash } = require("../../Utils/BCrypt");
+const { deleteAllData } = require("../../Helpers/deleteAllData");
 
 module.exports = {
     deleteStore: async (req, res) => {
@@ -37,18 +38,7 @@ module.exports = {
                 return res.status(401).json({ message: "Invalid password", success: false });
             }
 
-            await Promise.all([
-                ProductModel.deleteMany({ storeRef: storeId }),
-                SectionModel.deleteMany({ storeRef: storeId }),
-                CollectionModel.deleteMany({ storeRef: storeId }),
-                CartModel.deleteMany({ storeRef: storeId }),
-                ConfigurationModel.deleteMany({ storeRef: storeId }),
-                ContactModel.deleteMany({ storeRef: storeId }),
-                ContentModel.deleteMany({ storeRef: storeId }),
-                OrderModel.deleteMany({ storeRef: storeId }),
-                ReviewModel.deleteMany({ storeRef: storeId }),
-                SubscriberModel.deleteMany({ storeRef: storeId }),
-            ]);
+            deleteAllData([storeId])
 
             await StoreModal.findByIdAndDelete(storeId);
 
