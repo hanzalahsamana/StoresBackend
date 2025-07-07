@@ -3,7 +3,6 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { withParams, withoutParams } = require("./routes/routes");
-const { generatePaymentToken } = require("./Controller/payment");
 require("./Config/Database");
 
 const app = express();

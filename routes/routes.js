@@ -48,7 +48,7 @@ const { addToCart, getCartdata, deleteCartData } = require('../Controller/Cart')
 const { placeOrder, getOrders, editOrderData } = require('../Controller/Order');
 
 // Controllers - Payment
-const { initiateJazzCashPayment } = require('../Controller/payment');
+// const { initiateJazzCashPayment } = require('../Controller/payment');
 
 // Controllers - Theme
 const { addTheme, updateTheme } = require('../Controller/StoreConfigurations/ThemeSetting');
@@ -78,6 +78,7 @@ const { exportSite } = require('../Controller/migration');
 // Controllers - Analytics / Contact
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm } = require('../Controller/Contact');
+const { getHomePageData } = require('../Controller/pages/homePage');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -177,6 +178,8 @@ withoutParams.delete('/deleteAnnouncement', tokenChecker, deleteAnnouncement);
 withParams.get('/search/products', ValidStoreChecker, productSearchSuggestion);
 withParams.get('/search/collections', ValidStoreChecker, collectionSearchSuggestion);
 
+// --- Home Page ROUTES ---
+withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post('/addSubscriber', addSubscriber);
@@ -202,7 +205,7 @@ withoutParams.post('/jazzcash', async (req, res) => {
   }
 });
 
-withoutParams.post('/jazzcash-initiate', initiateJazzCashPayment);
+// withoutParams.post('/jazzcash-initiate', initiateJazzCashPayment);
 
 module.exports = {
   withParams,

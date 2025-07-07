@@ -1,10 +1,7 @@
 const { mongoose } = require('mongoose');
 const { orderSchema, OrderModel } = require('../Models/OrderModal');
-const { customerOrderDetail, adminOrderDetail } = require('../Helpers/EmailsToSend');
-const { UserModal } = require('../Models/userModal');
 const { ConfigurationModel } = require('../Models/ConfigurationModel');
 const { CartModel } = require('../Models/CartModel');
-const EnrichedCartProducts = require('../Helpers/EnrichedCartProducts');
 const { ProductModel } = require('../Models/ProductModel');
 const { getValidVariant } = require('../Utils/getValidVariant');
 const { StoreModal } = require('../Models/StoreModal');
