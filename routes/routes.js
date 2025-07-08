@@ -24,7 +24,7 @@ const ValidStoreChecker = require('../Middleware/ValidStoreChecker');
 const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle, editPassword } = require('../Controller/user');
 
 // Controllers - Store
-const { generateStore, getAllStores, getStore } = require('../Controller/StoreDetail');
+const { generateStore, getAllStores, getStore, editStore } = require('../Controller/StoreDetail');
 
 // Controllers - Product
 const { addProduct, deleteProduct, editProduct, getProducts, productSearchSuggestion } = require('../Controller/Product');
@@ -83,6 +83,7 @@ const { validateSection } = require('../Middleware/ValidationsMiddleware/section
 const { deleteStore } = require('../Controller/StoreConfigurations/deleteStore');
 const { deleteAccount } = require('../Controller/StoreConfigurations/deleteAccount');
 const { editPasswordValidate } = require('../Middleware/ValidationsMiddleware/editPasswordValidate');
+const { generateStoreValidation, editStoreValidation } = require('../Middleware/ValidationsMiddleware/StoreValidation');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -102,9 +103,11 @@ withoutParams.post('/authWithGoogle', authWithGoogle);
 withoutParams.get('/getUserFromToken', tokenChecker, getUserFromToken);
 
 // --- STORE ROUTES ---
-withoutParams.post('/generateStore', tokenChecker, generateStore);
+withoutParams.post('/generateStore', tokenChecker, generateStoreValidation, generateStore);
 withParams.get('/getStore', ValidStoreChecker, getStore);
 withoutParams.get('/getAllStores', tokenChecker, getAllStores);
+withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
+withParams.put('/edit/store', tokenChecker, validOwnerChecker, editStoreValidation, editStore);
 
 // --- PRODUCT ROUTES ---
 withParams.post('/addProduct', tokenChecker, validOwnerChecker, validateProduct(false), addProduct);
@@ -186,10 +189,8 @@ withParams.get('/search/collections', ValidStoreChecker, collectionSearchSuggest
 withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
 
 // --- Profile Page ROUTES ---
-withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
 withParams.delete('/delete/account', tokenChecker, deleteAccount);
 withParams.put('/edit/password', tokenChecker, editPasswordValidate, editPassword);
-// withParams.put('/edit/store', tokenChecker, validOwnerChecker);
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post('/addSubscriber', ValidStoreChecker, addSubscriber);

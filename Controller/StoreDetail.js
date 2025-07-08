@@ -1,28 +1,23 @@
 const { default: mongoose } = require("mongoose");
 const { StoreModal } = require("../Models/StoreModal");
 const { UserModal } = require("../Models/userModal");
-const generateSlug = require("../Utils/generateSlug");
-const { generateStoreValidation } = require("../Utils/ValidatePayloads");
 const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 
 const generateStore = async (req, res) => {
   const { userId } = req.query;
-  const { storeName, storeType } = req.body;
+  const { storeName, storeType, subDomain } = req.body;
 
   try {
-    const error = generateStoreValidation(req.body);
-    if (!error.isValid) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: error.errors,
-      });
+    const isSubDomainExist = await StoreModal.findOne({ subDomain });
+
+    if (isSubDomainExist) {
+      return res.status(400).json({ message: "Sub domain already exists!", success: false });
     }
 
     const newStore = new StoreModal({
       storeName,
       storeType,
-      subDomain: generateSlug(storeName),
+      subDomain,
       userRef: userId,
     });
     const savedStore = await newStore.save();
@@ -92,4 +87,31 @@ const getAllStores = async (req, res) => {
   }
 };
 
-module.exports = { generateStore, getAllStores, getStore };
+const editStore = async (req, res) => {
+  try {
+    const { storeName, subDomain } = req.body;
+    const { storeId } = req.params;
+    if (!req.body) {
+      return res.status(400).json({ message: "Data is required", success: false });
+    }
+    const isSubDomainExist = await StoreModal.findOne({ subDomain });
+
+    if (isSubDomainExist) {
+      return res.status(400).json({ message: "Sub domain already exists!", success: false });
+    }
+
+    const store = await StoreModal.findById(storeId)
+    if (!store) {
+      return res.status(404).json({ message: `Invalid Store Id!`, success: false })
+    }
+    store.storeName = storeName
+    const updatedStore = await store.save()
+    return res.status(200).json({ message: "Store Updated succesfully", data: updatedStore, success: true })
+
+  } catch (e) {
+    console.error("Error edit Store", e?.message || e);
+    return res.status(500).json({ message: "Something went wrong!", success: false });
+  }
+}
+
+module.exports = { generateStore, getAllStores, getStore, editStore };
