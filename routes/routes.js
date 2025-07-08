@@ -6,6 +6,9 @@ const { uploadSingleImage, uploadMultipleImages } = require('../Helpers/ImageUpl
 const importSiteData = require('../Helpers/ImportSite');
 
 // Validation middleware
+const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
+const { editPasswordValidate } = require('../Middleware/ValidationsMiddleware/editPasswordValidate');
+const { generateStoreValidation, editStoreValidation } = require('../Middleware/ValidationsMiddleware/StoreValidation');
 const { userLoginValidate, userRegisterValidate } = require('../Middleware/ValidationsMiddleware/UserValidation');
 const validateProduct = require('../Middleware/ValidationsMiddleware/ProductValidation');
 const validateCollection = require('../Middleware/ValidationsMiddleware/CollectionValidation');
@@ -21,10 +24,10 @@ const validOwnerChecker = require('../Middleware/ValidOwnerChecker');
 const ValidStoreChecker = require('../Middleware/ValidStoreChecker');
 
 // Controllers - Auth
-const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle, editPassword } = require('../Controller/user');
+const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle, editPassword, deleteAccount } = require('../Controller/user');
 
 // Controllers - Store
-const { generateStore, getAllStores, getStore, editStore } = require('../Controller/StoreDetail');
+const { generateStore, getAllStores, getStore, editStore, deleteStore } = require('../Controller/StoreDetail');
 
 // Controllers - Product
 const { addProduct, deleteProduct, editProduct, getProducts, productSearchSuggestion } = require('../Controller/Product');
@@ -46,9 +49,6 @@ const { addToCart, getCartdata, deleteCartData } = require('../Controller/Cart')
 
 // Controllers - Order
 const { placeOrder, getOrders, editOrderData } = require('../Controller/Order');
-
-// Controllers - Payment
-// const { initiateJazzCashPayment } = require('../Controller/payment');
 
 // Controllers - Theme
 const { addTheme, updateTheme } = require('../Controller/StoreConfigurations/ThemeSetting');
@@ -75,15 +75,12 @@ const { handleDomainRequest, automateDomainSetup, removeDomainFromDatabase, getS
 const { uploadSingle, uploadMultiple } = require('../Controller/imageUpload');
 const { exportSite } = require('../Controller/migration');
 
+// Controllers - Pages / homepage
+const { getHomePageData } = require('../Controller/pages/homePage');
+
 // Controllers - Analytics / Contact
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
-const { getHomePageData } = require('../Controller/pages/homePage');
-const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
-const { deleteStore } = require('../Controller/StoreConfigurations/deleteStore');
-const { deleteAccount } = require('../Controller/StoreConfigurations/deleteAccount');
-const { editPasswordValidate } = require('../Middleware/ValidationsMiddleware/editPasswordValidate');
-const { generateStoreValidation, editStoreValidation } = require('../Middleware/ValidationsMiddleware/StoreValidation');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -219,8 +216,6 @@ withoutParams.post('/jazzcash', async (req, res) => {
     res.status(503).send('MongoDB Unreachable');
   }
 });
-
-// withoutParams.post('/jazzcash-initiate', initiateJazzCashPayment);
 
 module.exports = {
   withParams,
