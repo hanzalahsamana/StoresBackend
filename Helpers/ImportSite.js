@@ -6,10 +6,12 @@ const { UserModal } = require("../Models/userModal");
 const { SectionSchema } = require("../Models/SectionsModel");
 const getModel = require("../Utils/GetModel");
 const { ContentModel } = require("../Models/ContentModel");
+const { StoreModal } = require("../Models/StoreModal");
 
 const importSiteData = async (req, res) => {
   try {
     const { userId, selectedKeys } = req.query;
+    const { storeId } = req.params
 
     // Validate selectedKeys
     console.error("Invalid selectedKeys:", selectedKeys);
@@ -21,13 +23,14 @@ const importSiteData = async (req, res) => {
 
     // Fetch user
     const user = await UserModal.findById(userId).select("-password");
+    const store = await StoreModal.findById(storeId);
     if (!user) {
       return res
         .status(404)
         .json({ message: `No user found with ID: ${userId}` });
     }
 
-    const siteName = user.brandName;
+    const siteName = store.storeName;
     if (!siteName) {
       return res.status(400).json({ message: "Missing 'brandName'." });
     }

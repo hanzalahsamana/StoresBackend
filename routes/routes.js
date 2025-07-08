@@ -159,8 +159,8 @@ withParams.get('/getAnalytics', tokenChecker, validOwnerChecker, getAnalyticsDat
 // --- UPLOAD ROUTES ---
 withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingle, uploadSingleImage);
 withParams.post('/uploadMultiple', tokenChecker, validOwnerChecker, uploadMultiple, uploadMultipleImages);
-withoutParams.post('/importSiteData', tokenChecker, upload.single('file'), importSiteData);
-withoutParams.get('/exportSiteData', tokenChecker, exportSite);
+withoutParams.post('/importSiteData', tokenChecker, validOwnerChecker, upload.single('file'), importSiteData);
+withoutParams.get('/exportSiteData', tokenChecker, validOwnerChecker, exportSite);
 
 // --- DOMAIN ROUTES ---
 withParams.post('/addDomainDns', handleDomainRequest);
