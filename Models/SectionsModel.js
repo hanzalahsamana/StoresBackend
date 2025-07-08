@@ -8,12 +8,11 @@ const SectionSchema = new Schema(
       ref: "Store",
       required: true,
     },
-    type: {
+    key: {
       type: String,
       required: true,
-      // enum: ["hero", "product_catalog", "rich_text", "collection_card"],
     },
-    sectionName: {
+    name: {
       type: String,
       required: true,
     },
