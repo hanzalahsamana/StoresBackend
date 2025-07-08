@@ -291,4 +291,35 @@ module.exports = {
       res.status(500).json({ message: "Google authentication failed." });
     }
   },
+
+  editPassword: async (req, res) => {
+    try {
+      const { userId } = req.query;
+      const { currentPassword, newPassword } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ message: "Invalid token", success: false });
+      }
+
+      const user = await UserModal.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found", success: false });
+      }
+
+      const isMatch = await compareHash(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Current password is incorrect", success: false });
+      }
+
+      const hashedPassword = await generateHash(newPassword, 10);
+      user.password = hashedPassword;
+      await user.save();
+
+      return res.status(200).json({ message: "Password updated successfully", success: true });
+
+    } catch (e) {
+      console.log("Error editing password", e?.message || e);
+      return res.status(500).json({ message: "Something went wrong!", success: false });
+    }
+  }
 };
