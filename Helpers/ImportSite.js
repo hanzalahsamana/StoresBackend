@@ -5,12 +5,12 @@ const { orderSchema } = require("../Models/OrderModal");
 const { UserModal } = require("../Models/userModal");
 const { SectionSchema } = require("../Models/SectionsModel");
 const getModel = require("../Utils/GetModel");
-const { ContentModel } = require("../Models/ContentModel");
 const { StoreModal } = require("../Models/StoreModal");
+const { ContentModel } = require("../Models/ContentModel");
 
 const importSiteData = async (req, res) => {
   try {
-    const { userId, selectedKeys } = req.query;
+    const { selectedKeys } = req.query;
     const { storeId } = req.params
 
     // Validate selectedKeys
@@ -22,13 +22,7 @@ const importSiteData = async (req, res) => {
     }
 
     // Fetch user
-    const user = await UserModal.findById(userId).select("-password");
     const store = await StoreModal.findById(storeId);
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: `No user found with ID: ${userId}` });
-    }
 
     const siteName = store.storeName;
     if (!siteName) {
@@ -120,16 +114,15 @@ const importSiteData = async (req, res) => {
 
     // Handle Pages/Contents
     if (selectedKeys.includes("contents") && jsonData.contents?.length) {
-      const ContentModel = getModel(siteName, "contents", ContentModel);
-      for (const incomingContent of jsonData.contents) {
-        const { type, _id, ...rest } = incomingContent;
-        const existing = await ContentModel.findOne({ type });
-        if (existing) {
-          importActions.push(ContentModel.updateOne({ type }, { $set: rest }));
-        } else {
-          importActions.push(ContentModel.create({ type, ...rest }));
-        }
-      }
+      await jsonData.contents.forEach(({ type, ...rest }) => {
+        importActions.push(
+          ContentModel.updateOne(
+            { storeRef: storeId, type },
+            { $set: { ...rest, storeRef: storeId } },
+            { upsert: true }
+          )
+        );
+      });
     }
 
     // Execute all import actions
