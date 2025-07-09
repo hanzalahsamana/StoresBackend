@@ -151,7 +151,7 @@ module.exports = {
         searchTerm: searchQuery,
         field: 'name',
         extraQuery: { storeRef: storeId },
-        projection: { _id: 1, name: 1 },
+        projection: { _id: 1, name: 1, displayImage: 1, price: 1 },
       });
 
       res.status(200).json({ success: true, data: results });

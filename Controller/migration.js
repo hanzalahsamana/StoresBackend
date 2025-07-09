@@ -1,16 +1,26 @@
+const fs = require("fs");
+const csv = require("csv-parser");
+const multer = require("multer");
+const path = require("path");
 const { CollectionModel } = require("../Models/CollectionModel");
 const { ContentModel } = require("../Models/ContentModel");
 const { ProductModel } = require("../Models/ProductModel");
 const { SectionModel } = require("../Models/SectionsModel");
 const { parse } = require("json2csv");
-const archiver = require("archiver");
-const stream = require("stream");
 
+const modelMap = {
+  products: ProductModel,
+  collections: CollectionModel,
+  sections: SectionModel,
+  contents: ContentModel,
+};
 const exportSite = async (req, res) => {
   const { storeId } = req.params;
   const { selectedData } = req.query;
+  const data = selectedData.split(',').map(d => d.trim());
 
-  if (!Array.isArray(selectedData) || selectedData.length < 1) {
+
+  if (!Array.isArray(data) || data.length < 1) {
     return res.status(400).json({ message: "selectedData must be a non-empty array." });
   }
 
@@ -18,61 +28,108 @@ const exportSite = async (req, res) => {
     const removeMetaFields = (docs) =>
       docs.map(({ _id, storeRef, __v, ...rest }) => rest);
 
-    // Use PassThrough stream for streaming response
-    const zipStream = new stream.PassThrough();
-    const archive = archiver("zip", { zlib: { level: 9 } });
+    const combinedData = [];
 
-    res.setHeader("Content-Type", "application/zip");
-    res.setHeader("Content-Disposition", "attachment; filename=site_export.zip");
+    // Helper to fetch and push with model name
+    const addToCombinedData = async (modelName, model) => {
+      const docs = await model.find({ storeRef: storeId }).lean();
+      const cleaned = removeMetaFields(docs);
+      cleaned.forEach(doc => combinedData.push({ model: modelName, ...doc }));
+    };
 
-    archive.pipe(zipStream);
-    zipStream.pipe(res);
 
-    // Export collections
-    if (selectedData.includes("collections")) {
-      const collections = await CollectionModel.find({ storeRef: storeId }).lean();
-      const cleaned = removeMetaFields(collections);
-      if (cleaned.length) {
-        const csv = parse(cleaned);
-        archive.append(csv, { name: "collections.csv" });
+    for (const modelKey of data) {
+      const model = modelMap[modelKey];
+      if (model) {
+        await addToCombinedData(modelKey, model);
       }
     }
 
-    // Export products
-    if (selectedData.includes("products")) {
-      const products = await ProductModel.find({ storeRef: storeId }).lean();
-      const cleaned = removeMetaFields(products);
-      if (cleaned.length) {
-        const csv = parse(cleaned);
-        archive.append(csv, { name: "products.csv" });
-      }
+    if (!combinedData.length) {
+      return res.status(404).json({ message: "No data found to export." });
     }
 
-    // Export sections
-    if (selectedData.includes("sections")) {
-      const sections = await SectionModel.find({ storeRef: storeId }).lean();
-      const cleaned = removeMetaFields(sections);
-      if (cleaned.length) {
-        const csv = parse(cleaned);
-        archive.append(csv, { name: "sections.csv" });
-      }
-    }
+    const csv = parse(combinedData);
 
-    // Export contents
-    if (selectedData.includes("contents")) {
-      const contents = await ContentModel.find({ storeRef: storeId }).lean();
-      const cleaned = removeMetaFields(contents);
-      if (cleaned.length) {
-        const csv = parse(cleaned);
-        archive.append(csv, { name: "contents.csv" });
-      }
-    }
+    res.header("Content-Type", "text/csv");
+    res.attachment("site_export.csv");
+    return res.send(csv);
 
-    archive.finalize();
   } catch (err) {
-    console.error("CSV Export Error:", err);
-    return res.status(500).json({ message: "Failed to export site data as CSV." });
+    console.error("Export CSV error:", err);
+    return res.status(500).json({ message: "Failed to export site data." });
   }
 };
 
-module.exports = { exportSite };
+const importSite = async (req, res) => {
+  const { selectedKeys, keepOldData = "true" } = req.query;
+
+  if (!selectedKeys) {
+    return res.status(400).json({ message: "Selected Keys is required!", success: false })
+  }
+  
+  const { storeId } = req.params;
+
+  const keys = selectedKeys.split(",").map(k => k.trim());
+  const shouldKeepOld = keepOldData === "true";
+
+  if (!req.file) {
+    return res.status(400).json({ message: "CSV file is required." });
+  }
+
+  const filePath = req.file.path;
+  const parsedData = [];
+
+  // Step 1: Parse CSV file
+  fs.createReadStream(filePath)
+    .pipe(csv())
+    .on("data", (row) => {
+      parsedData.push(row);
+    })
+    .on("end", async () => {
+      try {
+        // Step 2: Process by selectedKeys
+        for (const key of keys) {
+          const model = modelMap[key];
+          if (!model) continue;
+
+          // ✅ Match directly with CSV's "model" column
+          const matchingRows = parsedData.filter(row => row.model?.trim() === key);
+
+          if (!matchingRows.length) continue;
+
+          // Remove old data if keepOldData is false
+          if (!shouldKeepOld) {
+            await model.deleteMany({ storeRef: storeId });
+          }
+
+          // Remove model field and add storeRef
+          const formattedDocs = matchingRows.map(({ model, ...rest }) => ({
+            ...rest,
+            storeRef: storeId,
+          }));
+
+          if (formattedDocs.length) {
+            await model.insertMany(formattedDocs);
+          }
+        }
+
+        fs.unlinkSync(filePath); // Clean up the uploaded file
+        return res.json({ success: true, message: "Data imported successfully." });
+      } catch (err) {
+        console.error("Import error:", err);
+        fs.unlinkSync(filePath); // Clean up even if there's an error
+        return res.status(500).json({ message: "Failed to import site data." });
+      }
+    })
+    .on("error", (err) => {
+      console.error("CSV read error:", err);
+      return res.status(500).json({ message: "Error reading CSV file." });
+    });
+};
+
+
+
+
+
+module.exports = { exportSite, importSite };

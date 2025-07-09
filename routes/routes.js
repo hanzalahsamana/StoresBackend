@@ -3,7 +3,7 @@ const multer = require('multer');
 
 // File upload helpers
 const { uploadSingleImage, uploadMultipleImages } = require('../Helpers/ImageUpload');
-const importSiteData = require('../Helpers/ImportSite');
+// const importSiteData = require('../Helpers/ImportSite');
 
 // Validation middleware
 const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
@@ -73,7 +73,7 @@ const { handleDomainRequest, automateDomainSetup, removeDomainFromDatabase, getS
 
 // Controllers - Upload / Migration
 const { uploadSingle, uploadMultiple } = require('../Controller/imageUpload');
-const { exportSite } = require('../Controller/migration');
+const { exportSite, importSite } = require('../Controller/migration');
 
 // Controllers - Pages / homepage
 const { getHomePageData } = require('../Controller/pages/homePage');
@@ -159,7 +159,7 @@ withParams.get('/getAnalytics', tokenChecker, validOwnerChecker, getAnalyticsDat
 // --- UPLOAD ROUTES ---
 withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingle, uploadSingleImage);
 withParams.post('/uploadMultiple', tokenChecker, validOwnerChecker, uploadMultiple, uploadMultipleImages);
-withParams.post('/importSiteData', tokenChecker, validOwnerChecker, upload.single('file'), importSiteData);
+withParams.post('/importSiteData', tokenChecker, validOwnerChecker, upload.single('file'), importSite);
 withParams.get('/exportSiteData', tokenChecker, validOwnerChecker, exportSite);
 
 // --- DOMAIN ROUTES ---
