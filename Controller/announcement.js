@@ -74,3 +74,5 @@ const deleteAnnouncement = async (req, res) => {
 };
 
 module.exports = { addAnnouncement, deleteAnnouncement };
+
+
