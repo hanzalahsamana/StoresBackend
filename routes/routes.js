@@ -81,6 +81,7 @@ const { getHomePageData } = require('../Controller/pages/homePage');
 // Controllers - Analytics / Contact
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
+const { saveTheme } = require('../Controller/Theme/Builder');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -129,6 +130,9 @@ withParams.get('/getSections', ValidStoreChecker, getSections);
 withParams.delete('/deleteSection', tokenChecker, validOwnerChecker, deleteSection);
 withParams.patch('/editSection', tokenChecker, validOwnerChecker, editSection);
 withParams.patch('/changeSectionOrder', tokenChecker, validOwnerChecker, changeSectionOrder);
+
+// --- THEME ROUTES ---
+withParams.put('/builder/save', tokenChecker, validOwnerChecker, saveTheme);
 
 // --- CONTENT ROUTES ---
 withParams.get('/getContents', ValidStoreChecker, getContents);
