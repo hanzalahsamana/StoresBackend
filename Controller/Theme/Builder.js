@@ -78,44 +78,44 @@ module.exports = { saveTheme };
 
 
 
-const ThemeBuilder = require("../models/ThemeBuilder"); // adjust path accordingly
+// const ThemeBuilder = require("../models/ThemeBuilder"); // adjust path accordingly
 
-const togglePageEnabled = async (req, res) => {
-  try {
-    const { storeId, slug, enabled } = req.body;
+// const togglePageEnabled = async (req, res) => {
+//   try {
+//     const { storeId, slug, enabled } = req.body;
 
-    if (!storeId || !slug || typeof enabled !== "boolean") {
-      return res.status(400).json({ message: "storeId, slug, and enabled are required." });
-    }
+//     if (!storeId || !slug || typeof enabled !== "boolean") {
+//       return res.status(400).json({ message: "storeId, slug, and enabled are required." });
+//     }
 
-    // Find draft config
-    const draft = await ThemeBuilder.findOne({ storeId, mode: "draft" });
+//     // Find draft config
+//     const draft = await ThemeBuilder.findOne({ storeId, mode: "draft" });
 
-    if (!draft) {
-      return res.status(404).json({ message: "Draft not found." });
-    }
+//     if (!draft) {
+//       return res.status(404).json({ message: "Draft not found." });
+//     }
 
-    // Find target page by slug
-    const pageIndex = draft.pages.findIndex(p => p.slug === slug);
+//     // Find target page by slug
+//     const pageIndex = draft.pages.findIndex(p => p.slug === slug);
 
-    if (pageIndex === -1) {
-      return res.status(404).json({ message: "Page not found in draft." });
-    }
+//     if (pageIndex === -1) {
+//       return res.status(404).json({ message: "Page not found in draft." });
+//     }
 
-    // Update isEnabled
-    draft.pages[pageIndex].isEnabled = enabled;
-    draft.updatedAt = new Date();
-    draft.version += 1;
+//     // Update isEnabled
+//     draft.pages[pageIndex].isEnabled = enabled;
+//     draft.updatedAt = new Date();
+//     draft.version += 1;
 
-    await draft.save();
+//     await draft.save();
 
-    res.status(200).json({
-      message: `Page "${slug}" ${enabled ? "enabled" : "disabled"} successfully.`,
-      version: draft.version
-    });
+//     res.status(200).json({
+//       message: `Page "${slug}" ${enabled ? "enabled" : "disabled"} successfully.`,
+//       version: draft.version
+//     });
 
-  } catch (err) {
-    console.error("Toggle Page Error:", err);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//   } catch (err) {
+//     console.error("Toggle Page Error:", err);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };

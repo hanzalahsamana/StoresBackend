@@ -1,10 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 
-// File upload helpers
-const { uploadSingleImage, uploadMultipleImages } = require('../Helpers/ImageUpload');
-// const importSiteData = require('../Helpers/ImportSite');
-
 // Validation middleware
 const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
 const { editPasswordValidate } = require('../Middleware/ValidationsMiddleware/editPasswordValidate');
@@ -72,7 +68,6 @@ const addSubscriber = require('../Controller/subscribe');
 const { handleDomainRequest, automateDomainSetup, removeDomainFromDatabase, getStoreByDomain } = require('../Controller/domain');
 
 // Controllers - Upload / Migration
-const { uploadSingle, uploadMultiple } = require('../Controller/imageUpload');
 const { exportSite, importSite } = require('../Controller/migration');
 
 // Controllers - Pages / homepage
@@ -82,6 +77,7 @@ const { getHomePageData } = require('../Controller/pages/homePage');
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
 const { saveTheme } = require('../Controller/Theme/Builder');
+const { uploadSingleHelper, uploadMultipleHelper } = require('../Helpers/ImageUploadHelper');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -92,6 +88,7 @@ const upload = multer({ dest: '/tmp' });
 // Routers
 const withParams = express.Router({ mergeParams: true });
 const withoutParams = express.Router();
+
 // --- AUTH ROUTES ---
 withoutParams.post('/login', userLoginValidate, loginUser);
 withoutParams.post('/sendOtp', sendOtp);
@@ -161,8 +158,10 @@ withoutParams.post('/setTheme', tokenChecker, updateTheme);
 withParams.get('/getAnalytics', tokenChecker, validOwnerChecker, getAnalyticsData);
 
 // --- UPLOAD ROUTES ---
-withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingle, uploadSingleImage);
-withParams.post('/uploadMultiple', tokenChecker, validOwnerChecker, uploadMultiple, uploadMultipleImages);
+withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingleHelper, uploadSingleImage);
+withParams.post('/uploadMultiple', tokenChecker, validOwnerChecker, uploadMultipleHelper, uploadIma);
+
+// --- MIGERATION ROUTES ---
 withParams.post('/importSiteData', tokenChecker, validOwnerChecker, upload.single('file'), importSite);
 withParams.get('/exportSiteData', tokenChecker, validOwnerChecker, exportSite);
 
