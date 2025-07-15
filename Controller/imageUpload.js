@@ -58,3 +58,7 @@ module.exports = {
   uploadSingle: upload.single("image"),
   uploadMultiple: upload.array("images", 5),
 };
+
+
+
+
