@@ -67,8 +67,12 @@ const addSubscriber = require('../Controller/subscribe');
 // Controllers - Domain
 const { handleDomainRequest, automateDomainSetup, removeDomainFromDatabase, getStoreByDomain } = require('../Controller/domain');
 
-// Controllers - Upload / Migration
+// Controllers - Migration
 const { exportSite, importSite } = require('../Controller/migration');
+
+// Controllers - Upload
+const { getImages, uploadImage, deleteImages } = require('../Controller/imageUpload');
+const { uploadSingle } = require('../Helpers/s3Uploader');
 
 // Controllers - Pages / homepage
 const { getHomePageData } = require('../Controller/pages/homePage');
@@ -77,7 +81,6 @@ const { getHomePageData } = require('../Controller/pages/homePage');
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
 const { saveTheme } = require('../Controller/Theme/Builder');
-const { uploadSingleHelper, uploadMultipleHelper } = require('../Helpers/ImageUploadHelper');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -98,11 +101,11 @@ withoutParams.post('/authWithGoogle', authWithGoogle);
 withoutParams.get('/getUserFromToken', tokenChecker, getUserFromToken);
 
 // --- STORE ROUTES ---
+withoutParams.get('/getAllStores', tokenChecker, getAllStores);
 withoutParams.post('/generateStore', tokenChecker, generateStoreValidation, generateStore);
 withParams.get('/getStore', ValidStoreChecker, getStore);
-withoutParams.get('/getAllStores', tokenChecker, getAllStores);
-withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
 withParams.put('/edit/store', tokenChecker, validOwnerChecker, editStoreValidation, editStore);
+withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
 
 // --- PRODUCT ROUTES ---
 withParams.post('/addProduct', tokenChecker, validOwnerChecker, validateProduct(false), addProduct);
@@ -158,8 +161,9 @@ withoutParams.post('/setTheme', tokenChecker, updateTheme);
 withParams.get('/getAnalytics', tokenChecker, validOwnerChecker, getAnalyticsData);
 
 // --- UPLOAD ROUTES ---
-withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingleHelper, uploadSingleImage);
-withParams.post('/uploadMultiple', tokenChecker, validOwnerChecker, uploadMultipleHelper, uploadIma);
+withParams.post('/uploadImage', tokenChecker, validOwnerChecker, uploadSingle, uploadImage);
+withParams.get('/getImages', tokenChecker, validOwnerChecker, getImages);
+withParams.delete('/deleteImages', tokenChecker, validOwnerChecker, deleteImages);
 
 // --- MIGERATION ROUTES ---
 withParams.post('/importSiteData', tokenChecker, validOwnerChecker, upload.single('file'), importSite);

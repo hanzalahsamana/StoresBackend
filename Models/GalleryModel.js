@@ -6,10 +6,17 @@ const GallerySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    key: {
+      type: String,
+    },
     type: {
       type: String,
       enum: ['image', 'video'],
       default: 'image',
+    },
+    format: {
+      type: String,
+      default: 'unknown',
     },
     size: {
       type: Number, // in bytes
