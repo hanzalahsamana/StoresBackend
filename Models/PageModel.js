@@ -1,24 +1,22 @@
 const mongoose = require('mongoose');
 
-const SectionSchema = new mongoose.Schema(
-  {
-    type: { type: String, required: true }, // "hero", "banner", etc.
-    name: { type: String, required: true }, // Display name
-    order: { type: Number, required: true },
-    content: mongoose.Schema.Types.Mixed, // Flexible per section type
-  },
-  { _id: false }
-);
+const SectionSchema = new mongoose.Schema({
+  type: { type: String, required: true }, // "hero", "banner", etc.
+  name: { type: String, required: true }, // Display name
+  order: { type: Number, required: true },
+  sectionData: mongoose.Schema.Types.Mixed, // Flexible per section type
+});
 
 const PageSchema = new mongoose.Schema({
-  storeId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Store' },
+  storeRef: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Store' },
+  type: { type: String, enum: ['system', 'custom'], default: 'custom' },
   mode: { type: String, enum: ['draft', 'published'], default: 'draft' },
+  isHeaderFooter: { type: Boolean, default: true },
   slug: { type: String, required: true }, // "/about", "/"
   name: { type: String, required: true }, // "About Us"
   isEnabled: { type: Boolean, default: true },
   sections: [SectionSchema],
 
-  version: { type: Number, default: 1 },
   updatedAt: { type: Date, default: Date.now },
 });
 

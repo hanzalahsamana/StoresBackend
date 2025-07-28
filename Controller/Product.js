@@ -1,8 +1,8 @@
-const { ProductModel } = require("../Models/ProductModel");
-const { mongoose } = require("mongoose");
-const { ReviewModel } = require("../Models/ReviewModel");
-const { paginate } = require("../Helpers/pagination");
-const { searchSuggestion } = require("../Helpers/searchSuggest");
+const { ProductModel } = require('../Models/ProductModel');
+const { mongoose } = require('mongoose');
+const { ReviewModel } = require('../Models/ReviewModel');
+const { paginate } = require('../Helpers/pagination');
+const { searchSuggestion } = require('../Helpers/searchSuggest');
 
 module.exports = {
   // add product
@@ -17,10 +17,10 @@ module.exports = {
         data: savedProduct,
       });
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error('Error adding product:', error);
       return res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: 'Internal server error',
         error: error.message,
       });
     }
@@ -29,36 +29,38 @@ module.exports = {
   // get product
   getProducts: async (req, res) => {
     const { storeId } = req.params;
-    const { collection, productId, page = 0, limit = 0, filter } = req.query;
+    const { collections, productId, page = 0, limit = 0, filter } = req.query;
 
     try {
       const query = { storeRef: storeId };
 
-      // Filter by collection
-      if (collection) {
-        const ids = collection.split(',').map(id => id.trim());
-        const allValid = ids.every(id => mongoose.Types.ObjectId.isValid(id));
-        if (!allValid) return res.status(400).json({ message: "Invalid collection ID format" });
-        query.collections = { $in: ids.map(id => new mongoose.Types.ObjectId(id)) };
+      if (collections) {
+        const ids = collections.split(',').map((id) => id.trim());
+        const validIds = ids.filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+        if (validIds.length > 0) {
+          query.collections = { $in: validIds.map((id) => new mongoose.Types.ObjectId(id)) };
+        }
       }
 
-      // Filter by product ID
       if (productId) {
-        const ids = productId.split(',').map(id => id.trim());
-        const allValid = ids.every(id => mongoose.Types.ObjectId.isValid(id));
-        if (!allValid) return res.status(400).json({ message: "Invalid product ID format" });
-        query._id = { $in: ids.map(id => new mongoose.Types.ObjectId(id)) };
+        const ids = productId.split(',').map((id) => id.trim());
+        const validIds = ids.filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+        if (validIds.length > 0) {
+          query._id = { $in: validIds.map((id) => new mongoose.Types.ObjectId(id)) };
+        }
       }
 
       let sort = { createdAt: -1 };
-      if (filter === "lowToHigh") {
+      if (filter === 'lowToHigh') {
         sort = { price: 1 };
-      } else if (filter === "highToLow") {
+      } else if (filter === 'highToLow') {
         sort = { price: -1 };
-      } else if (filter === "topRated") {
-        sort = { wantsCustomerReview: -1, "ratings.average": -1, "ratings.count": -1 };
+      } else if (filter === 'topRated') {
+        sort = { wantsCustomerReview: -1, 'ratings.average': -1, 'ratings.count': -1 };
         useAggregation = true;
-      } else if (filter === "inStock") {
+      } else if (filter === 'inStock') {
         query.stock = { $gt: 0 };
       }
 
@@ -67,13 +69,13 @@ module.exports = {
       return res.status(200).json({
         success: true,
         data,
-        totalData
+        totalData,
       });
     } catch (error) {
-      console.error("Error fetching product data:", error);
+      console.error('Error fetching product data:', error);
       return res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: 'Internal server error',
         error: error.message,
       });
     }
@@ -91,9 +93,7 @@ module.exports = {
       });
 
       if (!product) {
-        return res
-          .status(404)
-          .json({ message: "Product not found for this store" });
+        return res.status(404).json({ message: 'Product not found for this store' });
       }
 
       Object.assign(product, req.body);
@@ -112,9 +112,7 @@ module.exports = {
     const { storeId } = req.params;
 
     if (!mongoose.isValidObjectId(productID) || !productID) {
-      return res
-        .status(400)
-        .json({ message: "Invalid product ID or ID is not defined" });
+      return res.status(400).json({ message: 'Invalid product ID or ID is not defined' });
     }
 
     try {
@@ -124,9 +122,7 @@ module.exports = {
       });
 
       if (product.deletedCount === 0) {
-        return res
-          .status(404)
-          .json({ message: "Product not found or unauthorized" });
+        return res.status(404).json({ message: 'Product not found or unauthorized' });
       }
 
       await ReviewModel.deleteMany({
@@ -134,13 +130,13 @@ module.exports = {
         storeRef: storeId,
       });
 
-      res.status(200).json({ message: "Product deleted successfully" });
+      res.status(200).json({ message: 'Product deleted successfully' });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   },
 
-  // search products 
+  // search products
   productSearchSuggestion: async (req, res) => {
     const { searchQuery } = req.query;
     const { storeId } = req.params;
@@ -156,11 +152,8 @@ module.exports = {
 
       res.status(200).json({ success: true, data: results });
     } catch (err) {
-      console.error("error fetching product suggestion:", err?.message || err);
+      console.error('error fetching product suggestion:', err?.message || err);
       res.status(500).json({ success: false, message: 'Server error' });
     }
   },
-
 };
-
-

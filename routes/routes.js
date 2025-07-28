@@ -80,7 +80,8 @@ const { getHomePageData } = require('../Controller/pages/homePage');
 // Controllers - Analytics / Contact
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
-const { saveTheme } = require('../Controller/Theme/Builder');
+const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, createPage, discardDraft } = require('../Controller/Theme/Builder');
+const { getMenuLinks } = require('../Controller/Suggestions/menuLinks');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -131,8 +132,14 @@ withParams.delete('/deleteSection', tokenChecker, validOwnerChecker, deleteSecti
 withParams.patch('/editSection', tokenChecker, validOwnerChecker, editSection);
 withParams.patch('/changeSectionOrder', tokenChecker, validOwnerChecker, changeSectionOrder);
 
-// --- THEME ROUTES ---
-withParams.put('/builder/save', tokenChecker, validOwnerChecker, saveTheme);
+// --- Builder ROUTES ---
+withParams.post('/saveDraft', tokenChecker, validOwnerChecker, saveDraft);
+withParams.post('/publishPage', tokenChecker, validOwnerChecker, publishPage);
+withParams.get('/getPublishPage', ValidStoreChecker, getPublishPage);
+withParams.get('/getDraftPage', tokenChecker, validOwnerChecker, getDraftPage);
+withParams.post('/discardDraft', tokenChecker, validOwnerChecker, discardDraft);
+withParams.get('/getAllPages', tokenChecker, validOwnerChecker, getAllPages);
+withParams.post('/createPage', tokenChecker, validOwnerChecker, createPage);
 
 // --- CONTENT ROUTES ---
 withParams.get('/getContents', ValidStoreChecker, getContents);
@@ -188,6 +195,7 @@ withoutParams.delete('/deleteAnnouncement', tokenChecker, deleteAnnouncement);
 // --- SEARCH SUGGESTION ROUTES ---
 withParams.get('/search/products', ValidStoreChecker, productSearchSuggestion);
 withParams.get('/search/collections', ValidStoreChecker, collectionSearchSuggestion);
+withParams.get('/search/getMenuLinks', tokenChecker, validOwnerChecker, getMenuLinks);
 
 // --- Home Page ROUTES ---
 withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
