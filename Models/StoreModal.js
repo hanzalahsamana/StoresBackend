@@ -33,6 +33,33 @@ const StoreSchema = new Schema(
       type: Number,
       default: 0,
     },
+    storeStatus: {
+      type: String,
+      enum: ["Active", "Suspended"],
+      required: true,
+      default: "Active"
+    },
+    plan: {
+      type: String,
+      required: true,
+      default: "Basic"
+    },
+    subscriptionStatus: {
+      type: String,
+      required: true,
+      default: "trial"
+    },
+    billingCycle: {
+      type: String,
+    },
+    subsStart: {
+      type: Date,
+      default: null
+    },
+    subsEnd: {
+      type: Date,
+      default: null
+    },
   },
   {
     timestamps: true,
