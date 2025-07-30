@@ -83,6 +83,8 @@ const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
 const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, createPage, discardDraft } = require('../Controller/Theme/Builder');
 const { getMenuLinks } = require('../Controller/Suggestions/menuLinks');
 const { getAnalyticsData: getDashboardData } = require('../Controller/pages/analytics');
+const superAdminChecker = require('../Middleware/superAdminChecker');
+const { getUsers } = require('../Controller/pages/users');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -233,7 +235,8 @@ withoutParams.post('/jazzcash', async (req, res) => {
   }
 });
 
-withoutParams.get('/get/analytics/data', getDashboardData);
+withoutParams.get('/get/analytics/data', tokenChecker, superAdminChecker, getDashboardData);
+withoutParams.get('/get/users', tokenChecker, superAdminChecker, getUsers);
 module.exports = {
   withParams,
   withoutParams,

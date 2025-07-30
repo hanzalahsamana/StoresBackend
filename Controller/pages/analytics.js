@@ -9,7 +9,7 @@ module.exports = {
             const [users, activeStores, suspendedStores] = await Promise.all([
                 UserModal.estimatedDocumentCount(),
                 StoreModal.countDocuments({ storeStatus: "Active" }),
-                StoreModal.countDocuments({ storeStatus: "Suspended" }),
+                StoreModal.countDocuments({ storeStatus: "Suspended" }), 
             ]);
 
             const now = new Date();
