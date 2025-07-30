@@ -15,8 +15,8 @@ const PageSchema = new mongoose.Schema({
   slug: { type: String, required: true }, // "/about", "/"
   name: { type: String, required: true }, // "About Us"
   isEnabled: { type: Boolean, default: true },
+  isEditable: { type: Boolean, default: true },
   sections: [SectionSchema],
-
   updatedAt: { type: Date, default: Date.now },
 });
 
