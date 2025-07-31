@@ -33,10 +33,6 @@ module.exports = {
             const userIds = data.map(user => user._id);
 
             const allStores = await StoreModal.find({ userRef: { $in: userIds } });
-            await UserModal.updateMany(
-                { status: { $exists: false } },
-                { $set: { status: 'Active' } }
-            )
             const storesMap = {};
             allStores.forEach(store => {
                 const userIdStr = store.userRef.toString();
@@ -74,8 +70,10 @@ module.exports = {
 
             user.status = user.status === "Active" ? "Suspended" : "Active";
             await user.save();
+            const stores = await StoreModal.find({ userRef: user._id })
+            const totalStores = stores.length;
 
-            return res.status(200).json({ message: `User ${user.status.toLowerCase()} successfully`, user, success: true });
+            return res.status(200).json({ message: `User ${user.status.toLowerCase()} successfully`, user: { ...user.toObject(), stores, totalStores }, success: true });
 
         } catch (e) {
             console.error("Error toggling user status!", e?.message || e);
