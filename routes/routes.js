@@ -84,7 +84,7 @@ const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, creat
 const { getMenuLinks } = require('../Controller/Suggestions/menuLinks');
 const { getAnalyticsData: getDashboardData } = require('../Controller/pages/analytics');
 const superAdminChecker = require('../Middleware/superAdminChecker');
-const { getUsers } = require('../Controller/pages/users');
+const { getUsers, searchUsers } = require('../Controller/pages/users');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -237,6 +237,7 @@ withoutParams.post('/jazzcash', async (req, res) => {
 
 withoutParams.get('/get/analytics/data', tokenChecker, superAdminChecker, getDashboardData);
 withoutParams.get('/get/users', tokenChecker, superAdminChecker, getUsers);
+withoutParams.get('/search/users', tokenChecker, superAdminChecker, searchUsers);
 module.exports = {
   withParams,
   withoutParams,

@@ -1,4 +1,5 @@
-const { paginate } = require("../../Helpers/pagination")
+const { paginate } = require("../../Helpers/pagination");
+const { searchSuggestion } = require("../../Helpers/searchSuggest");
 const { StoreModal } = require("../../Models/StoreModal")
 const { UserModal } = require("../../Models/userModal")
 const moment = require("moment");
@@ -60,5 +61,23 @@ module.exports = {
             return res.status(500).json({ message: "Internal server error!", success: false })
         }
 
+    },
+    searchUsers: async (req, res) => {
+        try {
+            const { searchQuery } = req?.query
+            const results = await searchSuggestion({
+                Model: UserModal,
+                searchTerm: searchQuery,
+                field: 'email',
+                extraQuery: { role: "admin" },
+                projection: { email: 1, _id: 0 },
+            });
+            const emails = results.map(user => user.email);
+            return res.status(200).json({ data: emails, success: true })
+
+        } catch (e) {
+            console.error("Error searching users!", e?.message || e)
+            return res.status(500).json({ message: "Something went wrong!", success: false })
+        }
     }
 }

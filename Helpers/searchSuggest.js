@@ -5,9 +5,10 @@ const searchSuggestion = async ({
     field = 'name',
     extraQuery = {},
     projection = { _id: 1, name: 1 },
-    limit = 0, // 0 means no limit
+    limit = 0,
 }) => {
     try {
+        console.log("projection", projection)
         if (!searchTerm) {
             const query = Model.find(extraQuery, projection).sort({ [field]: 1 });
             if (limit > 0) query.limit(limit);
