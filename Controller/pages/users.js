@@ -62,6 +62,27 @@ module.exports = {
         }
 
     },
+
+    toggleUserStatus: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const user = await UserModal.findById(id);
+            if (!user || user.role !== "admin") {
+                return res.status(400).json({ message: "Invalid user ID!", success: false });
+            }
+
+            user.status = user.status === "Active" ? "Suspended" : "Active";
+            await user.save();
+
+            return res.status(200).json({ message: `User ${user.status.toLowerCase()} successfully`, user, success: true });
+
+        } catch (e) {
+            console.error("Error toggling user status!", e?.message || e);
+            return res.status(500).json({ message: "Something went wrong!", success: false });
+        }
+    },
+
     searchUsers: async (req, res) => {
         try {
             const { searchQuery } = req?.query
@@ -74,7 +95,6 @@ module.exports = {
             });
             const emails = results.map(user => user.email);
             return res.status(200).json({ data: emails, success: true })
-
         } catch (e) {
             console.error("Error searching users!", e?.message || e)
             return res.status(500).json({ message: "Something went wrong!", success: false })
