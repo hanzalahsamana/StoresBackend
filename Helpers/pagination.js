@@ -1,5 +1,5 @@
 const paginate = async (Model, query = {}, options = {}, pipeline = []) => {
-    const { limit = 0, sort = {}, page = 1, populate, select } = options;
+    let { limit = 0, sort = {}, page = 1, populate, select } = options;
 
     limit = Math.max(parseInt(limit) || 0, 0);
     page = Math.max(parseInt(page) || 1, 1);
