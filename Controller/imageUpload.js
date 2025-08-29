@@ -51,8 +51,6 @@ const getImages = async (req, res) => {
     }
 
     const images = await GalleryModel.find(query).sort({ createdAt: -1 });
-    console.log(images);
-
     return res.status(200).json({
       message: 'Fetch successful',
       images,

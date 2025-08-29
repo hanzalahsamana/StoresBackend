@@ -33,29 +33,27 @@ const validateVariantsAgainstVariations = (variants, helpers) => {
 // ✅ Joi Schema: Add Product
 const addProductValidationSchema = Joi.object({
   name: Joi.string().required(),
+  pronounce: Joi.string().allow('').optional(),
   vendor: Joi.string().allow('').optional(),
   price: Joi.number().required(),
   comparedAtPrice: Joi.number().optional(),
-  displayImage: Joi.string().uri().required(),
-  gallery: Joi.array().items(Joi.string().uri()).optional(),
+  displayImage: Joi.string().uri().allow('').optional(),
+  gallery: Joi.array().items(Joi.string().uri().allow('')).optional(),
   collections: Joi.array().items(JoiObjectId()).optional(),
   trackInventory: Joi.boolean().default(false).optional(),
 
-  stock: Joi.number()
-    .integer()
-    .min(0)
-    .when('trackInventory', {
-      is: true,
-      then: Joi.required(),
-      otherwise: Joi.forbidden(),
-    }),
+  stock: Joi.number().integer().min(0).when('trackInventory', {
+    is: true,
+    then: Joi.required(),
+    otherwise: Joi.forbidden(),
+  }),
 
   showStockCount: Joi.boolean().when('trackInventory', {
     is: true,
     then: Joi.optional(),
     otherwise: Joi.forbidden(),
   }),
-
+  continueSelling: Joi.boolean().default(false).optional(),
   status: Joi.string().valid('active', 'inactive').optional(),
   pronouce: Joi.string().allow('').optional(),
   wantsCustomerReview: Joi.boolean().optional(),
@@ -134,7 +132,8 @@ const validateProduct = (isEdit = false) => {
 
     if (error) {
       return res.status(400).json({
-        message: error.details.map((e) => e.message),
+        message: `Error occuring: ${error.details.map((e) => e.message).join(', ')}`,
+        // message: `Changes Saved`,
       });
     }
 

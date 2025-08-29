@@ -1,6 +1,6 @@
 // POST /api/pages/save-draft
 
-const { enrichSectionsWithProducts } = require('../../Helpers/enrichSectionsWithProducts');
+const { enrichSections } = require('../../Helpers/EnrichSections');
 const { PageModel } = require('../../Models/PageModel');
 const { ThemeLayoutModel } = require('../../Models/ThemeLayoutModel');
 const generateSlug = require('../../Utils/generateSlug');
@@ -10,7 +10,7 @@ const saveDraft = async (req, res) => {
     const { storeId } = req.params;
     const { slug, name, isEnabled, sections, isHeaderFooter, header, footer } = req.body;
 
-    const cleanedSections = sections.map(({ _id, ...rest }) => rest);
+    // const cleanedSections = sections.map(({ _id, ...rest }) => rest);
 
     const updatedPage = await PageModel.findOneAndUpdate(
       { storeRef: storeId, slug, mode: 'draft' },
@@ -19,7 +19,7 @@ const saveDraft = async (req, res) => {
           name,
           isEnabled,
           isHeaderFooter: !!isHeaderFooter,
-          sections: cleanedSections,
+          sections: sections,
           updatedAt: new Date(),
         },
       },
@@ -71,13 +71,13 @@ const publishPage = async (req, res) => {
     const { storeId } = req.params;
     const { slug, name, isEnabled, isHeaderFooter, sections = [], header = {}, footer = {} } = req.body;
 
-    const cleanedSections = sections.map(({ _id, ...rest }) => rest);
+    // const cleanedSections = sections.map(({ _id, ...rest }) => rest);
 
     const [publishedPage] = await Promise.all([
       PageModel.findOneAndUpdate(
         { storeRef: storeId, slug, mode: 'published' },
         {
-          $set: { name, isEnabled, isHeaderFooter: !!isHeaderFooter, sections: cleanedSections, updatedAt: new Date() },
+          $set: { name, isEnabled, isHeaderFooter: !!isHeaderFooter, sections: sections, updatedAt: new Date() },
         },
         { upsert: true, new: true }
       ),
@@ -195,7 +195,7 @@ const getPublishPage = async (req, res) => {
       footer = layouts.find((l) => l.name === 'footer')?.data || null;
     }
 
-    const enrichedSections = await enrichSectionsWithProducts(page.sections, storeId);
+    const enrichedSections = await enrichSections(page.sections, storeId);
     page.sections = enrichedSections;
     
     // Send merged response

@@ -30,8 +30,8 @@ module.exports = {
   getProducts: async (req, res) => {
     const { storeId } = req.params;
     const {
-      collections: collectionIds,
-      productId: productIds,
+      collectionIds,
+      productIds,
       page = 0,
       limit = 0,
       sortBy,
@@ -90,6 +90,8 @@ module.exports = {
         query.stock = { $gt: 0 };
       } else if (sortBy === 'outOfStock') {
         query.stock = { $lte: 0 };
+      } else if (sortBy === 'newest') {
+        sort = { createdAt: -1 }; // Newest first
       }
 
       // ✅ Final Mongo Query Execution
