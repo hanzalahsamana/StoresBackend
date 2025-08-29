@@ -29,42 +29,77 @@ module.exports = {
   // get product
   getProducts: async (req, res) => {
     const { storeId } = req.params;
-    const { collections, productId, page = 0, limit = 0, filter } = req.query;
+    const {
+      collectionIds,
+      productIds,
+      page = 0,
+      limit = 0,
+      sortBy,
+      minPrice,
+      maxPrice,
+      ...restFilters // contains dynamic filters
+    } = req.query;
 
     try {
       const query = { storeRef: storeId };
 
-      if (collections) {
-        const ids = collections.split(',').map((id) => id.trim());
+      // ✅ Filter: Collection IDs
+      if (collectionIds) {
+        const ids = collectionIds.split(',').map((id) => id.trim());
         const validIds = ids.filter((id) => mongoose.Types.ObjectId.isValid(id));
-
         if (validIds.length > 0) {
           query.collections = { $in: validIds.map((id) => new mongoose.Types.ObjectId(id)) };
         }
       }
 
-      if (productId) {
-        const ids = productId.split(',').map((id) => id.trim());
+      // ✅ Filter: Product IDs
+      if (productIds) {
+        const ids = productIds.split(',').map((id) => id.trim());
         const validIds = ids.filter((id) => mongoose.Types.ObjectId.isValid(id));
-
         if (validIds.length > 0) {
           query._id = { $in: validIds.map((id) => new mongoose.Types.ObjectId(id)) };
         }
       }
 
-      let sort = { createdAt: -1 };
-      if (filter === 'lowToHigh') {
-        sort = { price: 1 };
-      } else if (filter === 'highToLow') {
-        sort = { price: -1 };
-      } else if (filter === 'topRated') {
-        sort = { wantsCustomerReview: -1, 'ratings.average': -1, 'ratings.count': -1 };
-        useAggregation = true;
-      } else if (filter === 'inStock') {
-        query.stock = { $gt: 0 };
+      // ✅ Filter: Price Range
+      if (minPrice || maxPrice) {
+        query.price = {};
+        if (minPrice) query.price.$gte = Number(minPrice);
+        if (maxPrice) query.price.$lte = Number(maxPrice);
       }
 
-      const { data, totalData } = await paginate(ProductModel, query, { page, limit, sort });
+      // ✅ Dynamic Variant Filters: Detect keys NOT in standard filters
+      const standardKeys = ['collections', 'productId', 'page', 'limit', 'sortBy', 'minPrice', 'maxPrice'];
+      Object.entries(restFilters).forEach(([key, value]) => {
+        if (!standardKeys.includes(key)) {
+          const valuesArray = value.split(',');
+          query[`variants.options.${key}`] = { $in: valuesArray };
+        }
+      });
+
+      // ✅ Sort Handling
+      let sort = { createdAt: -1 };
+
+      if (sortBy === 'priceLowToHigh') {
+        sort = { price: 1 };
+      } else if (sortBy === 'priceHighToLow') {
+        sort = { price: -1 };
+      } else if (sortBy === 'topRated') {
+        sort = { wantsCustomerReview: -1, 'ratings.average': -1, 'ratings.count': -1 };
+      } else if (sortBy === 'inStock') {
+        query.stock = { $gt: 0 };
+      } else if (sortBy === 'outOfStock') {
+        query.stock = { $lte: 0 };
+      } else if (sortBy === 'newest') {
+        sort = { createdAt: -1 }; // Newest first
+      }
+
+      // ✅ Final Mongo Query Execution
+      const { data, totalData } = await paginate(ProductModel, query, {
+        page: Number(page),
+        limit: Number(limit),
+        sort,
+      });
 
       return res.status(200).json({
         success: true,

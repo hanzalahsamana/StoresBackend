@@ -22,7 +22,6 @@ module.exports = {
             }
 
             if (dateRange) {
-                console.log("dateRange", dateRange)
                 const [startDateStr, endDateStr] = dateRange.split(" - ");
                 const startDate = moment(startDateStr, "MMM DD YYYY").startOf("day");
                 const endDate = moment(endDateStr, "MMM DD YYYY").endOf("day");
@@ -62,13 +61,21 @@ module.exports = {
     toggleUserStatus: async (req, res) => {
         try {
             const { id } = req.params;
+            const { status } = req.query;
+            if (!id) {
+                return res.status(400).json({ message: "User Id is required!", success: false });
+            }
+
+            if (!status) {
+                return res.status(400).json({ message: "Status is required!", success: false });
+            }
 
             const user = await UserModal.findById(id);
             if (!user || user.role !== "admin") {
                 return res.status(400).json({ message: "Invalid user ID!", success: false });
             }
 
-            user.status = user.status === "Active" ? "Suspended" : "Active";
+            user.status = status;
             await user.save();
             const stores = await StoreModal.find({ userRef: user._id })
             const totalStores = stores.length;

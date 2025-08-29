@@ -6,6 +6,8 @@ const ThemeCustomizationSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 
   layout: { type: String, enum: ['boxed', 'full-width'], default: 'full-width' },
+  logo: { type: String, default: '' },
+  favicon: { type: String, default: '' },
   font: { type: String, default: 'Assistant' },
   colors: {
     pri: { type: String, default: '#FFFFFF' },

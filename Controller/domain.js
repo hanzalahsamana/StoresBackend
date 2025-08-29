@@ -1,11 +1,11 @@
-const { exec } = require("child_process");
-const { checkDomainDNS } = require("../Helpers/CheckDomainDns");
-const { UserModal } = require("../Models/userModal");
-const { StoreModal } = require("../Models/StoreModal");
+const { exec } = require('child_process');
+const { checkDomainDNS } = require('../Helpers/CheckDomainDns');
+const { UserModal } = require('../Models/userModal');
+const { StoreModal } = require('../Models/StoreModal');
 const WEBSITE_IP_ADDRESS = process.env.WEBSITE_IP_ADDRESS;
-const frontendIP = "18.198.243.219";
-const privateKeyPath = "/home/ubuntu/saasweb.pem";
-const frontendUser = "ubuntu";
+const frontendIP = '18.198.243.219';
+const privateKeyPath = '/home/ubuntu/saasweb.pem';
+const frontendUser = 'ubuntu';
 
 const isDomainAlreadyInUse = async (storeId, domain) => {
   try {
@@ -17,7 +17,7 @@ const isDomainAlreadyInUse = async (storeId, domain) => {
 
     return !!existingStore; // Returns true if a verified domain exists with a different storeId, else false
   } catch (error) {
-    console.error("Error checking domain:", error);
+    console.error('Error checking domain:', error);
     return false; // In case of error, return false to avoid breaking logic
   }
 };
@@ -34,9 +34,9 @@ const updateDomainToDatabase = async (siteName, domain, isDomainVerified) => {
     user.isDomainVerified = isDomainVerified; // Update the field
     await user.save(); // Save the updated document
 
-    return { success: true, message: "Domain updated successfully" };
+    return { success: true, message: 'Domain updated successfully' };
   } catch (error) {
-    console.error("Error updating domain:", error);
+    console.error('Error updating domain:', error);
     throw error; // Ensure the calling API catches this error
   }
 };
@@ -49,7 +49,7 @@ const removeDomainFromDatabase = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         message: `No document found with brandName: ${siteName}`,
-        StatusCode: "FailedToProcess",
+        StatusCode: 'FailedToProcess',
       });
     }
 
@@ -60,13 +60,13 @@ const removeDomainFromDatabase = async (req, res) => {
     console.log(`Domain removed successfully for ${siteName}`);
     return res.status(200).json({
       message: `Domain removed successfully`,
-      StatusCode: "success",
+      StatusCode: 'success',
     });
   } catch (error) {
-    console.error("Error removing domain:", error);
+    console.error('Error removing domain:', error);
     return res.status(500).json({
-      message: "Error occurring while deleting domain.",
-      StatusCode: "FailedToProcess",
+      message: 'Error occurring while deleting domain.',
+      StatusCode: 'FailedToProcess',
       error: error.message,
     });
   }
@@ -78,17 +78,14 @@ const handleDomainRequest = async (req, res) => {
   try {
     if (!domain) {
       return res.status(400).json({
-        message: "❌ domain name is required",
-        StatusCode: "InvalidDomain",
+        message: '❌ domain name is required',
+        StatusCode: 'InvalidDomain',
       });
     }
-    if (
-      domain.includes("xperiode.com") ||
-      (await isDomainAlreadyInUse(type, domain))
-    ) {
+    if (domain.includes('xperiode.com') || (await isDomainAlreadyInUse(type, domain))) {
       return res.status(400).json({
         message: `❌ domain ${domain} is already in use.`,
-        StatusCode: "InvalidDomain",
+        StatusCode: 'InvalidDomain',
       });
     }
     const dnsRecords = await checkDomainDNS(domain);
@@ -96,47 +93,45 @@ const handleDomainRequest = async (req, res) => {
 
     if (isDomainLive) {
       await updateDomainToDatabase(type, domain, true);
-      return res
-        .status(200)
-        .json({ domain: domain, message: "✅ Your domain is live!" });
+      return res.status(200).json({ domain: domain, message: '✅ Your domain is live!' });
     } else if (dnsRecords.length === 0) {
       await updateDomainToDatabase(type, domain, false);
       return res.status(400).json({
-        message: "❌ Your domain has no valid A record.",
-        StatusCode: "UpdateDNS",
+        message: '❌ Your domain has no valid A record.',
+        StatusCode: 'UpdateDNS',
         instructions: {
-          type: "A",
-          name: "@",
+          type: 'A',
+          name: '@',
           pointsTo: WEBSITE_IP_ADDRESS,
-          TTL: "14400",
+          TTL: '14400',
         },
       });
     } else {
       await updateDomainToDatabase(type, domain, false);
       return res.status(400).json({
-        message: "❌ Your domain is pointing to the wrong IP.",
+        message: '❌ Your domain is pointing to the wrong IP.',
         current_ip: dnsRecords,
-        StatusCode: "UpdateDNS",
+        StatusCode: 'UpdateDNS',
         instructions: {
-          type: "A",
-          name: "@",
+          type: 'A',
+          name: '@',
           pointsTo: WEBSITE_IP_ADDRESS,
-          TTL: "14400",
+          TTL: '14400',
         },
       });
     }
   } catch (error) {
-    console.error("Error handling domain request:", error);
-    if (error.code === "ENOTFOUND") {
+    console.error('Error handling domain request:', error);
+    if (error.code === 'ENOTFOUND') {
       return res.status(400).json({
-        message: "❌ Invalid domain. The domain does not exist.",
-        StatusCode: "InvalidDomain",
+        message: '❌ Invalid domain. The domain does not exist.',
+        StatusCode: 'InvalidDomain',
       });
     }
 
     return res.status(500).json({
-      message: "❌ Failed to check the domain OR Domain might be Invalid.",
-      StatusCode: "FailedToProcess",
+      message: '❌ Failed to check the domain OR Domain might be Invalid.',
+      StatusCode: 'FailedToProcess',
       error: error.message,
     });
   }
@@ -147,26 +142,26 @@ const getStoreByDomain = async (req, res) => {
     const { domain, subDomain } = req.query;
 
     if (!domain && !subDomain) {
-      return res.status(400).json({ error: "Domain or Subdomain is required" });
+      return res.status(400).json({ error: 'Domain or Subdomain is required' });
     }
 
     let query = {};
 
     if (subDomain) {
-      query = { subDomain: { $regex: `^${subDomain}$`, $options: "i" } }; // Exact match (case-insensitive)
+      query = { subDomain: { $regex: `^${subDomain}$`, $options: 'i' } }; // Exact match (case-insensitive)
     } else if (domain) {
-      query = { customDomain: { $regex: `^${domain}$`, $options: "i" } }; // Exact match (case-insensitive)
+      query = { customDomain: { $regex: `^${domain}$`, $options: 'i' } }; // Exact match (case-insensitive)
     }
 
     const store = await StoreModal.findOne(query);
 
     if (!store) {
-      return res.status(404).json({ message: "store not found" });
+      return res.status(404).json({ message: 'store not found' });
     }
-    res.json({ storeId: store._id });
+    res.json({ store: store });
   } catch (error) {
-    console.error("Error fetching site:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error fetching site:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
@@ -175,8 +170,8 @@ const automateDomainSetup = async (req, res) => {
 
   if (!userDomain || !frontendIP || !privateKeyPath) {
     return res.status(400).json({
-      message: "❌ Missing required parameters.",
-      requiredFields: ["userDomain", "frontendIP", "privateKeyPath"],
+      message: '❌ Missing required parameters.',
+      requiredFields: ['userDomain', 'frontendIP', 'privateKeyPath'],
     });
   }
 
@@ -231,7 +226,7 @@ ENDSSH`;
       if (error) {
         console.error(`❌ Error issuing SSL certificate: ${stderr}`);
         return res.status(500).json({
-          message: "❌ SSL setup failed.",
+          message: '❌ SSL setup failed.',
           error: stderr,
         });
       }
@@ -242,9 +237,9 @@ ENDSSH`;
       });
     });
   } catch (error) {
-    console.error("❌ Error processing request:", error);
+    console.error('❌ Error processing request:', error);
     return res.status(500).json({
-      message: "❌ An error occurred during domain verification or SSL setup.",
+      message: '❌ An error occurred during domain verification or SSL setup.',
       error: error.message,
     });
   }

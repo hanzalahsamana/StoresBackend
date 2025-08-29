@@ -32,7 +32,7 @@ const ProductSchema = new Schema({
   vendor: { type: String },
   price: { type: Number, required: true },
   comparedAtPrice: { type: Number },
-  displayImage: { type: String, required: true },
+  displayImage: { type: String, },
   gallery: [String],
   trackInventory: { type: Boolean, default: false, required: true },
   stock: { type: Number },
@@ -78,7 +78,7 @@ const ProductSchema = new Schema({
     ref: 'Store',
     required: true,
   },
-});
+}, { timestamps: true });
 
 const ProductModel = mongoose.model('Product', ProductSchema);
 

@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const SectionSchema = new mongoose.Schema({
   type: { type: String, required: true }, // "hero", "banner", etc.
   name: { type: String, required: true }, // Display name
-  order: { type: Number, required: true },
+  order: { type: Number, required: true, default: 1 }, // Order of the section
   sectionData: mongoose.Schema.Types.Mixed, // Flexible per section type
+  _id: { type: String, required: true, default: uuidv4 },
 });
 
 const PageSchema = new mongoose.Schema({
@@ -15,8 +17,8 @@ const PageSchema = new mongoose.Schema({
   slug: { type: String, required: true }, // "/about", "/"
   name: { type: String, required: true }, // "About Us"
   isEnabled: { type: Boolean, default: true },
+  isEditable: { type: Boolean, default: true },
   sections: [SectionSchema],
-
   updatedAt: { type: Date, default: Date.now },
 });
 
