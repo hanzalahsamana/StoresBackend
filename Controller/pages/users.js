@@ -61,7 +61,7 @@ module.exports = {
     toggleUserStatus: async (req, res) => {
         try {
             const { id } = req.params;
-            const { status } = req.query;
+            const { status } = req.body;
             if (!id) {
                 return res.status(400).json({ message: "User Id is required!", success: false });
             }

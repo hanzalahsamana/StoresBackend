@@ -26,6 +26,10 @@ const paymentHistorySchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
+        status: {
+            type: String,
+            required: true
+        },
         amount: {
             type: Number,
             required: true,

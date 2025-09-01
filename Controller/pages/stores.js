@@ -13,7 +13,7 @@ module.exports = {
                 filterQuery.storeName = { $regex: storeName, $options: "i" }
             }
             if (plan) {
-                filterQuery.plan = { $regex: plan, $options: "i" }
+                filterQuery.subscriptionStatus = { $regex: plan, $options: "i" }
             }
             if (status) {
                 filterQuery.storeStatus = { $regex: status, $options: "i" }
@@ -24,7 +24,12 @@ module.exports = {
                 const endDate = moment(endDateStr, "MMM DD YYYY").endOf("day");
                 filterQuery.createdAt = { $gte: startDate.toDate(), $lte: endDate.toDate() };
             }
-            const { data: rawData, pagination } = await paginate(StoreModal, filterQuery, { page, sort: { createdAt: -1 }, limit, populate: { path: "userRef", select: "email" } })
+            await StoreModal.updateMany(
+                { subscriptionStatus: { $exists: false } },
+                { $set: { subscriptionStatus: "trial" } }
+            );
+
+            const { data: rawData, pagination } = await paginate(StoreModal, filterQuery, { page, sort: { createdAt: -1 }, limit, populate: { path: "userRef", select: "email -_id" } })
             const data = rawData.map(store => {
                 const storeObj = store.toObject();
                 const { userRef, ...rest } = storeObj;
@@ -40,16 +45,19 @@ module.exports = {
     toggleStoreStatus: async (req, res) => {
         try {
             const { id } = req.params;
-            const { status } = req?.query
+            const { status } = req?.body
             if (!status) {
-                return res.status(400).json({ message: "Store is required!", success: false });
+                return res.status(400).json({ message: "Status is required!", success: false });
             }
 
             if (!id) {
                 return res.status(400).json({ message: "Store Id is required!", success: false });
             }
 
+            console.log("id==>", id)
+
             const store = await StoreModal.findById(id);
+            console.log("store==>", store)
             if (!store) {
                 return res.status(400).json({ message: "Invalid store id!", success: false });
             }

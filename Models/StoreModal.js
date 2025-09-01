@@ -39,26 +39,9 @@ const StoreSchema = new Schema(
       required: true,
       default: "Active"
     },
-    plan: {
-      type: String,
-      required: true,
-      default: "Basic"
-    },
     subscriptionStatus: {
       type: String,
-      required: true,
       default: "trial"
-    },
-    billingCycle: {
-      type: String,
-    },
-    subsStart: {
-      type: Date,
-      default: null
-    },
-    subsEnd: {
-      type: Date,
-      default: null
     },
   },
   {

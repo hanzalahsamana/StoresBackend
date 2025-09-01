@@ -86,6 +86,7 @@ const { getAnalyticsData: getDashboardData } = require('../Controller/pages/anal
 const superAdminChecker = require('../Middleware/superAdminChecker');
 const { getUsers, searchUsers, toggleUserStatus } = require('../Controller/pages/users');
 const { getStores, toggleStoreStatus, searchStores } = require('../Controller/pages/stores');
+const { getSubscriptions, toggleSubscriptionStatus } = require('../Controller/pages/subscriptions');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -243,6 +244,8 @@ withoutParams.get('/search/users', tokenChecker, superAdminChecker, searchUsers)
 withoutParams.put('/users/:id/status-toggle', tokenChecker, superAdminChecker, toggleUserStatus);
 withoutParams.put('/stores/:id/status-toggle', tokenChecker, superAdminChecker, toggleStoreStatus);
 withoutParams.get('/search/stores', tokenChecker, superAdminChecker, searchStores);
+withoutParams.get('/get/subscriptions', tokenChecker, superAdminChecker, getSubscriptions);
+withoutParams.put('/subscriptions/:id/status-toggle', tokenChecker, superAdminChecker, toggleSubscriptionStatus);
 module.exports = {
   withParams,
   withoutParams,
