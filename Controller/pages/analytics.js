@@ -1,32 +1,31 @@
 const { OrderModel } = require("../../Models/OrderModal");
 const { PaymentHistoryModel } = require("../../Models/paymentHistoryModel");
 const { StoreModal } = require("../../Models/StoreModal");
+const { SubscriptionModel } = require("../../Models/subscriptionmodel");
 const { UserModal } = require("../../Models/userModal");
 
 module.exports = {
     getAnalyticsData: async (req, res) => {
         try {
             const [users, activeStores, suspendedStores] = await Promise.all([
-                UserModal.estimatedDocumentCount(),
+                UserModal.countDocuments({ role: { $ne: "superAdmin" } }),
                 StoreModal.countDocuments({ storeStatus: "Active" }),
                 StoreModal.countDocuments({ storeStatus: "Suspended" }),
             ]);
 
-
-
             const now = new Date();
             const startOfYear = new Date(now.getFullYear(), 0, 1);
-            const last30Days = new Date(now);
-            last30Days.setDate(now.getDate() - 30);
-            last30Days.setHours(0, 0, 0, 0);
+            const lastYear = new Date(now);
+            lastYear.setFullYear(now.getFullYear() - 1);
+            lastYear.setHours(0, 0, 0, 0);
 
             const [paymentsData] = await PaymentHistoryModel.aggregate([
                 {
                     $facet: {
                         totalRevenue: [{ $group: { _id: null, total: { $sum: "$amount" } } }],
                         monthlyRevenue: [
-                            { $match: { paidAt: { $gte: startOfYear } } },
-                            { $group: { _id: { $month: "$paidAt" }, total: { $sum: "$amount" } } }
+                            { $match: { createdAt: { $gte: startOfYear } } },
+                            { $group: { _id: { $month: "$createdAt" }, total: { $sum: "$amount" } } }
                         ],
                         totalSales: [{ $count: "count" }],
                     },
@@ -51,7 +50,7 @@ module.exports = {
             const topStoresResult = await OrderModel.aggregate([
                 {
                     $match: {
-                        createdAt: { $gte: last30Days },
+                        createdAt: { $gte: lastYear },
                         "paymentInfo.status": "paid"
                     }
                 },
@@ -95,10 +94,10 @@ module.exports = {
                 { $group: { _id: "$plan", count: { $sum: 1 } } }
             ]);
 
-            const subscriptionPlanResult = await StoreModal.aggregate([
+            const subscriptionPlanResult = await SubscriptionModel.aggregate([
                 {
                     $group: {
-                        _id: "$plan",
+                        _id: "$status",
                         count: { $sum: 1 }
                     }
                 },

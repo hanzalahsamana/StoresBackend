@@ -26,10 +26,6 @@ const SubscriptionSchema = new Schema(
             type: Date,
             default: null
         },
-        amount: {
-            type: Number,
-            default: null
-        }
 
     },
     {
