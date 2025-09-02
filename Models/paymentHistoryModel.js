@@ -6,6 +6,10 @@ const paymentHistorySchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: true,
         },
+        imageUrl: {
+            type: String,
+            required: true
+        },
         status: {
             type: String,
             required: true,

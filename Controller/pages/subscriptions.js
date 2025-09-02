@@ -1,8 +1,53 @@
 const { paginate } = require("../../Helpers/pagination");
+const { PaymentHistoryModel } = require("../../Models/paymentHistoryModel");
 const { SubscriptionModel } = require("../../Models/subscriptionmodel");
 const moment = require("moment");
 
 module.exports = {
+
+    updateSubscription: async (req, res) => {
+        try {
+            const body = req.body;
+            const { imageUrl, amount, status } = body
+            if (!body || Object.keys(body).length === 0) {
+                return res.status(400).json({ message: "Data is required!" });
+            }
+
+            const { storeId } = req.params;
+
+            const updatedSubscription = await SubscriptionModel.findOneAndUpdate(
+                { storeRef: storeId },
+                { status },
+            );
+
+            if (!updatedSubscription) {
+                return res.status(400).json({ message: "Invalid store!" });
+            }
+
+            const newPaymentHistory = new PaymentHistoryModel({
+                subscriptionId: updatedSubscription._id,
+                amount,
+                imageUrl,
+                status: "pending"
+            });
+
+            newPaymentHistory.save()
+
+            return res.status(200).json({
+                message: "Subscription upgrade successfully!",
+                data: updatedSubscription,
+                success: true
+            });
+        } catch (e) {
+            console.error("Error updating subscription!", e?.message || e);
+            return res.status(500).json({
+                message: "Something went wrong!",
+                success: false
+            });
+        }
+    },
+
+
     getSubscriptions: async (req, res) => {
         try {
             const { storeName, dateRange, status, page = 1, limit = 0 } = req.query;
@@ -91,13 +136,22 @@ module.exports = {
             if (!subscription) {
                 return res.status(400).json({ message: "Invalid subscription id!", success: false });
             }
+            // const paymenthistory = await PaymentHistoryModel.findOneAndUpdate({ subscriptionId: subscription?._id })
 
             subscription.status = status;
             await subscription.save();
+            const paymentStatus = status === "cancelled" ? "failed" : status === "active" ? "paid" : undefined;
+
+            if (paymentStatus) {
+                await PaymentHistoryModel.findOneAndUpdate(
+                    { subscriptionId: subscription._id },
+                    { status: paymentStatus }
+                );
+            }
             return res.status(200).json({ message: `Subscription ${subscription?.status?.toLowerCase()} successfully`, data: subscription, success: true });
         } catch (e) {
             console.error("Error toggling subscription status!", e?.message || e);
             return res.status(500).json({ message: "Something went wrong!", success: false });
         }
-    }
+    },
 };
