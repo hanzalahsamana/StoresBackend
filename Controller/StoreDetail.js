@@ -3,6 +3,8 @@ const { UserModal } = require("../Models/userModal");
 const SeedDefaultData = require("../InitialSeeding/SeedDefaultData");
 const { compareHash } = require("../Utils/BCrypt");
 const { deleteAllData } = require("../Helpers/deleteAllData");
+const { SubscriberModel } = require("../Models/SubscriberModal");
+const { SubscriptionModel } = require("../Models/subscriptionmodel");
 
 const generateStore = async (req, res) => {
   const { userId } = req.query;
@@ -21,7 +23,15 @@ const generateStore = async (req, res) => {
       subDomain,
       userRef: userId,
     });
+
     const savedStore = await newStore.save();
+    const newSubscription = new SubscriptionModel({
+      storeRef: savedStore._id,
+      status: "trial",
+    });
+    const savedSubscription = await newSubscription.save();
+    savedStore.subscriptionId = savedSubscription._id;
+    await savedStore.save();
     await SeedDefaultData(savedStore?._id);
     return res.status(201).json({
       success: true,
@@ -41,8 +51,10 @@ const getStore = async (req, res) => {
   const { storeId } = req.params;
 
   try {
-    const storeData = await StoreModal.findById(storeId);
-
+    const storeData = await StoreModal.findById(storeId).populate("subscriptionId");;
+    if (!storeData) {
+      return res.status(400).json({ message: "Invalid Store Id!", success: false })
+    }
     return res.status(200).json({
       success: true,
       data: storeData,

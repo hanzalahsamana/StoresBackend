@@ -2,8 +2,14 @@ const mongoose = require("mongoose");
 
 const paymentHistorySchema = new mongoose.Schema(
     {
+        storeRef: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Store',
+            required: true,
+        },
         subscriptionId: {
             type: mongoose.Schema.Types.ObjectId,
+            ref: 'Subscriptions',
             required: true,
         },
         imageUrl: {

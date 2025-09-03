@@ -28,9 +28,6 @@ const paginate = async (Model, query = {}, options = {}, pipeline = []) => {
 
         data = await Model.aggregate(fullPipeline);
     } else {
-        console.log("limit", limit)
-        console.log("skip", skip)
-        console.log("page", page)
         totalData = await Model.countDocuments(query);
         let abc = Model.find(query).select(select || "").sort(sort).skip(skip).limit(limit);
         if (populate) {

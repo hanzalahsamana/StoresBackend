@@ -39,9 +39,9 @@ const StoreSchema = new Schema(
       required: true,
       default: "Active"
     },
-    subscriptionStatus: {
-      type: String,
-      default: "trial"
+    subscriptionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Subscriptions',
     },
   },
   {
