@@ -195,6 +195,7 @@ const {
 const {
   getInvoices,
   getStoreInvoices,
+  toggleInvoiceStatus,
 } = require("../Controller/pages/invoices");
 
 // // Variations (commented for now)
@@ -551,7 +552,18 @@ withParams.get(
   validOwnerChecker,
   getStoreInvoices
 );
-withParams.get("/get/invoices", tokenChecker, superAdminChecker, getInvoices);
+withoutParams.get(
+  "/get/invoices",
+  tokenChecker,
+  superAdminChecker,
+  getInvoices
+);
+withoutParams.put(
+  "/invoice/:id/status-toggle",
+  tokenChecker,
+  superAdminChecker,
+  toggleInvoiceStatus
+);
 module.exports = {
   withParams,
   withoutParams,

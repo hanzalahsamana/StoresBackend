@@ -20,7 +20,8 @@ module.exports = {
 
       const updatedSubscription = await SubscriptionModel.findOneAndUpdate(
         { storeRef: storeId },
-        { status, subsStart: null, subsEnd: null, billingCycle: null }
+        { status, subsStart: null, subsEnd: null, billingCycle: null },
+        { new: true }
       );
 
       if (!updatedSubscription) {
@@ -146,7 +147,7 @@ module.exports = {
           .json({ message: "Invalid subscription id!", success: false });
       }
 
-      if (status === "active") {
+      if (status.toLowerCase() === "active") {
         subscription.subsStart = new Date();
         subscription.subsEnd = new Date(
           new Date().setMonth(new Date().getMonth() + 1)
@@ -154,7 +155,8 @@ module.exports = {
         subscription.billingCycle = "monthly";
       }
 
-      subscription.status = status;
+      subscription.status =
+        status.toLowerCase() === "cancel" ? "cancelled" : status.toLowerCase();
       await subscription.save();
       return res.status(200).json({
         message: `Subscription ${subscription?.status?.toLowerCase()} successfully`,

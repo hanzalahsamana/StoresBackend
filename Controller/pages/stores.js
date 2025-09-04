@@ -100,21 +100,20 @@ module.exports = {
           .json({ message: "Store Id is required!", success: false });
       }
 
-      console.log("id==>", id);
-
-      const store = await StoreModal.findById(id);
-      console.log("store==>", store);
-      if (!store) {
+      const updatedStore = await StoreModal.findByIdAndUpdate(
+        id,
+        { storeStatus: status },
+        { new: true }
+      );
+      if (!updatedStore) {
         return res
-          .status(400)
-          .json({ message: "Invalid store id!", success: false });
+          .status(404)
+          .json({ message: "Store not found!", success: false });
       }
 
-      store.storeStatus = status;
-      await store.save();
       return res.status(200).json({
-        message: `Store ${store?.storeStatus?.toLowerCase()} successfully`,
-        updatedStore: store,
+        message: `Store ${updatedStore?.storeStatus} successfully`,
+        updatedStore,
         success: true,
       });
     } catch (e) {

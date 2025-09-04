@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const StoreSchema = new Schema(
   {
     userRef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     storeName: {
@@ -35,13 +35,21 @@ const StoreSchema = new Schema(
     },
     storeStatus: {
       type: String,
-      enum: ["Active", "Suspended"],
       required: true,
-      default: "Active"
+      default: "Active",
+      enum: ["Active", "Suspended"],
     },
     subscriptionId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Subscriptions',
+      ref: "Subscriptions",
+    },
+    promoCode: {
+      type: String,
+      required: true,
+    },
+    refferals: {
+      type: Number,
+      default: 0,
     },
   },
   {
@@ -50,13 +58,13 @@ const StoreSchema = new Schema(
 );
 
 // Ensure subdomain uniqueness and validate fields
-StoreSchema.pre('validate', async function (next) {
-  if (this.isModified('subDomain') && this.subDomain) {
+StoreSchema.pre("validate", async function (next) {
+  if (this.isModified("subDomain") && this.subDomain) {
     const baseSlug = this.subDomain
       .trim()
       .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
 
     let slug = baseSlug;
     let counter = 1;
@@ -71,6 +79,6 @@ StoreSchema.pre('validate', async function (next) {
   next();
 });
 
-const StoreModal = mongoose.model('Store', StoreSchema);
+const StoreModal = mongoose.model("Store", StoreSchema);
 
 module.exports = { StoreModal };
