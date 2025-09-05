@@ -191,6 +191,7 @@ const {
   getSubscriptions,
   toggleSubscriptionStatus,
   updateSubscription,
+  updateReferralModal,
 } = require("../Controller/pages/subscriptions");
 const {
   getInvoices,
@@ -535,7 +536,7 @@ withoutParams.get(
   getSubscriptions
 );
 withoutParams.put(
-  "/subscriptions/:id/status-toggle",
+  "/subscriptions/status-toggle",
   tokenChecker,
   superAdminChecker,
   toggleSubscriptionStatus
@@ -563,6 +564,12 @@ withoutParams.put(
   tokenChecker,
   superAdminChecker,
   toggleInvoiceStatus
+);
+withParams.put(
+  "/referral/:id/modal-shown",
+  tokenChecker,
+  validOwnerChecker,
+  updateReferralModal
 );
 module.exports = {
   withParams,

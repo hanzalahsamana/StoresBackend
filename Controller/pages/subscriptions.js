@@ -54,14 +54,22 @@ module.exports = {
 
   getSubscriptions: async (req, res) => {
     try {
-      const { storeName, dateRange, status, page = 1, limit = 0 } = req.query;
+      const {
+        storeName,
+        dateRange,
+        status = "all",
+        page = 1,
+        limit = 0,
+      } = req.query;
       const filterQuery = {};
       const pipeline = [];
 
-      if (status) {
+      // tab filter
+      if (status !== "all") {
         filterQuery.status = { $regex: status, $options: "i" };
       }
 
+      // date filter
       if (dateRange) {
         const [startDateStr, endDateStr] = dateRange.split(" - ");
         const startDate = moment(startDateStr, "MMM DD YYYY").startOf("day");
@@ -72,6 +80,7 @@ module.exports = {
         };
       }
 
+      // store + user lookup
       pipeline.push({
         $lookup: {
           from: "stores",
@@ -80,7 +89,6 @@ module.exports = {
           as: "store",
         },
       });
-
       pipeline.push({ $unwind: "$store" });
 
       pipeline.push({
@@ -91,9 +99,9 @@ module.exports = {
           as: "user",
         },
       });
-
       pipeline.push({ $unwind: "$user" });
 
+      // store name filter
       if (storeName) {
         pipeline.push({
           $match: {
@@ -109,13 +117,34 @@ module.exports = {
         },
       });
 
+      // pagination data
       const { data, pagination } = await paginate(
         SubscriptionModel,
         filterQuery,
         { limit, page, sort: { createdAt: -1 } },
         pipeline
       );
-      return res.json({ success: true, data, pagination });
+
+      // counts for tabs
+      const countsAgg = await SubscriptionModel.aggregate([
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const counts = countsAgg.reduce(
+        (acc, item) => {
+          acc[item._id?.toLowerCase()] = item.count;
+          acc.all += item.count;
+          return acc;
+        },
+        { all: 0 }
+      );
+
+      return res.json({ success: true, data, pagination, counts });
     } catch (e) {
       console.error("Error fetching subscriptions!", e?.message || e);
       return res
@@ -126,45 +155,91 @@ module.exports = {
 
   toggleSubscriptionStatus: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { status } = req?.body;
+      const { status, subscriptionIds } = req.body;
+
       if (!status) {
         return res
           .status(400)
           .json({ message: "Status is required!", success: false });
       }
 
-      if (!mongoose.Types.ObjectId.isValid(id)) {
+      if (subscriptionIds?.length === 0 || !subscriptionIds) {
         return res
           .status(400)
-          .json({ message: "Subscription Id is required!", success: false });
+          .json({ message: "Subscription Ids are required!", success: false });
       }
 
-      const subscription = await SubscriptionModel.findById(id);
-      if (!subscription) {
+      const invalidIds = subscriptionIds.filter(
+        (id) => !mongoose.Types.ObjectId.isValid(id)
+      );
+      if (invalidIds.length > 0) {
         return res
           .status(400)
-          .json({ message: "Invalid subscription id!", success: false });
+          .json({ message: "Invalid subscription Id(s)!", success: false });
       }
+
+      let updateData = {
+        status:
+          status.toLowerCase() === "cancel"
+            ? "cancelled"
+            : status.toLowerCase(),
+      };
 
       if (status.toLowerCase() === "active") {
-        subscription.subsStart = new Date();
-        subscription.subsEnd = new Date(
-          new Date().setMonth(new Date().getMonth() + 1)
-        );
-        subscription.billingCycle = "monthly";
+        updateData = {
+          ...updateData,
+          subsStart: new Date(),
+          subsEnd: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+          billingCycle: "monthly",
+          referralModalShown: true,
+        };
       }
 
-      subscription.status =
-        status.toLowerCase() === "cancel" ? "cancelled" : status.toLowerCase();
-      await subscription.save();
+      await SubscriptionModel.updateMany(
+        { _id: { $in: subscriptionIds } },
+        { $set: updateData }
+      );
+
+      const updatedSubscriptions = await SubscriptionModel.find({
+        _id: { $in: subscriptionIds },
+      });
+
       return res.status(200).json({
-        message: `Subscription ${subscription?.status?.toLowerCase()} successfully`,
-        data: subscription,
+        message: `Subscriptions ${updateData.status} successfully`,
+        data: updatedSubscriptions,
         success: true,
       });
     } catch (e) {
       console.error("Error toggling subscription status!", e?.message || e);
+      return res
+        .status(500)
+        .json({ message: "Something went wrong!", success: false });
+    }
+  },
+
+  updateReferralModal: async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return res
+          .status(400)
+          .json({ message: "Subscription id is required!", success: false });
+      }
+      const subscription = await SubscriptionModel.findByIdAndUpdate(
+        id,
+        {
+          referralModalShown: false,
+        },
+        { new: true }
+      );
+      if (!subscription) {
+        return res
+          .status(404)
+          .json({ message: "Subscription not found!", success: false });
+      }
+      return res.status(200).json({ data: subscription, success: true });
+    } catch (e) {
+      console.error("Error updating referralModal!", e?.message || e);
       return res
         .status(500)
         .json({ message: "Something went wrong!", success: false });
