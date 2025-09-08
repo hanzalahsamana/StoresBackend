@@ -512,13 +512,13 @@ withoutParams.get(
   searchUsers
 );
 withoutParams.put(
-  "/users/:id/status-toggle",
+  "/users/status-toggle",
   tokenChecker,
   superAdminChecker,
   toggleUserStatus
 );
 withoutParams.put(
-  "/stores/:id/status-toggle",
+  "/stores/status-toggle",
   tokenChecker,
   superAdminChecker,
   toggleStoreStatus
@@ -560,7 +560,7 @@ withoutParams.get(
   getInvoices
 );
 withoutParams.put(
-  "/invoice/:id/status-toggle",
+  "/invoice/status-toggle",
   tokenChecker,
   superAdminChecker,
   toggleInvoiceStatus

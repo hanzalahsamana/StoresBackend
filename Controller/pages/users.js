@@ -1,3 +1,4 @@
+const { getCounts } = require("../../Helpers/getCounts");
 const { paginate } = require("../../Helpers/pagination");
 const { searchSuggestion } = require("../../Helpers/searchSuggest");
 const { StoreModal } = require("../../Models/StoreModal");
@@ -9,7 +10,7 @@ module.exports = {
     try {
       const { status, role, email, dateRange, page = 1, limit = 0 } = req.query;
       const filterQuery = { role: "admin" };
-      if (status) {
+      if (status !== "all") {
         filterQuery.status = { $regex: status, $options: "i" };
       }
       if (role) {
@@ -55,9 +56,13 @@ module.exports = {
         return { ...user.toObject(), totalStores, stores: userStores };
       });
 
+      const counts = await getCounts(UserModal, "status", {
+        role: { $ne: "superAdmin" },
+      });
+
       return res
         .status(200)
-        .json({ data: enrichedUsers, pagination, success: true });
+        .json({ data: enrichedUsers, pagination, counts, success: true });
     } catch (e) {
       console.log("Error Fetching users:", e?.message || e);
       return res
@@ -68,12 +73,12 @@ module.exports = {
 
   toggleUserStatus: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { status } = req.body;
-      if (!id) {
+      const { status, ids } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
         return res
           .status(400)
-          .json({ message: "User Id is required!", success: false });
+          .json({ message: "User IDs are required!", success: false });
       }
 
       if (!status) {
@@ -82,18 +87,34 @@ module.exports = {
           .json({ message: "Status is required!", success: false });
       }
 
-      const user = await UserModal.findById(id);
-      if (!user || user.role !== "admin") {
+      const users = await UserModal.find({ _id: { $in: ids }, role: "admin" });
+      if (!users || users.length === 0) {
         return res
           .status(400)
-          .json({ message: "Invalid user ID!", success: false });
+          .json({ message: "Invalid users Id!", success: false });
       }
 
-      user.status = status;
-      await user.save();
+      await UserModal.updateMany(
+        { _id: { $in: ids } },
+        { $set: { status: status.toLowerCase() } }
+      );
+
+      const updatedUsers = await UserModal.find({ _id: { $in: ids } });
+
+      if (!updatedUsers || updatedUsers.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No users found to update!", success: false });
+      }
+
+      const counts = await getCounts(UserModal, "status", {
+        role: { $ne: "superAdmin" },
+      });
+
       return res.status(200).json({
-        message: `User ${user.status.toLowerCase()} successfully`,
-        user: { ...user.toObject() },
+        message: `User(s) ${status.toLowerCase()} successfully`,
+        users: updatedUsers,
+        counts,
         success: true,
       });
     } catch (e) {

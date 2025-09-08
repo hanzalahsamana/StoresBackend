@@ -3,6 +3,7 @@ const { paginate } = require("../../Helpers/pagination");
 const { PaymentHistoryModel } = require("../../Models/paymentHistoryModel");
 const { SubscriptionModel } = require("../../Models/subscriptionmodel");
 const moment = require("moment");
+const { getCounts } = require("../../Helpers/getCounts");
 
 module.exports = {
   updateSubscription: async (req, res) => {
@@ -125,24 +126,7 @@ module.exports = {
         pipeline
       );
 
-      // counts for tabs
-      const countsAgg = await SubscriptionModel.aggregate([
-        {
-          $group: {
-            _id: "$status",
-            count: { $sum: 1 },
-          },
-        },
-      ]);
-
-      const counts = countsAgg.reduce(
-        (acc, item) => {
-          acc[item._id?.toLowerCase()] = item.count;
-          acc.all += item.count;
-          return acc;
-        },
-        { all: 0 }
-      );
+      const counts = await getCounts(SubscriptionModel);
 
       return res.json({ success: true, data, pagination, counts });
     } catch (e) {
@@ -204,9 +188,12 @@ module.exports = {
         _id: { $in: subscriptionIds },
       });
 
+      const counts = await getCounts(SubscriptionModel);
+
       return res.status(200).json({
         message: `Subscriptions ${updateData.status} successfully`,
-        data: updatedSubscriptions,
+        subscriptions: updatedSubscriptions,
+        counts,
         success: true,
       });
     } catch (e) {

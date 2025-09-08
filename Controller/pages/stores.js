@@ -1,3 +1,4 @@
+const { getCounts } = require("../../Helpers/getCounts");
 const { paginate } = require("../../Helpers/pagination");
 const { searchSuggestion } = require("../../Helpers/searchSuggest");
 const { StoreModal } = require("../../Models/StoreModal");
@@ -19,7 +20,7 @@ module.exports = {
       if (storeName) {
         filterQuery.storeName = { $regex: storeName, $options: "i" };
       }
-      if (status) {
+      if (status !== "all") {
         filterQuery.storeStatus = { $regex: status, $options: "i" };
       }
       if (dateRange) {
@@ -73,9 +74,8 @@ module.exports = {
           subscriptionStatus: subscription?.status || subscriptionId?.status,
         };
       });
-      console.log("rawData", rawData);
-
-      return res.status(200).json({ data, pagination, success: true });
+      const counts = await getCounts(StoreModal, "storeStatus");
+      return res.status(200).json({ data, pagination, counts, success: true });
     } catch (e) {
       console.error("Error fetching stores!", e?.message || e);
       return res
@@ -86,34 +86,46 @@ module.exports = {
 
   toggleStoreStatus: async (req, res) => {
     try {
-      const { id } = req.params;
-      const { status } = req?.body;
+      const { status, ids } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res
+          .status(400)
+          .json({ message: "Store IDs are required!", success: false });
+      }
+
       if (!status) {
         return res
           .status(400)
           .json({ message: "Status is required!", success: false });
       }
 
-      if (!id) {
+      const stores = await StoreModal.find({ _id: { $in: ids } });
+      if (!stores || stores.length === 0) {
         return res
           .status(400)
-          .json({ message: "Store Id is required!", success: false });
+          .json({ message: "Invalid store Ids!", success: false });
       }
 
-      const updatedStore = await StoreModal.findByIdAndUpdate(
-        id,
-        { storeStatus: status },
-        { new: true }
+      await StoreModal.updateMany(
+        { _id: { $in: ids } },
+        { $set: { storeStatus: status.toLowerCase() } }
       );
-      if (!updatedStore) {
+
+      const updatedStores = await StoreModal.find({ _id: { $in: ids } });
+
+      if (!updatedStores || updatedStores.length === 0) {
         return res
           .status(404)
-          .json({ message: "Store not found!", success: false });
+          .json({ message: "No stores found to update!", success: false });
       }
 
+      const counts = await getCounts(StoreModal, "storeStatus");
+
       return res.status(200).json({
-        message: `Store ${updatedStore?.storeStatus} successfully`,
-        updatedStore,
+        message: `Store(s) ${status.toLowerCase()} successfully`,
+        stores: updatedStores,
+        counts,
         success: true,
       });
     } catch (e) {

@@ -1,3 +1,4 @@
+const { getCounts } = require("../../Helpers/getCounts");
 const { paginate } = require("../../Helpers/pagination");
 const { PaymentHistoryModel } = require("../../Models/paymentHistoryModel");
 const moment = require("moment");
@@ -7,7 +8,7 @@ module.exports = {
     try {
       const { limit = 0, page = 1, status, dateRange, email } = req.query;
       const query = {};
-      if (status) {
+      if (status !== "all") {
         query.status = { $regex: status, $options: "i" };
       }
       if (dateRange) {
@@ -47,9 +48,11 @@ module.exports = {
         return { ...invoiceObj, serial, email };
       });
 
+      const counts = await getCounts(PaymentHistoryModel);
+
       return res
         .status(200)
-        .json({ data: invoicesWithSerial, pagination, success: true });
+        .json({ data: invoicesWithSerial, pagination, counts, success: true });
     } catch (e) {
       console.error("Error fetching invoices!", e?.message || e);
       return res
@@ -116,25 +119,36 @@ module.exports = {
 
   toggleInvoiceStatus: async (req, res) => {
     try {
-      const { id } = req?.params;
-      const { status } = req?.body;
-      if (!id) {
-        return res.status(400).json({ message: "Invoice Id is required!" });
+      const { status, ids } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "Invoice IDs are required!" });
       }
       if (!status) {
         return res.status(400).json({ message: "Invoice Status is required!" });
       }
-      const updatedInvoice = await PaymentHistoryModel.findByIdAndUpdate(
-        id,
-        { status: status.toLowerCase() },
-        { new: true }
+
+      await PaymentHistoryModel.updateMany(
+        { _id: { $in: ids } },
+        { $set: { status: status.toLowerCase() } }
       );
-      if (!updatedInvoice) {
-        return res.status(404).json({ message: "Invoice not found!" });
+
+      const updatedInvoices = await PaymentHistoryModel.find({
+        _id: { $in: ids },
+      });
+
+      const counts = await getCounts(PaymentHistoryModel);
+
+      if (!updatedInvoices || updatedInvoices.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No invoices found to update!" });
       }
+
       return res.status(200).json({
-        message: `Invoice ${status} successfully!`,
-        updatedInvoice,
+        message: `Invoices updated to ${status} successfully!`,
+        updatedInvoice: updatedInvoices,
+        counts,
       });
     } catch (e) {
       console.error("Error toggling invoice status!", e?.message || e);
