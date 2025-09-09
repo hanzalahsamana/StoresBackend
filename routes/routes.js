@@ -82,6 +82,7 @@ const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
 const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, createPage, discardDraft } = require('../Controller/Theme/Builder');
 const { getMenuLinks } = require('../Controller/Suggestions/menuLinks');
+const { addCustomDomain, checkDomainStatus, deleteCustomDomain } = require('../Controller/CustomDomain');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -181,6 +182,10 @@ withParams.post('/addDomainDns', handleDomainRequest);
 withParams.post('/genrateSSl', automateDomainSetup);
 withParams.delete('/deleteDomain', removeDomainFromDatabase);
 withoutParams.get('/getStoreByDomain', getStoreByDomain);
+
+withParams.post('/addCustomDomain', tokenChecker, validOwnerChecker, addCustomDomain);
+withParams.get('/checkDomainStatus', tokenChecker, validOwnerChecker, checkDomainStatus);
+withParams.delete('/deleteCustomDomain', tokenChecker, validOwnerChecker, deleteCustomDomain);
 
 // --- DISCOUNT ROUTES ---
 withParams.post('/addDiscount', tokenChecker, validOwnerChecker, validateDiscount(false), addDiscount);
