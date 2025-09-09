@@ -1,5 +1,10 @@
-const baseTemplate = ({ title, bodyHtml, customStyles = '' }) => {
-    return `
+const baseTemplate = ({
+  title,
+  userName = "User",
+  bodyHtml,
+  customStyles = "",
+}) => {
+  return `
   <!DOCTYPE html>
   <html lang="en">
     <head>
@@ -18,28 +23,43 @@ const baseTemplate = ({ title, bodyHtml, customStyles = '' }) => {
           box-sizing: border-box;
           padding: 20px 0;
           width: 100%;
-          background-color: #F3F2F0
+          background-color: #ffffff;
         }
         .email-container {
-          border: 2px solid #BBBBBB;
-          max-width: 450px;
+          border: 1px solid #e5e7eb;
+          width:100%;
+          max-width: 500px;
           margin: 0 auto;
           background-color: #ffffff;
-          padding: 20px;
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-          border-radius: 5px;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -2px rgba(0, 0, 0, 0.1);
         }
         .header {
-          margin-bottom: 20px;
-          display: flex;
-          width: 100%;
+          background-color: #355DFC;
+          padding: 25px 0px;
+          text-align: center;
         }
-        .header img {
-          width: 250px;
-          margin: 0 auto;
+        .header .logo {
+          font-size: 22px;
+          font-weight: bold;
+          color: #ffffff;
+          margin: 0;
+          letter-spacing: 1px;
+        }
+        .content {
+          padding: 20px;
+        }
+        .greeting {
+          font-size: 18px;
+          font-weight: bold;
+          margin: 0 0 15px 0;
+          color: #333333;
         }
         .title {
-          font-size: 24px;
+          font-size: 20px; 
           font-weight: bold;
           color: #333333;
           margin-bottom: 10px;
@@ -50,16 +70,13 @@ const baseTemplate = ({ title, bodyHtml, customStyles = '' }) => {
           line-height: 1.6;
         }
         .footer {
+          background: #F3F4F6;
+          padding: 6px 0px;
+          border-top: 1px solid #e5e7eb;
           font-size: 14px;
           color: #999999;
-          margin-top: 30px;
           text-align: center;
         }
-
-        .logo{
-        font-size:25px;
-        }
-
         ${customStyles}
       </style>
     </head>
@@ -67,12 +84,15 @@ const baseTemplate = ({ title, bodyHtml, customStyles = '' }) => {
       <div class="main-container">
         <div class="email-container">
           <div class="header">
-           <p class="logo">Multi Tenant</p>
+            <p class="logo">MULTI TENANT</p>
           </div>
-          ${bodyHtml}
-          <p class="message">Best regards,<br />Team myratespermile</p>
+          <div class="content">
+            <p class="greeting">Hello ${userName} 👋,</p>
+            ${bodyHtml}
+            <p class="message">Best regards,<br />Team Multi Tenant</p>
+          </div>
           <div class="footer">
-            <p>&copy; 2024 Multi Tenant. All rights reserved.</p>
+            <p>&copy; 2025 Multi Tenant. All rights reserved.</p>
           </div>
         </div>
       </div>

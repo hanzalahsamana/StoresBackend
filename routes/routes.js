@@ -198,6 +198,10 @@ const {
   getStoreInvoices,
   toggleInvoiceStatus,
 } = require("../Controller/pages/invoices");
+const {
+  validateEmailTemplate,
+} = require("../Middleware/ValidationsMiddleware/emailValidate");
+const { emailSender } = require("../Controller/pages/email");
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -564,6 +568,13 @@ withoutParams.put(
   tokenChecker,
   superAdminChecker,
   toggleInvoiceStatus
+);
+withoutParams.post(
+  "/send/email",
+  tokenChecker,
+  superAdminChecker,
+  validateEmailTemplate,
+  emailSender
 );
 withParams.put(
   "/referral/:id/modal-shown",

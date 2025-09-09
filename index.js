@@ -3,6 +3,7 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const { withParams, withoutParams } = require("./routes/routes");
+const { exampleEmail } = require("./Helpers/EmailsToSend");
 require("./Config/Database");
 
 const app = express();
@@ -30,6 +31,8 @@ app.get("/", (req, res) => {
 app.use("/api/v1/:storeId", withParams);
 app.use("/api/v1", withoutParams);
 
+// exampleEmail();
+
 // generatePaymentToken(123);
 
 if (process.env.NODE_ENV !== "production") {
@@ -40,5 +43,3 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 module.exports = app;
-
-

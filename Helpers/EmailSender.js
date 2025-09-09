@@ -6,6 +6,9 @@ const createTransporter = () => {
     auth: {
       user: "junaidhunani890@gmail.com",
       pass: "kgns hjyl xumr zexs",
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 50,
     },
   });
 };
@@ -14,7 +17,7 @@ const createTransporter = () => {
 
 const sendEmail = async (from, to, subject, html) => {
   const mailOptions = {
-    from: `${from.brandName} <${from.email}>`,
+    from: `${from.storeName} <${from.email}>`,
     to,
     subject,
     html,
@@ -30,4 +33,4 @@ const sendEmail = async (from, to, subject, html) => {
   }
 };
 
-module.exports = sendEmail;
+module.exports = { sendEmail };

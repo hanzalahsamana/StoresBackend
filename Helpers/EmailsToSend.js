@@ -1,3 +1,4 @@
+const { baseTemplate } = require("../Emails/baseTemplate");
 const {
   generateOrderDetailsTemplate,
   generateAdminContactTemplate,
@@ -17,7 +18,7 @@ const adminContactResponse = async (admin, to, logo, data) => {
     admin,
     to,
     `Contact Form Submitted from ${admin.storeName}`,
-    generateAdminContactTemplate({ ...admin, logo }, data),
+    generateAdminContactTemplate({ ...admin, logo }, data)
   );
 };
 
@@ -26,7 +27,7 @@ const customerContactResponse = async (admin, to, logo, data) => {
     admin,
     to,
     `Contact To ${admin.storeName}`,
-    generateCustomerContactTemplate({ ...admin, logo }, data),
+    generateCustomerContactTemplate({ ...admin, logo }, data)
   );
 };
 
@@ -35,7 +36,7 @@ const adminOrderDetail = async (admin, to, orderDetails) => {
     admin,
     to,
     `Order Summary of ${admin.storeName}`,
-    generateOrderDetailsTemplate(admin, orderDetails),
+    generateOrderDetailsTemplate(admin, orderDetails)
   );
 };
 
@@ -44,7 +45,7 @@ const customerOrderDetail = async (admin, to, orderDetails) => {
     admin,
     to,
     `Order Summary of ${admin.storeName}`,
-    generateOrderConfirmTemplate(admin, orderDetails),
+    generateOrderConfirmTemplate(admin, orderDetails)
   );
 };
 
@@ -53,7 +54,7 @@ const OTPVerificationEmail = async (user, otp) => {
     AdminPanel,
     user.email,
     `OTP Verification`,
-    generateOTPVerificationTemplate(user, otp),
+    generateOTPVerificationTemplate(user, otp)
   );
 };
 
