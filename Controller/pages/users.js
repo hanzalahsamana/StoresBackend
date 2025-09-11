@@ -1,3 +1,5 @@
+const { userStatusTemplate } = require("../../Emails/templates");
+const { sendEmail } = require("../../Helpers/EmailSender");
 const { getCounts } = require("../../Helpers/getCounts");
 const { paginate } = require("../../Helpers/pagination");
 const { searchSuggestion } = require("../../Helpers/searchSuggest");
@@ -73,7 +75,7 @@ module.exports = {
 
   toggleUserStatus: async (req, res) => {
     try {
-      const { status, ids } = req.body;
+      const { status, ids, reason } = req.body;
 
       if (!Array.isArray(ids) || ids.length === 0) {
         return res
@@ -85,6 +87,12 @@ module.exports = {
         return res
           .status(400)
           .json({ message: "Status is required!", success: false });
+      }
+
+      if (status === "suspended" && !reason) {
+        return res
+          .status(400)
+          .json({ message: "Reason is required!", success: false });
       }
 
       const users = await UserModal.find({ _id: { $in: ids }, role: "admin" });
@@ -101,11 +109,22 @@ module.exports = {
 
       const updatedUsers = await UserModal.find({ _id: { $in: ids } });
 
-      if (!updatedUsers || updatedUsers.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No users found to update!", success: false });
-      }
+      const emailPromises = updatedUsers.map((user) => {
+        const subject =
+          status === "suspended"
+            ? "Account Suspended - Immediate Attention Required"
+            : "Your Account is Now Active!";
+
+        return sendEmail(
+          { storeName: "Admin Team", email: "admin@example.com" },
+          user?.email,
+          subject,
+          userStatusTemplate(subject, status, reason)
+        );
+      });
+
+      // Run in parallel
+      await Promise.all(emailPromises);
 
       const counts = await getCounts(UserModal, "status", {
         role: { $ne: "superAdmin" },

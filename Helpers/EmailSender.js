@@ -6,9 +6,6 @@ const createTransporter = () => {
     auth: {
       user: "junaidhunani890@gmail.com",
       pass: "kgns hjyl xumr zexs",
-      pool: true,
-      maxConnections: 5,
-      maxMessages: 50,
     },
   });
 };
