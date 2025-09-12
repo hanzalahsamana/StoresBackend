@@ -4,6 +4,11 @@ const { PaymentHistoryModel } = require("../../Models/paymentHistoryModel");
 const { SubscriptionModel } = require("../../Models/subscriptionmodel");
 const moment = require("moment");
 const { getCounts } = require("../../Helpers/getCounts");
+const {
+  subscriptionStatusTemplate,
+  invoiceStatusTemplate,
+} = require("../../Emails/emailTemplates");
+const { sendEmail } = require("../../Helpers/EmailSender");
 
 module.exports = {
   updateSubscription: async (req, res) => {
@@ -23,10 +28,16 @@ module.exports = {
         { storeRef: storeId },
         { status, subsStart: null, subsEnd: null, billingCycle: null },
         { new: true }
-      );
+      ).populate({
+        path: "storeRef",
+        populate: {
+          path: "userRef",
+          select: "name email",
+        },
+      });
 
       if (!updatedSubscription) {
-        return res.status(400).json({ message: "Invalid store!" });
+        return res.status(400).json({ message: "Invalid store id!" });
       }
 
       const newPaymentHistory = new PaymentHistoryModel({
@@ -38,6 +49,29 @@ module.exports = {
       });
 
       newPaymentHistory.save();
+
+      const storeName = updatedSubscription?.storeRef?.storeName;
+      const userEmail = updatedSubscription?.storeRef?.userRef?.email;
+
+      const notifications = [
+        {
+          subject: `Subscription for ${storeName} store is Under Review`,
+          template: subscriptionStatusTemplate,
+        },
+        {
+          subject: `Payment for ${storeName} store is Under Review`,
+          template: invoiceStatusTemplate,
+        },
+      ];
+      
+      for (const { subject, template } of notifications) {
+        await sendEmail(
+          { storeName: "Admin Store", email: "" },
+          userEmail,
+          subject,
+          template(subject, status, "", storeName)
+        );
+      }
 
       return res.status(200).json({
         message: "Subscription upgrade successfully!",
@@ -139,7 +173,13 @@ module.exports = {
 
   toggleSubscriptionStatus: async (req, res) => {
     try {
-      const { status, subscriptionIds } = req.body;
+      const { status, subscriptionIds, reason } = req.body;
+
+      if (subscriptionIds?.length === 0 || !subscriptionIds) {
+        return res
+          .status(400)
+          .json({ message: "Subscription Ids are required!", success: false });
+      }
 
       if (!status) {
         return res
@@ -147,10 +187,10 @@ module.exports = {
           .json({ message: "Status is required!", success: false });
       }
 
-      if (subscriptionIds?.length === 0 || !subscriptionIds) {
+      if (status === "Cancel" && !reason) {
         return res
           .status(400)
-          .json({ message: "Subscription Ids are required!", success: false });
+          .json({ message: "Reason is required!", success: false });
       }
 
       const invalidIds = subscriptionIds.filter(
@@ -183,12 +223,40 @@ module.exports = {
         { _id: { $in: subscriptionIds } },
         { $set: updateData }
       );
-
       const updatedSubscriptions = await SubscriptionModel.find({
         _id: { $in: subscriptionIds },
+      }).populate({
+        path: "storeRef",
+        populate: {
+          path: "userRef",
+        },
       });
 
+      if (!updatedSubscriptions || updatedSubscriptions?.length === 0) {
+        return res.status(404).json({
+          message: "No subscriptions found to update!",
+          success: false,
+        });
+      }
+
       const counts = await getCounts(SubscriptionModel);
+
+      const emailPromises = updatedSubscriptions.map((subs) => {
+        const storeName = subs?.storeRef?.storeName;
+        const subject =
+          status === "cancelled"
+            ? `Subscription for ${storeName} Cancelled - Action Required`
+            : `Your Subscription for ${storeName} is Active`;
+
+        return sendEmail(
+          { storeName: "Admin Team", email: "admin@example.com" },
+          subs?.storeRef?.userRef?.email,
+          subject,
+          subscriptionStatusTemplate(subject, status, reason, storeName)
+        );
+      });
+
+      await Promise.all(emailPromises);
 
       return res.status(200).json({
         message: `Subscriptions ${updateData.status} successfully`,

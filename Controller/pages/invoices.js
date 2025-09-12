@@ -1,3 +1,5 @@
+const { invoiceStatusTemplate } = require("../../Emails/emailTemplates");
+const { sendEmail } = require("../../Helpers/EmailSender");
 const { getCounts } = require("../../Helpers/getCounts");
 const { paginate } = require("../../Helpers/pagination");
 const { PaymentHistoryModel } = require("../../Models/paymentHistoryModel");
@@ -119,13 +121,20 @@ module.exports = {
 
   toggleInvoiceStatus: async (req, res) => {
     try {
-      const { status, ids } = req.body;
+      const { status, ids, reason } = req.body;
 
       if (!Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({ message: "Invoice IDs are required!" });
       }
+
       if (!status) {
         return res.status(400).json({ message: "Invoice Status is required!" });
+      }
+
+      if (status === "Failed" && !reason) {
+        return res
+          .status(400)
+          .json({ message: "Reason is required!", success: false });
       }
 
       await PaymentHistoryModel.updateMany(
@@ -135,6 +144,11 @@ module.exports = {
 
       const updatedInvoices = await PaymentHistoryModel.find({
         _id: { $in: ids },
+      }).populate({
+        path: "storeRef",
+        populate: {
+          path: "userRef",
+        },
       });
 
       const counts = await getCounts(PaymentHistoryModel);
@@ -144,6 +158,23 @@ module.exports = {
           .status(404)
           .json({ message: "No invoices found to update!" });
       }
+
+      const emailPromises = updatedInvoices.map((invoice) => {
+        const storeName = invoice?.storeRef?.storeName;
+        const subject =
+          status === "cancelled"
+            ? `Invoice for ${storeName} Failed - Action Required`
+            : `Your Invoice for ${storeName} is Paid`;
+
+        return sendEmail(
+          { storeName: "Admin Team", email: "admin@example.com" },
+          invoice?.storeRef?.userRef?.email,
+          subject,
+          invoiceStatusTemplate(subject, status, reason, storeName)
+        );
+      });
+
+      await Promise.all(emailPromises);
 
       return res.status(200).json({
         message: `Invoices updated to ${status} successfully!`,

@@ -93,7 +93,7 @@ const generateStore = async (req, res) => {
     const savedSubscription = await newSubscription.save();
     savedStore.subscriptionId = savedSubscription._id;
     await savedStore.save();
-    await SeedDefaultData(savedStore?._id);
+    // await SeedDefaultData(savedStore?._id);
     return res.status(201).json({
       success: true,
       data: savedStore,

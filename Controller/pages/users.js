@@ -1,4 +1,4 @@
-const { userStatusTemplate } = require("../../Emails/templates");
+const { userStatusTemplate } = require("../../Emails/emailTemplates");
 const { sendEmail } = require("../../Helpers/EmailSender");
 const { getCounts } = require("../../Helpers/getCounts");
 const { paginate } = require("../../Helpers/pagination");
@@ -109,6 +109,16 @@ module.exports = {
 
       const updatedUsers = await UserModal.find({ _id: { $in: ids } });
 
+      if (!updatedUsers || updatedUsers?.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No users found to update!", success: false });
+      }
+
+      const counts = await getCounts(UserModal, "status", {
+        role: { $ne: "superAdmin" },
+      });
+
       const emailPromises = updatedUsers.map((user) => {
         const subject =
           status === "suspended"
@@ -123,12 +133,7 @@ module.exports = {
         );
       });
 
-      // Run in parallel
       await Promise.all(emailPromises);
-
-      const counts = await getCounts(UserModal, "status", {
-        role: { $ne: "superAdmin" },
-      });
 
       return res.status(200).json({
         message: `User(s) ${status.toLowerCase()} successfully`,

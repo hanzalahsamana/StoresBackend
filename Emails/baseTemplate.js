@@ -30,7 +30,6 @@ const baseTemplate = ({ title, bodyHtml, customStyles = "" }) => {
           border-radius: 10px;
         }
         .header {
-          margin-bottom: 20px;
           width: 100%;
         }
         .header img {
@@ -75,7 +74,7 @@ const baseTemplate = ({ title, bodyHtml, customStyles = "" }) => {
           ${bodyHtml}
           <p class="message">Best regards,<br />Team Multi Tenant</p>
           <div class="footer">
-            <p>&copy; 2024 Trucker. All rights reserved.</p>
+            <p>&copy; 2024 Multi Tenant. All rights reserved.</p>
           </div>
         </div>
       </div>

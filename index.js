@@ -5,6 +5,7 @@ const cors = require("cors");
 const { withParams, withoutParams } = require("./routes/routes");
 const { exampleEmail } = require("./Helpers/EmailsToSend");
 require("./Config/Database");
+require("./Jobs");
 
 const app = express();
 

@@ -36,8 +36,8 @@ const StoreSchema = new Schema(
     storeStatus: {
       type: String,
       required: true,
-      default: "Active",
-      enum: ["Active", "Suspended"],
+      default: "active",
+      enum: ["active", "suspended"],
     },
     subscriptionId: {
       type: mongoose.Schema.Types.ObjectId,

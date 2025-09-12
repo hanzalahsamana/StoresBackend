@@ -1,3 +1,5 @@
+const { storeStatusTemplate } = require("../../Emails/emailTemplates");
+const { sendEmail } = require("../../Helpers/EmailSender");
 const { getCounts } = require("../../Helpers/getCounts");
 const { paginate } = require("../../Helpers/pagination");
 const { searchSuggestion } = require("../../Helpers/searchSuggest");
@@ -86,7 +88,7 @@ module.exports = {
 
   toggleStoreStatus: async (req, res) => {
     try {
-      const { status, ids } = req.body;
+      const { status, ids, reason } = req.body;
 
       if (!Array.isArray(ids) || ids.length === 0) {
         return res
@@ -98,6 +100,12 @@ module.exports = {
         return res
           .status(400)
           .json({ message: "Status is required!", success: false });
+      }
+
+      if (status === "suspended" && !reason) {
+        return res
+          .status(400)
+          .json({ message: "Reason is required!", success: false });
       }
 
       const stores = await StoreModal.find({ _id: { $in: ids } });
@@ -112,15 +120,34 @@ module.exports = {
         { $set: { storeStatus: status.toLowerCase() } }
       );
 
-      const updatedStores = await StoreModal.find({ _id: { $in: ids } });
+      const updatedStores = await StoreModal.find({
+        _id: { $in: ids },
+      }).populate("userRef");
 
-      if (!updatedStores || updatedStores.length === 0) {
+      if (!updatedStores || updatedStores?.length === 0) {
         return res
           .status(404)
           .json({ message: "No stores found to update!", success: false });
       }
 
       const counts = await getCounts(StoreModal, "storeStatus");
+
+      const emailPromises = updatedStores.map((store) => {
+        const subject =
+          status === "suspended"
+            ? `Your ${store?.storeName} store Suspended - Immediate Attention Required`
+            : `Your ${store?.storeName} store is Now Active!`;
+
+        return sendEmail(
+          { storeName: "Admin Team", email: "admin@example.com" },
+          store?.userRef?.email,
+          subject,
+          storeStatusTemplate(subject, status, reason, store?.storeName)
+        );
+      });
+
+      // Run in parallel
+      await Promise.all(emailPromises);
 
       return res.status(200).json({
         message: `Store(s) ${status.toLowerCase()} successfully`,
