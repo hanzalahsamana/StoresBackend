@@ -6,19 +6,16 @@ const { ProductModel } = require('../Models/ProductModel');
 const { getValidVariant } = require('../Utils/getValidVariant');
 const { StoreModal } = require('../Models/StoreModal');
 const { getValidCouponDiscount, getValidGlobalDiscount } = require('../Helpers/GetValidDiscount');
+const { verifyCheckoutSessionUtil } = require('../Helpers/VerifyCheckoutSessionUtil');
 
 const placeOrder = async (req, res) => {
-  const { storeId } = req.params;
+  const { storeId, checkoutToken } = req.params;
   const { cartId, customerInfo, paymentInfo, couponCode = null } = req.body;
 
   try {
     const config = await ConfigurationModel.findOne({
       storeRef: storeId,
     }).lean();
-
-    if (!config) {
-      return res.status(404).json({ message: 'Store configuration not found.', success: false });
-    }
 
     const cart = await CartModel.findOne({
       storeRef: storeId,
@@ -29,70 +26,21 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ message: 'Cart is empty or not found.' });
     }
 
-    // 1. ✅ Validate payment method
+    const result = await verifyCheckoutSessionUtil(checkoutToken);
 
-    const isPaymentMethodAvailable = config.paymentMethods.some((m) => m.method === paymentInfo.method && m.isEnabled === true);
-
-    if (!isPaymentMethodAvailable) {
-      return res.status(400).json({ message: 'Payment method not supported.' });
-    }
-
-    // 4. ✅ Fetch cart and populate product details
-    // const cart = await Cart.findById(cartId).populate("items.productId");
-
-    // 5. ✅ Build orderItems & check product availability
     const orderItems = [];
     let totalProductCost = 0;
-
-    for (const product of cart.products) {
-      console.log(cart, 'Cart Data😂😂😂😂');
-
-      const productData = await ProductModel.findOne({ storeRef: storeId, _id: product.productId }).lean();
-
-      if (!productData) {
-        return res.status(400).json({ message: `Product not found with ${product.productId} ID.` });
-      }
-
-      const productDataAccToVariant = getValidVariant(productData, product?.selectedVariant);
-      if (productData?.trackInventory === true) {
-        const maxQty = productDataAccToVariant?.stock ?? 0;
-
-        if (!maxQty) {
-          return res.status(400).json({ message: `Stock not available for ${product.name}` });
-        }
-
-        if (maxQty < product.quantity) {
-          return res.status(400).json({
-            message: `Only ${maxQty} item(s) available for ${product.name}`,
-          });
-        }
-      }
-
-      // Update subtotal
-      const itemTotal = productDataAccToVariant.price * product.quantity;
-      totalProductCost += itemTotal;
-
-      // Build order item
-      orderItems.push({
-        productId: product.productId,
-        name: productData.name,
-        quantity: product.quantity,
-        selectedVariant: product.selectedVariant,
-        image: productDataAccToVariant.image,
-        price: productDataAccToVariant.price,
-      });
-    }
 
     // 2. ✅ Validate discount (optional)
     const globalDiscount = getValidGlobalDiscount({ discounts: config?.discounts, totalAmount: totalProductCost });
     const couponDiscount = couponCode
       ? await getValidCouponDiscount({
-        email: customerInfo.email,
-        storeId,
-        couponCode,
-        allDiscounts: config?.discounts,
-        totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
-      })
+          email: customerInfo.email,
+          storeId,
+          couponCode,
+          allDiscounts: config?.discounts,
+          totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
+        })
       : null;
 
     // 3. ✅ Get tax & shipping from Configuration model
@@ -260,12 +208,12 @@ const cancelOrder = async (req, res) => {
     const globalDiscount = getValidGlobalDiscount({ discounts: config?.discounts, totalAmount: totalProductCost });
     const couponDiscount = couponCode
       ? await getValidCouponDiscount({
-        email: customerInfo.email,
-        storeId,
-        couponCode,
-        allDiscounts: config?.discounts,
-        totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
-      })
+          email: customerInfo.email,
+          storeId,
+          couponCode,
+          allDiscounts: config?.discounts,
+          totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
+        })
       : null;
 
     const subTotal = totalProductCost - ((globalDiscount?.discountAmount || 0) + (couponDiscount?.discountAmount || 0));
@@ -276,7 +224,6 @@ const cancelOrder = async (req, res) => {
     const shipping = config?.shipping || 120;
 
     const totalAmount = subTotal + tax + shipping;
-
 
     const store = await StoreModal.findOneAndUpdate({ _id: storeId }, { $inc: { orderCounter: 1 } }, { new: true });
     const orderNumber = `#${store.orderCounter.toString().padStart(6, '0')}`;
@@ -401,4 +348,4 @@ const editOrderData = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, getOrders, editOrderData ,cancelOrder };
+module.exports = { placeOrder, getOrders, editOrderData, cancelOrder };

@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { v4: uuidv4 } = require("uuid");
+const { v4: uuidv4 } = require('uuid');
 
 const CartSchema = new Schema(
   {
@@ -17,15 +17,15 @@ const CartSchema = new Schema(
         },
         selectedVariant: {
           type: Object,
-          default: {},
+          default: null,
         },
       },
     ],
-    storeRef: { type: Schema.Types.ObjectId, ref: "Store", required: true },
+    storeRef: { type: Schema.Types.ObjectId, ref: 'Store', required: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-const CartModel = mongoose.model("Cart", CartSchema);
+const CartModel = mongoose.model('Cart', CartSchema);
 
 module.exports = { CartModel };

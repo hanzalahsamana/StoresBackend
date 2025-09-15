@@ -13,7 +13,7 @@ const orderItemSchema = new mongoose.Schema(
     image: { type: String },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    selectedVariant: { type: Object }, // Add if variants exist (e.g. size, color)
+    selectedVariant: { type: Object },
   },
   { _id: false }
 );
@@ -38,10 +38,11 @@ const paymentInfoSchema = new mongoose.Schema(
     method: {
       type: String,
       required: true,
+      enum: ['cod', 'account']
     },
     status: {
       type: String,
-      enum: ['unpaid', 'paid', 'failed', 'refunded'],
+      enum: ['unpaid', 'paid', 'pending', 'failed'],
       default: 'unpaid',
     },
     transactionId: {
@@ -75,23 +76,20 @@ const OrderSchema = new mongoose.Schema(
     discount: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
 
-    trackingInfo: {
-      carrier: { type: String },
-      trackingNumber: { type: String },
-      estimatedDelivery: { type: Date },
-    },
-
     notes: { type: String },
+
     orderNumber: {
       type: String,
       required: true,
       unique: true,
     },
+
     storeRef: {
       type: Schema.Types.ObjectId,
       ref: 'Store',
       required: true,
     },
+    
   },
   {
     timestamps: true,
