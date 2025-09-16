@@ -83,7 +83,29 @@ module.exports = {
 
   subscriptionStatusTemplate: (title, status, reason, storeName) => {
     let bodyHtml = "";
-    if (status === "Cancel") {
+    if (status === "cancelled_due_to_expiry") {
+      bodyHtml = `
+     <div style="font-family: Arial, sans-serif; max-width: 600px; padding:10px 0px; margin: 0px auto; background: #fff;">
+       <h2 style="color: #dc3545;">Your Subscription Has Ended</h2>
+       <p style="font-size: 15px; color: #555;">
+         Your subscription for <strong>${storeName}</strong> has reached the end of its billing period.
+       </p>
+       <div style="background-color:#fff8e1; border:1px solid #ffe58f; padding:15px; border-radius:8px; margin:20px 0;">
+         <p style="margin:0; font-size:15px; color:#ad6800;">
+           To keep your store running without interruptions, please renew your subscription by making the payment.
+         </p>
+       </div>
+       <p style="font-size: 14px; color: #555;">
+         Renew now to regain full access to your dashboard and keep your store live.
+       </p>
+       <div style="padding: 20px 0px 0px 0px;">
+         <a href="https://yourdomain.com/billing" style="background-color:#28a745; color:#fff; padding:12px 20px; text-decoration:none; border-radius:6px; font-weight:bold;">
+           Renew Subscription
+         </a>
+       </div>
+     </div>
+   `;
+    } else if (status === "Cancel") {
       bodyHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; padding:10px 0px; margin: 0px auto; background: #fff;">
         <h2 style="color: #dc3545;">Subscription Cancelled</h2>

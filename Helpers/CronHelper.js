@@ -23,7 +23,7 @@ function scheduleCronJob(cronTime, jobFunction, jobName = "Unnamed Job") {
       },
       {
         scheduled: true,
-        timezone: "Asia/Karachi", // ✅ set your timezone
+        timezone: "Asia/Karachi",
       }
     );
 
