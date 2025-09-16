@@ -161,7 +161,6 @@ const { uploadSingle } = require("../Helpers/s3Uploader");
 const { getHomePageData } = require("../Controller/pages/homePage");
 
 // Controllers - Analytics / Contact
-const { getAnalyticsData } = require("../Controller/analytics");
 const { postConatctForm, getContactedUsers } = require("../Controller/Contact");
 const {
   saveDraft,
@@ -174,7 +173,7 @@ const {
 } = require("../Controller/Theme/Builder");
 const { getMenuLinks } = require("../Controller/Suggestions/menuLinks");
 const {
-  getAnalyticsData: getDashboardData,
+  getDashboardData,
 } = require("../Controller/pages/analytics");
 const superAdminChecker = require("../Middleware/superAdminChecker");
 const {
@@ -202,6 +201,8 @@ const {
   validateEmailTemplate,
 } = require("../Middleware/ValidationsMiddleware/emailValidate");
 const { emailSender } = require("../Controller/pages/email");
+const { getAnalyticsData } = require('../Controller/analytics');
+const { addCustomDomain, checkDomainStatus, deleteCustomDomain } = require('../Controller/CustomDomain');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -419,6 +420,10 @@ withParams.post("/addDomainDns", handleDomainRequest);
 withParams.post("/genrateSSl", automateDomainSetup);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
 withoutParams.get("/getStoreByDomain", getStoreByDomain);
+
+withParams.post('/addCustomDomain', tokenChecker, validOwnerChecker, addCustomDomain);
+withParams.get('/checkDomainStatus', tokenChecker, validOwnerChecker, checkDomainStatus);
+withParams.delete('/deleteCustomDomain', tokenChecker, validOwnerChecker, deleteCustomDomain);
 
 // --- DISCOUNT ROUTES ---
 withParams.post(

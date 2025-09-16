@@ -5,7 +5,7 @@ const { SubscriptionModel } = require("../../Models/subscriptionmodel");
 const { UserModal } = require("../../Models/userModal");
 
 module.exports = {
-  getAnalyticsData: async (req, res) => {
+  getDashboardData: async (req, res) => {
     try {
       const [users, activeStores, suspendedStores, activeSubscriptions] =
         await Promise.all([
