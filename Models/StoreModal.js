@@ -47,6 +47,13 @@ const StoreSchema = new Schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      default: null,
+    },
+    metaTitle: { type: String },
+    metaDescription: { type: String },
+    metaImage: { type: String },
     refferals: {
       type: Number,
       default: 0,

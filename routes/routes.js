@@ -172,9 +172,7 @@ const {
   discardDraft,
 } = require("../Controller/Theme/Builder");
 const { getMenuLinks } = require("../Controller/Suggestions/menuLinks");
-const {
-  getDashboardData,
-} = require("../Controller/pages/analytics");
+const { getDashboardData } = require("../Controller/pages/analytics");
 const superAdminChecker = require("../Middleware/superAdminChecker");
 const {
   getUsers,
@@ -201,8 +199,13 @@ const {
   validateEmailTemplate,
 } = require("../Middleware/ValidationsMiddleware/emailValidate");
 const { emailSender } = require("../Controller/pages/email");
-const { getAnalyticsData } = require('../Controller/analytics');
-const { addCustomDomain, checkDomainStatus, deleteCustomDomain } = require('../Controller/CustomDomain');
+const { getAnalyticsData } = require("../Controller/analytics");
+const {
+  addCustomDomain,
+  checkDomainStatus,
+  deleteCustomDomain,
+} = require("../Controller/CustomDomain");
+const { getSitemapData } = require("../Controller/sitemap");
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -421,9 +424,24 @@ withParams.post("/genrateSSl", automateDomainSetup);
 withParams.delete("/deleteDomain", removeDomainFromDatabase);
 withoutParams.get("/getStoreByDomain", getStoreByDomain);
 
-withParams.post('/addCustomDomain', tokenChecker, validOwnerChecker, addCustomDomain);
-withParams.get('/checkDomainStatus', tokenChecker, validOwnerChecker, checkDomainStatus);
-withParams.delete('/deleteCustomDomain', tokenChecker, validOwnerChecker, deleteCustomDomain);
+withParams.post(
+  "/addCustomDomain",
+  tokenChecker,
+  validOwnerChecker,
+  addCustomDomain
+);
+withParams.get(
+  "/checkDomainStatus",
+  tokenChecker,
+  validOwnerChecker,
+  checkDomainStatus
+);
+withParams.delete(
+  "/deleteCustomDomain",
+  tokenChecker,
+  validOwnerChecker,
+  deleteCustomDomain
+);
 
 // --- DISCOUNT ROUTES ---
 withParams.post(
@@ -587,6 +605,7 @@ withParams.put(
   validOwnerChecker,
   updateReferralModal
 );
+withParams.get("/data/sitemap", getSitemapData);
 module.exports = {
   withParams,
   withoutParams,

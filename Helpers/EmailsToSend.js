@@ -6,7 +6,7 @@ const {
   generateOrderConfirmTemplate,
   generateOTPVerificationTemplate,
 } = require("./EmailHtmlTemplate");
-const sendEmail = require("./EmailSender");
+const { sendEmail } = require("./EmailSender");
 
 const AdminPanel = {
   email: "hanzalahsamana789@gmail.com",

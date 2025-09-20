@@ -59,7 +59,7 @@ module.exports = {
       });
 
       const counts = await getCounts(UserModal, "status", {
-        role: { $ne: "superAdmin" },
+        role: "admin",
       });
 
       return res
