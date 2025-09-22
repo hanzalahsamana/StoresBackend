@@ -6,9 +6,19 @@ const CheckoutSchema = new mongoose.Schema(
     token: { type: String, required: true, unique: true }, // UUID or JWT
     cartItems: [
       {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-        variantSku: { type: String },
-        quantity: { type: Number, required: true },
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        selectedVariant: {
+          type: Object,
+          default: null,
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+          min: 1,
+        },
       },
     ],
     storeRef: { type: mongoose.Schema.Types.ObjectId, ref: 'Store', required: true },

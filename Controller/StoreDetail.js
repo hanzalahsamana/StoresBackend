@@ -9,11 +9,11 @@ const generateStore = async (req, res) => {
   const { storeName, storeType, subDomain } = req.body;
 
   try {
-    const isSubDomainExist = await StoreModal.findOne({ subDomain });
+    // const isSubDomainExist = await StoreModal.findOne({ subDomain });
 
-    if (isSubDomainExist) {
-      return res.status(400).json({ message: "Sub domain already exists!", success: false });
-    }
+    // if (isSubDomainExist) {
+    //   return res.status(400).json({ message: "Sub domain already exists!", success: false });
+    // }
 
     const newStore = new StoreModal({
       storeName,
@@ -22,7 +22,7 @@ const generateStore = async (req, res) => {
       userRef: userId,
     });
     const savedStore = await newStore.save();
-    await SeedDefaultData(savedStore?._id);
+    // await SeedDefaultData(savedStore?._id);
     return res.status(201).json({
       success: true,
       data: savedStore,

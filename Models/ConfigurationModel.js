@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 /* ========== Variation Schema ========== */
@@ -12,16 +12,13 @@ const VariationSchema = new Schema({
         validator: function (options) {
           return options.length > 0;
         },
-        message: "At least one option is required.",
+        message: 'At least one option is required.',
       },
       {
         validator: function (options) {
-          return (
-            new Set(options.map((o) => o.trim().toLowerCase())).size ===
-            options.length
-          );
+          return new Set(options.map((o) => o.trim().toLowerCase())).size === options.length;
         },
-        message: "Options must be unique.",
+        message: 'Options must be unique.',
       },
     ],
   },
@@ -35,17 +32,17 @@ const DiscountSchema = new Schema({
   name: { type: String, required: true },
   discountType: {
     type: String,
-    enum: ["coupon", "global"],
+    enum: ['coupon', 'global'],
     required: true,
   },
   access: {
     type: String,
-    enum: ["all", "subscription"],
-    default: "all",
+    enum: ['all', 'subscription'],
+    default: 'all',
   },
   amountType: {
     type: String,
-    enum: ["fixed", "percent"],
+    enum: ['fixed', 'percent'],
     required: true,
   },
   amount: { type: Number, required: true },
@@ -58,7 +55,8 @@ const DiscountSchema = new Schema({
   },
   usageLimit: { type: Number, default: null },
   usagePerUser: { type: Number, default: null },
-  headline: { type: String, default: "" },
+  usedBy: { type: Number, default: 0 },
+  headline: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -66,7 +64,7 @@ const DiscountSchema = new Schema({
 /* ========== Payment Method Schema ========== */
 const PaymentMethodSchema = new Schema({
   method: { type: String, required: true }, // e.g. "jazzcash", "easypaisa"
-  label: { type: String, required: true, default: "Online Payment" },
+  label: { type: String, required: true, default: 'Online Payment' },
   isEnabled: { type: Boolean, default: false },
   credentials: {
     type: Map,
@@ -80,7 +78,7 @@ const ConfigurationSchema = new Schema(
   {
     storeRef: {
       type: Schema.Types.ObjectId,
-      ref: "Store",
+      ref: 'Store',
       required: true,
       unique: true,
     },
@@ -109,9 +107,9 @@ const ConfigurationSchema = new Schema(
     },
   },
   {
-    timestamps: true,
-  },
+    timesmps: true,
+  }
 );
 
-const ConfigurationModel = mongoose.model("Configuration", ConfigurationSchema);
+const ConfigurationModel = mongoose.model('Configuration', ConfigurationSchema);
 module.exports = { ConfigurationModel };
