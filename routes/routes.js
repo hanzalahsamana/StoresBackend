@@ -205,7 +205,8 @@ const {
   checkDomainStatus,
   deleteCustomDomain,
 } = require("../Controller/CustomDomain");
-const { getSitemapData } = require("../Controller/sitemap");
+const { getSitemapData } = require("../Controller/SEO/sitemap");
+const { getRobotsTxt } = require("../Controller/SEO/robots");
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -605,7 +606,8 @@ withParams.put(
   validOwnerChecker,
   updateReferralModal
 );
-withParams.get("/data/sitemap", getSitemapData);
+withParams.get("/data/sitemap/xml", getSitemapData);
+withParams.get("/data/robots/txt", getRobotsTxt);
 module.exports = {
   withParams,
   withoutParams,
