@@ -1,6 +1,5 @@
 // utils/createCheckoutSession.js
 const { v4: uuidv4 } = require('uuid');
-const { validateCartProducts } = require('./validateCartProducts');
 const { CheckoutModel } = require('../Models/CheckoutModel');
 
 async function createCheckoutSession({ cartItems, storeRef }) {
