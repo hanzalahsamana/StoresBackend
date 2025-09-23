@@ -42,13 +42,11 @@ const generateStore = async (req, res) => {
   const { storeName, storeType, subDomain, referralCode } = req.body;
 
   try {
-    const isSubDomainExist = await StoreModal.findOne({ subDomain });
+    // const isSubDomainExist = await StoreModal.findOne({ subDomain });
 
-    if (isSubDomainExist) {
-      return res
-        .status(400)
-        .json({ message: "Sub domain already exists!", success: false });
-    }
+    // if (isSubDomainExist) {
+    //   return res.status(400).json({ message: "Sub domain already exists!", success: false });
+    // }
 
     if (referralCode) {
       const referredStore = await StoreModal.findOne({

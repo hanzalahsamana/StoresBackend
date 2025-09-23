@@ -22,8 +22,8 @@ const addressSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
+    email: { type: String, required: false },
+    phone: { type: String, required: false },
     country: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String },
@@ -38,7 +38,7 @@ const paymentInfoSchema = new mongoose.Schema(
     method: {
       type: String,
       required: true,
-      enum: ['cod', 'account']
+      enum: ['cod', 'account'],
     },
     status: {
       type: String,
@@ -49,6 +49,10 @@ const paymentInfoSchema = new mongoose.Schema(
       type: String,
       required: true,
       default: uuidv4,
+    },
+    recipt: {
+      type: String,
+      default: '',
     },
   },
   { _id: false }
@@ -74,6 +78,8 @@ const OrderSchema = new mongoose.Schema(
     tax: { type: Number, default: 0 },
     shipping: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
+    globalDiscount: { type: Object, default: null },
+    couponDiscount: { type: Object, default: null },
     totalAmount: { type: Number, required: true },
 
     notes: { type: String },
@@ -89,7 +95,6 @@ const OrderSchema = new mongoose.Schema(
       ref: 'Store',
       required: true,
     },
-    
   },
   {
     timestamps: true,

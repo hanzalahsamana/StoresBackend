@@ -41,6 +41,7 @@ const ProductSchema = new Schema(
     pronouce: { type: String, default: "piece" },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
     slug: { type: String, required: true },
+        totalSold: { type: Number, default: 0 },
     description: { type: String },
     metaTitle: { type: String },
     metaDescription: { type: String },
@@ -50,7 +51,7 @@ const ProductSchema = new Schema(
     collections: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Collection",
+        ref: 'Collection',
       },
     ],
     ratings: {
@@ -78,7 +79,7 @@ const ProductSchema = new Schema(
     },
     storeRef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Store",
+      ref: 'Store',
       required: true,
     },
   },

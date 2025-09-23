@@ -4,7 +4,6 @@ const { OrderModel } = require('../Models/OrderModal');
 const { ConfigurationModel } = require('../Models/ConfigurationModel');
 const { SubscriberModel } = require('../Models/SubscriberModal');
 
-
 const getValidCouponDiscount = async ({ storeId, email, couponCode, totalAmount, allDiscounts }) => {
   if (!couponCode) throw { status: 400, message: 'Coupon code is required.' };
   if (totalAmount === undefined || isNaN(Number(totalAmount))) {
@@ -62,12 +61,10 @@ const getValidCouponDiscount = async ({ storeId, email, couponCode, totalAmount,
 
   return {
     success: true,
-    discount: {
-      amountType: discount.amountType,
-      amount: discount.amount,
-      discountAmount,
-      name: discount.name,
-    },
+    amountType: discount.amountType,
+    amount: discount.amount,
+    discountAmount,
+    name: discount.name,
   };
 };
 

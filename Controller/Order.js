@@ -7,6 +7,7 @@ const { getValidVariant } = require('../Utils/getValidVariant');
 const { StoreModal } = require('../Models/StoreModal');
 const { getValidCouponDiscount, getValidGlobalDiscount } = require('../Helpers/GetValidDiscount');
 const { verifyCheckoutSessionUtil } = require('../Helpers/VerifyCheckoutSessionUtil');
+const { applyOrderUpdates } = require('../Helpers/EnrichedAndValidateProducts');
 
 const placeOrder = async (req, res) => {
   const { storeId, checkoutToken } = req.params;
@@ -17,39 +18,38 @@ const placeOrder = async (req, res) => {
       storeRef: storeId,
     }).lean();
 
-    const cart = await CartModel.findOne({
-      storeRef: storeId,
-      _id: cartId,
-    }).lean();
-
-    if (!cart || cart.products?.length === 0) {
-      return res.status(400).json({ message: 'Cart is empty or not found.' });
+    const result = await verifyCheckoutSessionUtil(checkoutToken);
+    if (!result?.success) {
+      return res.status(result.statusCode).json(result);
     }
 
-    const result = await verifyCheckoutSessionUtil(checkoutToken);
+    const orderItems = result?.cartItems;
 
-    const orderItems = [];
     let totalProductCost = 0;
+
+    orderItems.forEach((item) => {
+      totalProductCost += item?.price * item?.quantity;
+    });
 
     // 2. ✅ Validate discount (optional)
     const globalDiscount = getValidGlobalDiscount({ discounts: config?.discounts, totalAmount: totalProductCost });
-    const couponDiscount = couponCode
-      ? await getValidCouponDiscount({
-          email: customerInfo.email,
-          storeId,
-          couponCode,
-          allDiscounts: config?.discounts,
-          totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
-        })
-      : null;
+    const couponDiscount =
+      couponCode &&
+      (await getValidCouponDiscount({
+        email: customerInfo.email,
+        storeId,
+        couponCode,
+        allDiscounts: config?.discounts,
+        totalAmount: totalProductCost - (globalDiscount?.discountAmount || 0),
+      }));
 
     // 3. ✅ Get tax & shipping from Configuration model
     const subTotal = totalProductCost - ((globalDiscount?.discountAmount || 0) + (couponDiscount?.discountAmount || 0));
     if (subTotal < 0) {
       return res.status(400).json({ message: 'Total amount cannot be negative after discounts.' });
     }
-    const tax = config?.tax || 200;
-    const shipping = config?.shipping || 120;
+    const tax = config?.tax || 0;
+    const shipping = config?.shipping || 0;
 
     // 6. ✅ Calculate total
     const totalAmount = subTotal + tax + shipping;
@@ -79,56 +79,9 @@ const placeOrder = async (req, res) => {
       storeRef: storeId,
     });
 
-    for (const product of cart.products) {
-      const productData = await ProductModel.findOne({ storeRef: storeId, _id: product.productId }).lean();
+    await applyOrderUpdates(orderItems, [globalDiscount?.name, couponDiscount?.name].filter(Boolean), storeId);
 
-      if (productData?.trackInventory === true) {
-        for (const item of orderItems) {
-          const { productId, selectedVariant, quantity } = item;
-
-          if (selectedVariant && Object.keys(selectedVariant).length > 0) {
-            // Case: Variant selected — update specific variant stock + global stock
-            await ProductModel.updateOne(
-              {
-                _id: productId,
-                'variants.options': selectedVariant,
-              },
-              {
-                $inc: {
-                  'variants.$.stock': -quantity,
-                  stock: -quantity,
-                },
-              }
-            );
-          } else {
-            // Case: No variant — update only global stock
-            await ProductModel.updateOne(
-              { _id: productId },
-              {
-                $inc: { stock: -quantity },
-              }
-            );
-          }
-        }
-      }
-    }
-    // 9. ✅ Optionally create customer record
-    // const existingCustomer = await CustomerModel.findOne({
-    //   storeRef: storeId,
-    //   email: customerInfo.email,
-    // });
-
-    // if (!existingCustomer) {
-    //   await CustomerModel.create({
-    //     storeRef: storeId,
-    //     ...customerInfo,
-    //   });
-    // }
-
-    // 10. ✅ If COD, trigger email
-    // if (paymentInfo.method === 'cod') {
-    //   await sendOrderConfirmationEmail(customerInfo.email, newOrder);
-    // }
+    // await sendOrderConfirmationEmail(customerInfo.email, newOrder);
 
     return res.status(201).json(newOrder);
   } catch (err) {
@@ -247,7 +200,7 @@ const cancelOrder = async (req, res) => {
       storeRef: storeId,
     });
 
-    for (const product of cart.products) {
+    for (const product of orderItems) {
       const productData = await ProductModel.findOne({ storeRef: storeId, _id: product.productId }).lean();
 
       if (productData?.trackInventory === true) {
@@ -289,15 +242,15 @@ const cancelOrder = async (req, res) => {
 
 // get orders
 const getOrders = async (req, res) => {
-  const type = req.collectionType;
-  const orderId = req.query.orderId;
+  const { storeId } = req.params;
+  const { orderId } = req.query;
   if (orderId) {
     if (!mongoose.isValidObjectId(orderId)) {
       return res.status(400).json({ message: 'Invalid id OR id is not defined' });
     }
   }
   try {
-    const OrderModel = mongoose.model(type + '_Orders', orderSchema, type + '_Orders');
+
     if (!orderId) {
       const orderData = await OrderModel.find({});
       return res.status(201).json(orderData);

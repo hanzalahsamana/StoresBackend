@@ -1,5 +1,6 @@
 const { isEqual } = require('lodash');
 const { ProductModel } = require('../Models/ProductModel');
+const { ConfigurationModel } = require('../Models/ConfigurationModel');
 
 const enrichedAndValidateProducts = async (products) => {
   const enrichedProducts = await Promise.all(
@@ -24,7 +25,17 @@ const enrichedAndValidateProducts = async (products) => {
           return { success: false, code: 'Variant_Required', message: 'Variant selection is required' };
         }
 
-        // check if each selected key & value is valid
+        // Get list of valid variation names
+        const validVariationNames = product.variations.map((v) => v.name);
+
+        // ✅ Check for extra / invalid keys
+        for (const key of Object.keys(item.selectedVariant)) {
+          if (!validVariationNames.includes(key)) {
+            return { success: false, code: 'Variant_Invalid', message: `${key} is not a valid variation` };
+          }
+        }
+
+        // ✅ Check each variation for missing/invalid values
         for (const variation of product.variations) {
           const selectedValue = item.selectedVariant[variation.name];
           if (!selectedValue) {
@@ -48,13 +59,11 @@ const enrichedAndValidateProducts = async (products) => {
           return isEqual(variantOptions, item.selectedVariant || {});
         });
 
-        if (!matchedVariant) {
-          return { success: false, code: 'Variant_Not_Available', message: 'Selected variant not available' };
+        if (matchedVariant) {
+          finalPrice = matchedVariant.price ?? product?.price;
+          finalStock = matchedVariant.stock ?? product.stock;
+          finalImage = matchedVariant.image || product.displayImage;
         }
-
-        finalPrice = matchedVariant.price;
-        finalStock = matchedVariant.stock;
-        finalImage = matchedVariant.image || product.displayImage;
       }
 
       // ✅ STEP 3: Stock validation
@@ -82,33 +91,45 @@ const enrichedAndValidateProducts = async (products) => {
   return enrichedProducts;
 };
 
-const updateProductStock = async (cartProducts) => {
-  for (const item of cartProducts) {
+const applyOrderUpdates = async (orderedProducts, appliedDiscounts , storeRef) => {
+  for (const item of orderedProducts) {
     const product = await ProductModel.findById(item.productId);
 
-    if (!product) continue; // product deleted after checkout
+    if (!product) continue;
+    let variantMatched = false;
 
-    // ✅ CASE 1: If product has variants and matched variant
     if (Array.isArray(product.variants) && product.variants.length > 0 && item.selectedVariant) {
       const matchedVariant = product.variants.find((variant) => {
         const variantOptions = variant.options instanceof Map ? Object.fromEntries(variant.options) : variant.options;
-        return _.isEqual(variantOptions, item.selectedVariant);
+        return isEqual(variantOptions, item.selectedVariant);
       });
 
-      if (matchedVariant) {
-        // Deduct from variant stock
-        matchedVariant.stock = Math.max(0, matchedVariant.stock - item.quantity);
+      if (matchedVariant && product.trackInventory) {
+        matchedVariant.stock = Math.max(0, (matchedVariant.stock || 0) - item.quantity);
+        variantMatched = true;
       }
     }
 
-    // ✅ Deduct from global product stock
     if (product.trackInventory) {
       product.stock = Math.max(0, (product.stock || 0) - item.quantity);
     }
 
+    product.totalSold = (product.totalSold || 0) + item.quantity;
+
     await product.save();
+
+    if (Array.isArray(appliedDiscounts) && appliedDiscounts.length > 0 && storeRef) {
+      for (const discountName of appliedDiscounts) {
+        await ConfigurationModel.updateOne(
+          { storeRef, 'discounts.name': discountName, 'discounts.isActive': true },
+          {
+            $inc: { 'discounts.$.usedBy': 1 },
+            $set: { 'discounts.$.updatedAt': new Date() },
+          }
+        );
+      }
+    }
   }
 };
 
-
-module.exports = { enrichedAndValidateProducts , updateProductStock };
+module.exports = { enrichedAndValidateProducts, applyOrderUpdates };

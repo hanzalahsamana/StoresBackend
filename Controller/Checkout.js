@@ -34,13 +34,14 @@ const startCheckout = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No cart data provided' });
     }
 
-    const validatedProducts = await enrichedAndValidateProducts(cart.products);
+    const validatedProducts = await enrichedAndValidateProducts(products);
 
     const errors = [];
     const cleanedProducts = [];
+    const checkoutItems = [];
 
     validatedProducts.forEach((p, idx) => {
-      const originalProduct = cart.products[idx];
+      const originalProduct = products[idx];
 
       if (!p.success) {
         if (p.code === 'Product_Not_Found') {
@@ -54,19 +55,25 @@ const startCheckout = async (req, res) => {
             message: `We have decreased the quantity of product because only ${p.availableStock} are in stock.`,
           });
 
-          cleanedProducts.push({
+          cleanedProducts.push(p);
+          checkoutItems.push({
             ...originalProduct,
             quantity: p.availableStock,
           });
         }
       } else {
-        cleanedProducts.push(originalProduct);
+        console.log(originalProduct);
+
+        cleanedProducts.push(p);
+        checkoutItems.push(originalProduct);
       }
     });
 
-    // ✅ Create checkout session
+    if (!cleanedProducts?.length || !checkoutItems.length) {
+      throw new Error('No valid items available for checkout.');
+    }
     const checkout = await createCheckoutSession({
-      cartItems: cleanedProducts,
+      cartItems: checkoutItems,
       storeRef: storeId,
     });
 
