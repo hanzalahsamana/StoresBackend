@@ -23,7 +23,7 @@ const ValidStoreChecker = require('../Middleware/ValidStoreChecker');
 const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle, editPassword, deleteAccount } = require('../Controller/user');
 
 // Controllers - Store
-const { generateStore, getAllStores, getStore, editStore, deleteStore } = require('../Controller/StoreDetail');
+const { generateStore, getAllStores, getStore, editStore, deleteStore, editStoreAppearance } = require('../Controller/StoreDetail');
 
 // Controllers - Product
 const { addProduct, deleteProduct, editProduct, getProducts, productSearchSuggestion } = require('../Controller/Product');
@@ -107,6 +107,7 @@ withoutParams.get('/getUserFromToken', tokenChecker, getUserFromToken);
 withoutParams.get('/getAllStores', tokenChecker, getAllStores);
 withoutParams.post('/generateStore', tokenChecker, generateStoreValidation, generateStore);
 withParams.get('/getStore', ValidStoreChecker, getStore);
+withParams.post('/editStoreAppearance', tokenChecker, validOwnerChecker, editStoreAppearance);
 withParams.put('/edit/store', tokenChecker, validOwnerChecker, editStoreValidation, editStore);
 withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
 
