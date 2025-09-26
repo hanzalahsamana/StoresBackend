@@ -1,6 +1,7 @@
-const Joi = require('joi');
-const JoiObjectId = require('joi-objectid')(Joi);
-const { CollectionModel } = require('../../Models/CollectionModel');
+const Joi = require("joi");
+const JoiObjectId = require("joi-objectid")(Joi);
+const { CollectionModel } = require("../../Models/CollectionModel");
+const { ProductModel } = require("../../Models/ProductModel");
 
 // 🧠 Helper: Validate variants against variations
 const validateVariantsAgainstVariations = (variants, helpers) => {
@@ -15,12 +16,12 @@ const validateVariantsAgainstVariations = (variants, helpers) => {
     const keys = Object.keys(variant.options || {});
     for (const key of keys) {
       if (!variationMap[key]) {
-        return helpers.error('any.invalid', {
+        return helpers.error("any.invalid", {
           message: `Variant option key "${key}" is not defined in variations.`,
         });
       }
       if (!variationMap[key].includes(variant.options[key])) {
-        return helpers.error('any.invalid', {
+        return helpers.error("any.invalid", {
           message: `Variant option "${variant.options[key]}" is not valid for "${key}".`,
         });
       }
@@ -33,12 +34,12 @@ const validateVariantsAgainstVariations = (variants, helpers) => {
 // ✅ Joi Schema: Add Product
 const addProductValidationSchema = Joi.object({
   name: Joi.string().required(),
-  pronounce: Joi.string().allow('').optional(),
-  vendor: Joi.string().allow('').optional(),
+  pronounce: Joi.string().allow("").optional(),
+  vendor: Joi.string().allow("").optional(),
   price: Joi.number().required(),
   comparedAtPrice: Joi.number().optional(),
-  displayImage: Joi.string().uri().allow('').optional(),
-  gallery: Joi.array().items(Joi.string().uri().allow('')).optional(),
+  displayImage: Joi.string().uri().allow("").optional(),
+  gallery: Joi.array().items(Joi.string().uri().allow("")).optional(),
   collections: Joi.array().items(JoiObjectId()).optional(),
   trackInventory: Joi.boolean().default(false).optional(),
 
@@ -48,39 +49,44 @@ const addProductValidationSchema = Joi.object({
     otherwise: Joi.forbidden(),
   }),
 
-  showStockCount: Joi.boolean().when('trackInventory', {
+  showStockCount: Joi.boolean().when("trackInventory", {
     is: true,
     then: Joi.optional(),
     otherwise: Joi.forbidden(),
   }),
   continueSelling: Joi.boolean().default(false).optional(),
-  status: Joi.string().valid('active', 'inactive').optional(),
-  pronouce: Joi.string().allow('').optional(),
+  status: Joi.string().valid("active", "inactive").optional(),
+  pronouce: Joi.string().allow("").optional(),
   wantsCustomerReview: Joi.boolean().optional(),
-  description: Joi.string().allow('').optional(),
-  metaTitle: Joi.string().allow('').optional(),
-  metaDescription: Joi.string().allow('').optional(),
-  note: Joi.string().allow('').optional(),
-
+  description: Joi.string().allow("").optional(),
+  metaTitle: Joi.string().allow("").optional(),
+  metaDescription: Joi.string().allow("").optional(),
+  note: Joi.string().allow("").optional(),
+  relatedProducts: Joi.array()
+    .items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/))
+    .optional(),
   variations: Joi.array()
     .items(
       Joi.object({
+        id: Joi.string().required(),
         name: Joi.string().required(),
         options: Joi.array().items(Joi.string()).min(1).required(),
       })
     )
-    .unique((a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim())
+    .unique(
+      (a, b) => a.name.toLowerCase().trim() === b.name.toLowerCase().trim()
+    )
     .optional(),
 
-  variants: Joi.alternatives().conditional('trackInventory', {
+  variants: Joi.alternatives().conditional("trackInventory", {
     is: true,
     then: Joi.array()
       .items(
         Joi.object({
           sku: Joi.string().required(),
           options: Joi.object().pattern(Joi.string(), Joi.string()).required(),
-          stock: Joi.number().integer().min(0).required(),
-          price: Joi.number().min(0).required(),
+          stock: Joi.number().min(0).allow(null).required(),
+          price: Joi.number().min(0).allow(null).required(),
           image: Joi.string().uri().required(),
         })
       )
@@ -109,7 +115,9 @@ const addProductValidationSchema = Joi.object({
 
 // ✅ Joi Schema: Edit Product = All optional but at least one required
 const editProductValidationSchema = addProductValidationSchema
-  .fork(Object.keys(addProductValidationSchema.describe().keys), (schema) => schema.optional())
+  .fork(Object.keys(addProductValidationSchema.describe().keys), (schema) =>
+    schema.optional()
+  )
   .min(1)
   .required();
 
@@ -119,21 +127,27 @@ const validateProduct = (isEdit = false) => {
     const { storeId } = req.params;
     const productID = req.query.id;
 
+    console.log("req.body", req.body);
+
     // Validate ID for edit
     if (isEdit) {
       if (!productID || JoiObjectId().validate(productID).error) {
-        return res.status(400).json({ message: 'Invalid or missing product ID in query' });
+        return res
+          .status(400)
+          .json({ message: "Invalid or missing product ID in query" });
       }
     }
+    const schema = isEdit
+      ? editProductValidationSchema
+      : addProductValidationSchema;
 
-    const schema = isEdit ? editProductValidationSchema : addProductValidationSchema;
-
-    const { error, value } = schema.validate(req.body, { abortEarly: false });
+    const { error, value } = schema.validate(req.body, {
+      abortEarly: false,
+    });
 
     if (error) {
       return res.status(400).json({
-        message: `Error occuring: ${error.details.map((e) => e.message).join(', ')}`,
-        // message: `Changes Saved`,
+        message: `Error occuring: ${error.details[0]?.message}`,
       });
     }
 
@@ -142,14 +156,16 @@ const validateProduct = (isEdit = false) => {
       const validCollections = await CollectionModel.find({
         _id: { $in: value.collections },
         storeRef: storeId,
-      }).select('_id');
+      }).select("_id");
 
       const validIds = validCollections.map((col) => col._id.toString());
-      const invalidIds = value.collections.filter((id) => !validIds.includes(id.toString()));
+      const invalidIds = value.collections.filter(
+        (id) => !validIds.includes(id.toString())
+      );
 
       if (invalidIds.length > 0) {
         return res.status(400).json({
-          message: `Invalid collection ID(s): ${invalidIds.join(', ')}`,
+          message: `Invalid collection ID(s): ${invalidIds.join(", ")}`,
         });
       }
     }

@@ -63,6 +63,7 @@ const {
   editProduct,
   getProducts,
   productSearchSuggestion,
+  getSingleProduct,
 } = require("../Controller/Product");
 
 // Controllers - Collection
@@ -190,12 +191,27 @@ const {
 const { emailSender } = require("../Controller/pages/email");
 const { getSitemapData } = require("../Controller/SEO/sitemap");
 const { getRobotsTxt } = require("../Controller/SEO/robots");
-const { getAnalyticsData } = require('../Controller/analytics');
-const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
-const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, createPage, discardDraft } = require('../Controller/Theme/Builder');
-const { getMenuLinks } = require('../Controller/Suggestions/menuLinks');
-const { addCustomDomain, checkDomainStatus, deleteCustomDomain } = require('../Controller/CustomDomain');
-const { startCheckout, verifyCheckoutSession } = require('../Controller/Checkout');
+const { getAnalyticsData } = require("../Controller/analytics");
+const { postConatctForm, getContactedUsers } = require("../Controller/Contact");
+const {
+  saveDraft,
+  publishPage,
+  getDraftPage,
+  getPublishPage,
+  getAllPages,
+  createPage,
+  discardDraft,
+} = require("../Controller/Theme/Builder");
+const { getMenuLinks } = require("../Controller/Suggestions/menuLinks");
+const {
+  addCustomDomain,
+  checkDomainStatus,
+  deleteCustomDomain,
+} = require("../Controller/CustomDomain");
+const {
+  startCheckout,
+  verifyCheckoutSession,
+} = require("../Controller/Checkout");
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -247,6 +263,7 @@ withParams.post(
   addProduct
 );
 withParams.get("/getProducts", ValidStoreChecker, getProducts);
+withParams.get("/products/single-product", ValidStoreChecker, getSingleProduct);
 withParams.delete(
   "/deleteProduct",
   tokenChecker,
@@ -337,11 +354,20 @@ withParams.patch(
 );
 
 // --- ORDER ROUTES ---
-withParams.post('/placeOrder/:checkoutToken', ValidStoreChecker, validateOrder, placeOrder);
-withParams.get('/getOrders', ValidStoreChecker, getOrders);
-withParams.put('/editOrder', editOrderData);
-withParams.post('/startCheckout', ValidStoreChecker, startCheckout);
-withParams.get('/verifyCheckoutSession/:checkoutToken', ValidStoreChecker, verifyCheckoutSession);
+withParams.post(
+  "/placeOrder/:checkoutToken",
+  ValidStoreChecker,
+  validateOrder,
+  placeOrder
+);
+withParams.get("/getOrders", ValidStoreChecker, getOrders);
+withParams.put("/editOrder", editOrderData);
+withParams.post("/startCheckout", ValidStoreChecker, startCheckout);
+withParams.get(
+  "/verifyCheckoutSession/:checkoutToken",
+  ValidStoreChecker,
+  verifyCheckoutSession
+);
 
 // --- CART ROUTES ---
 withParams.post("/addToCart", ValidStoreChecker, addToCart);

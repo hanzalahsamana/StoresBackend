@@ -65,26 +65,26 @@ const StoreSchema = new Schema(
 );
 
 // Ensure subdomain uniqueness and validate fields
-StoreSchema.pre("validate", async function (next) {
-  if (this.isModified("subDomain") && this.subDomain) {
-    const baseSlug = this.subDomain
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
+// StoreSchema.pre("validate", async function (next) {
+//   if (this.isModified("subDomain") && this.subDomain) {
+//     const baseSlug = this.subDomain
+//       .trim()
+//       .toLowerCase()
+//       .replace(/\s+/g, "-")
+//       .replace(/[^a-z0-9-]/g, "");
 
-    let slug = baseSlug;
-    let counter = 1;
-    const Store = this.constructor;
+//     let slug = baseSlug;
+//     let counter = 1;
+//     const Store = this.constructor;
 
-    while (await Store.exists({ subDomain: slug })) {
-      slug = `${baseSlug}-${counter++}`;
-    }
+//     while (await Store.exists({ subDomain: slug })) {
+//       slug = `${baseSlug}-${counter++}`;
+//     }
 
-    this.subDomain = slug;
-  }
-  next();
-});
+//     this.subDomain = slug;
+//   }
+//   next();
+// });
 
 const StoreModal = mongoose.model("Store", StoreSchema);
 

@@ -2,30 +2,34 @@ const { required } = require("joi");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const variantSchema = new mongoose.Schema({
-  sku: {
-    type: String,
-    required: true,
+const variantSchema = new mongoose.Schema(
+  {
+    sku: {
+      type: String,
+      required: true,
+    },
+    options: {
+      type: Map,
+      of: String,
+      required: true,
+    },
+    stock: {
+      type: Number || null,
+      required: true,
+      default: null,
+    },
+    price: {
+      type: Number || null,
+      required: true,
+      default: null,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
   },
-  options: {
-    type: Map,
-    of: String,
-    required: true,
-  },
-  stock: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  image: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false }
+);
 
 const ProductSchema = new Schema(
   {
@@ -41,7 +45,7 @@ const ProductSchema = new Schema(
     pronouce: { type: String, default: "piece" },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
     slug: { type: String, required: true },
-        totalSold: { type: Number, default: 0 },
+    totalSold: { type: Number, default: 0 },
     description: { type: String },
     metaTitle: { type: String },
     metaDescription: { type: String },
@@ -51,7 +55,7 @@ const ProductSchema = new Schema(
     collections: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Collection',
+        ref: "Collection",
       },
     ],
     ratings: {
@@ -60,26 +64,31 @@ const ProductSchema = new Schema(
     },
     variations: {
       type: [
-        {
-          name: {
-            type: String,
-            required: true,
+        new mongoose.Schema(
+          {
+            id: { type: String, required: true },
+            name: { type: String, required: true },
+            options: { type: [String], required: true },
           },
-          options: {
-            type: [String],
-            required: true,
-          },
-        },
+          { _id: false }
+        ),
       ],
       default: [],
     },
+
     variants: {
       type: [variantSchema],
       default: [],
     },
+    relatedProducts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
     storeRef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Store',
+      ref: "Store",
       required: true,
     },
   },

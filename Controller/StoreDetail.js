@@ -6,6 +6,7 @@ const { deleteAllData } = require("../Helpers/deleteAllData");
 const { SubscriberModel } = require("../Models/SubscriberModal");
 const { SubscriptionModel } = require("../Models/subscriptionmodel");
 const { generateUniquePromoCode } = require("../Helpers/generatePromoCode");
+const { generateSlug } = require("../Utils/generateSlug");
 
 const addReferralSubscriptionTime = async (referredStore) => {
   if (!referredStore?.subscriptionId) return;
@@ -42,7 +43,11 @@ const generateStore = async (req, res) => {
   const { storeName, storeType, subDomain, referralCode } = req.body;
 
   try {
-    // const isSubDomainExist = await StoreModal.findOne({ subDomain });
+    const uniqueSubDomain = await generateSlug(
+      subDomain,
+      StoreModal,
+      "subDomain"
+    );
 
     // if (isSubDomainExist) {
     //   return res.status(400).json({ message: "Sub domain already exists!", success: false });
@@ -70,7 +75,6 @@ const generateStore = async (req, res) => {
       await addReferralSubscriptionTime(referredStore);
       referredStore.refferals = (referredStore?.refferals || 0) + 1;
       await referredStore.save();
-      
     }
 
     const promoCode = await generateUniquePromoCode(StoreModal);
@@ -78,7 +82,7 @@ const generateStore = async (req, res) => {
     const newStore = new StoreModal({
       storeName,
       storeType,
-      subDomain,
+      subDomain: uniqueSubDomain,
       userRef: userId,
       promoCode,
     });

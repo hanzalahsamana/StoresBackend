@@ -1,47 +1,54 @@
-const { CollectionModel } = require('../Models/CollectionModel');
-const { mongoose } = require('mongoose');
-const { ProductModel } = require('../Models/ProductModel');
-const generateSlug = require('../Utils/generateSlug');
-const { paginate } = require('../Helpers/pagination');
-const { searchSuggestion } = require('../Helpers/searchSuggest');
+const { CollectionModel } = require("../Models/CollectionModel");
+const { mongoose } = require("mongoose");
+const { ProductModel } = require("../Models/ProductModel");
+const { generateSlug } = require("../Utils/generateSlug");
+const { paginate } = require("../Helpers/pagination");
+const { searchSuggestion } = require("../Helpers/searchSuggest");
 
 module.exports = {
   // add category
   addCollection: async (req, res) => {
     const { storeId } = req.params;
     const { name, image, products } = req.body;
+    const uniqueSlug = await generateSlug(name, CollectionModel);
 
     try {
       const newCollection = new CollectionModel({
         name,
         image,
-        slug: generateSlug(name),
+        slug: uniqueSlug,
         storeRef: storeId,
       });
 
       const savedCollection = await newCollection.save();
       if (products && products.length > 0) {
-        await ProductModel.updateMany({ _id: { $in: products }, storeRef: storeId }, { $addToSet: { collections: savedCollection._id } });
+        await ProductModel.updateMany(
+          { _id: { $in: products }, storeRef: storeId },
+          { $addToSet: { collections: savedCollection._id } }
+        );
       }
 
       let savedProducts = [];
-      savedProducts = await ProductModel.find({ _id: { $in: products } }, { _id: 1, name: 1 });
+      savedProducts = await ProductModel.find(
+        { _id: { $in: products } },
+        { _id: 1, name: 1 }
+      );
 
       return res.status(201).json({
         success: true,
         data: { ...savedCollection.toObject?.(), products: savedProducts },
       });
     } catch (error) {
-      console.error('Error adding collection:', error);
+      console.error("Error adding collection:", error);
       if (error.code === 11000) {
         return res.status(400).json({
           success: false,
-          message: 'Collection name already exists.',
+          message: "Collection name already exists.",
         });
       }
       return res.status(500).json({
         success: false,
-        message: 'Internal server error',
+        message: "Internal server error",
         error: error.message,
       });
     }
@@ -58,14 +65,18 @@ module.exports = {
       // Handle multiple collection IDs
       if (collectionIds) {
         const idArray = collectionIds
-          .split(',')
+          .split(",")
           .map((id) => id.trim())
           .filter(Boolean);
 
         // Validate all IDs
-        const invalidIds = idArray.filter((id) => !mongoose.Types.ObjectId.isValid(id));
+        const invalidIds = idArray.filter(
+          (id) => !mongoose.Types.ObjectId.isValid(id)
+        );
         if (invalidIds.length > 0) {
-          return res.status(400).json({ message: `Invalid collection ID(s): ${invalidIds.join(', ')}` });
+          return res.status(400).json({
+            message: `Invalid collection ID(s): ${invalidIds.join(", ")}`,
+          });
         }
 
         const objectIds = idArray.map((id) => new mongoose.Types.ObjectId(id));
@@ -76,10 +87,10 @@ module.exports = {
         { $match: query },
         {
           $lookup: {
-            from: 'products',
-            localField: '_id',
-            foreignField: 'collections',
-            as: 'products',
+            from: "products",
+            localField: "_id",
+            foreignField: "collections",
+            as: "products",
             pipeline: [
               {
                 $project: {
@@ -105,7 +116,9 @@ module.exports = {
 
       return res.status(200).json({ success: true, data, totalData });
     } catch (e) {
-      return res.status(500).json({ message: e.message || 'An error occurred' });
+      return res
+        .status(500)
+        .json({ message: e.message || "An error occurred" });
     }
   },
 
@@ -119,7 +132,7 @@ module.exports = {
       const collection = await CollectionModel.findById(collectionId);
 
       if (!collection) {
-        return res.status(404).json({ message: 'Collection not found' });
+        return res.status(404).json({ message: "Collection not found" });
       }
 
       const updatedProductIds = (products || []).map((p) => p.toString());
@@ -127,22 +140,37 @@ module.exports = {
       const previouslyLinkedProducts = await ProductModel.find({
         collections: collectionId,
         storeRef: storeId,
-      }).select('_id');
+      }).select("_id");
 
-      const previouslyLinkedIds = previouslyLinkedProducts.map((p) => p._id.toString());
+      const previouslyLinkedIds = previouslyLinkedProducts.map((p) =>
+        p._id.toString()
+      );
 
-      const removedProductIds = previouslyLinkedIds.filter((id) => !updatedProductIds.includes(id));
-      const newlyAddedProductIds = updatedProductIds.filter((id) => !previouslyLinkedIds.includes(id));
+      const removedProductIds = previouslyLinkedIds.filter(
+        (id) => !updatedProductIds.includes(id)
+      );
+      const newlyAddedProductIds = updatedProductIds.filter(
+        (id) => !previouslyLinkedIds.includes(id)
+      );
 
       if (removedProductIds.length > 0) {
-        await ProductModel.updateMany({ _id: { $in: removedProductIds }, storeRef: storeId }, { $pull: { collections: collectionId } });
+        await ProductModel.updateMany(
+          { _id: { $in: removedProductIds }, storeRef: storeId },
+          { $pull: { collections: collectionId } }
+        );
       }
 
       if (newlyAddedProductIds.length > 0) {
-        await ProductModel.updateMany({ _id: { $in: newlyAddedProductIds }, storeRef: storeId }, { $addToSet: { collections: collectionId } });
+        await ProductModel.updateMany(
+          { _id: { $in: newlyAddedProductIds }, storeRef: storeId },
+          { $addToSet: { collections: collectionId } }
+        );
       }
       let savedProducts = [];
-      savedProducts = await ProductModel.find({ _id: { $in: [products] } }, { _id: 1, name: 1 });
+      savedProducts = await ProductModel.find(
+        { _id: { $in: [products] } },
+        { _id: 1, name: 1 }
+      );
 
       Object.assign(collection, { name, image, slug: generateSlug(name) });
       const savedCollection = await collection.save();
@@ -162,7 +190,9 @@ module.exports = {
     const collectionId = req.query.collectionId;
 
     if (!mongoose.isValidObjectId(collectionId) || !collectionId) {
-      return res.status(400).json({ message: 'Invalid id OR id is not defined' });
+      return res
+        .status(400)
+        .json({ message: "Invalid id OR id is not defined" });
     }
 
     try {
@@ -173,13 +203,18 @@ module.exports = {
       });
 
       if (deleted.deletedCount === 0) {
-        return res.status(404).json({ message: 'Collection not found' });
+        return res.status(404).json({ message: "Collection not found" });
       }
 
       // Step 2: Remove collection ref from all products
-      await ProductModel.updateMany({ storeRef: storeId, collections: collectionId }, { $pull: { collections: collectionId } });
+      await ProductModel.updateMany(
+        { storeRef: storeId, collections: collectionId },
+        { $pull: { collections: collectionId } }
+      );
 
-      return res.status(200).json({ message: 'Collection Deleted Successfully' });
+      return res
+        .status(200)
+        .json({ message: "Collection Deleted Successfully" });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -194,15 +229,15 @@ module.exports = {
       const results = await searchSuggestion({
         Model: CollectionModel,
         searchTerm: searchQuery,
-        field: 'name',
+        field: "name",
         extraQuery: { storeRef: storeId },
         projection: { _id: 1, name: 1 },
       });
 
       res.status(200).json({ success: true, data: results });
     } catch (err) {
-      console.error('error fetching product suggestion:', err?.message || err);
-      res.status(500).json({ success: false, message: 'Server error' });
+      console.error("error fetching product suggestion:", err?.message || err);
+      res.status(500).json({ success: false, message: "Server error" });
     }
   },
 };
