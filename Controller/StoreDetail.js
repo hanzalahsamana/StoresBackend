@@ -205,6 +205,45 @@ const editStore = async (req, res) => {
   }
 };
 
+const editStoreAppearance = async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    const { branding } = req.body;
+
+    if (!storeId) {
+      return res.status(400).json({ message: "Store ID is required" });
+    }
+
+    // Validate branding.theme if provided
+    if (branding?.theme && !Allowed_Themes.includes(branding.theme)) {
+      return res.status(400).json({
+        message: `Invalid theme. Allowed values: ${Allowed_Themes.join(", ")}`,
+      });
+    }
+
+    const updateData = {};
+    if (branding) updateData.branding = branding;
+
+    const updatedStore = await StoreModal.findByIdAndUpdate(
+      storeId,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedStore) {
+      return res.status(404).json({ message: "Store not found" });
+    }
+
+    res.status(200).json({
+      message: "Store appearance updated successfully",
+      branding: updatedStore?.branding,
+    });
+  } catch (error) {
+    console.error("Error updating store appearance:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 const deleteStore = async (req, res) => {
   try {
     const { storeId } = req.params;
@@ -260,4 +299,5 @@ module.exports = {
   getStore,
   editStore,
   deleteStore,
+  editStoreAppearance,
 };

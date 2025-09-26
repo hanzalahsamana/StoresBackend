@@ -58,6 +58,17 @@ const StoreSchema = new Schema(
       type: Number,
       default: 0,
     },
+    branding: {
+      logo: { type: String, default: null },
+      favicon: { type: String, default: null },
+      description: { type: String, default: "" },
+      font: { type: String, default: "Arial, sans-serif" },
+      theme: {
+        type: String,
+        default: "",
+        enum: ["Light", "Modern Dark", "Milt Blue", "Soft Breeze"],
+      },
+    },
   },
   {
     timestamps: true,
