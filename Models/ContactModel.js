@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const contactSchema = new Schema({
+  storeRef: {
+    type: Schema.Types.ObjectId,
+    ref: "Store",
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -23,4 +28,5 @@ const contactSchema = new Schema({
   },
 });
 
-module.exports = { contactSchema };
+const ContactModel = mongoose.model("contacts", contactSchema);
+module.exports = { ContactModel };

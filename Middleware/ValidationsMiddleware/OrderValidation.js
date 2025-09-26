@@ -2,13 +2,11 @@ const Joi = require("joi");
 const JoiObjectId = require("joi-objectid")(Joi);
 
 const orderValidationSchema = Joi.object({
-  userId: Joi.string().optional(),
-
   customerInfo: Joi.object({
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
-    email: Joi.string().email().required(),
-    phone: Joi.string().required(),
+    email: Joi.string().email().optional(),
+    phone: Joi.string().optional(),
     country: Joi.string().required(),
     city: Joi.string().required(),
     postalCode: Joi.string().optional(),
@@ -16,11 +14,7 @@ const orderValidationSchema = Joi.object({
     apartment: Joi.string().optional(),
   }).required(),
 
-  cartId: JoiObjectId().required(),
-
-  orderStatus: Joi.string()
-    .valid("pending", "processing", "shipped", "delivered", "cancelled")
-    .optional(),
+  couponCode: Joi.string().optional(),
 
   paymentInfo: Joi.object({
     method: Joi.string().required(),
@@ -29,18 +23,6 @@ const orderValidationSchema = Joi.object({
       .optional(),
     transactionId: Joi.string().optional(),
   }).required(),
-
-  // These are now server-calculated, so removed from payload validation
-  // tax: Joi.number().min(0).optional(),
-  // shipping: Joi.number().min(0).optional(),
-  // discount: Joi.number().min(0).optional(),
-  // totalAmount: Joi.number().min(0).required(),
-
-  trackingInfo: Joi.object({
-    carrier: Joi.string().optional(),
-    trackingNumber: Joi.string().optional(),
-    estimatedDelivery: Joi.date().optional(),
-  }).optional(),
 
   notes: Joi.string().optional(),
 });

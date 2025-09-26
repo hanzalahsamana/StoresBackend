@@ -6,18 +6,19 @@ const { paginate } = require("../Helpers/pagination");
 
 const addReview = async (req, res) => {
   const { storeId } = req.params;
-  const { productId } = req.query;
+  const { productSlug } = req.query;
 
   try {
     const product = await ProductModel.findOne({
-      _id: productId,
+      slug: productSlug,
       storeRef: storeId,
     });
 
     if (!product) {
-      return res
-        .status(404)
-        .json({ message: "Product not found for this store" });
+      return res.status(404).json({
+        message: "Product not found for this store OR invalid slug!",
+        success: false,
+      });
     }
 
     if (!product.wantsCustomerReview) {
@@ -28,7 +29,7 @@ const addReview = async (req, res) => {
 
     const existingReview = await ReviewModel.findOne({
       email: req.body.email,
-      productId,
+      productId: product._id,
       storeRef: storeId,
     });
 
@@ -40,7 +41,7 @@ const addReview = async (req, res) => {
 
     const newReview = new ReviewModel({
       ...req.body,
-      productId: productId,
+      productId: product._id,
       storeRef: storeId,
     });
 
@@ -72,8 +73,11 @@ const getReviews = async (req, res) => {
   }
 
   try {
-    // const reviews = await ReviewModel.find(filter);
-    const data = await paginate(ReviewModel, filter, { page, limit, sort: { createdAt: -1 } });
+    const { data, totalData } = await paginate(ReviewModel, filter, {
+      page,
+      limit,
+      sort: { createdAt: -1 },
+    });
 
     if (data.length === 0) {
       return res.status(404).json({
@@ -86,6 +90,7 @@ const getReviews = async (req, res) => {
     return res.status(200).json({
       success: true,
       data,
+      totalData,
     });
   } catch (e) {
     return res.status(500).json({ message: e.message });

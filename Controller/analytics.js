@@ -1,6 +1,11 @@
-const { BetaAnalyticsDataClient } = require("@google-analytics/data");
-const { calculateDateRange } = require("../Utils/CalculateDateRange");
-require("dotenv").config();
+const { BetaAnalyticsDataClient } = require('@google-analytics/data');
+const { calculateDateRange } = require('../Utils/CalculateDateRange');
+const { StoreModal } = require('../Models/StoreModal');
+const { ProductModel } = require('../Models/ProductModel');
+const { OrderModel } = require('../Models/OrderModal');
+const { CartModel } = require('../Models/CartModel');
+const { SubscriberModel } = require('../Models/SubscriberModal');
+require('dotenv').config();
 
 const {
   GOOGLE_CLOUD_PROJECT_ID,
@@ -19,10 +24,10 @@ const {
 // 🎯 Initialize Google Analytics Client
 const analyticsDataClient = new BetaAnalyticsDataClient({
   credentials: {
-    type: "service_account",
+    type: 'service_account',
     project_id: GOOGLE_CLOUD_PROJECT_ID,
     private_key_id: GOOGLE_CLOUD_PRIVATE_KEY_ID,
-    private_key: GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    private_key: GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
     client_email: GOOGLE_CLOUD_CLIENT_EMAIL,
     client_id: GOOGLE_CLOUD_CLIENT_ID,
     auth_uri: GOOGLE_CLOUD_AUTH_URI,
@@ -35,27 +40,14 @@ const analyticsDataClient = new BetaAnalyticsDataClient({
 
 // 🎯 Helper Functions for Formatting Date/Time
 const formatMonth = (monthIndex) => {
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   return months[parseInt(monthIndex, 10) - 1] || monthIndex;
 };
 
 const formatHour = (hourIndex) => {
   const hour = parseInt(hourIndex, 10);
   if (isNaN(hour)) return hourIndex;
-  const period = hour < 12 ? "AM" : "PM";
+  const period = hour < 12 ? 'AM' : 'PM';
   const formattedHour = hour % 12 || 12; // Convert 0 -> 12, 13 -> 1, etc.
   return `${formattedHour} ${period}`;
 };
@@ -63,47 +55,41 @@ const formatHour = (hourIndex) => {
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   if (isNaN(date.getTime())) return dateString; // Return original if invalid
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 };
 
 // 🚀 Get Analytics Data
 const getAnalyticsData = async (req, res) => {
   try {
-    const { dateFilter, siteName = "ModestWardrobe" } = req.query;
+    const { dateFilter } = req.query;
+    const { storeId } = req.params;
+    const store = await StoreModal.findById(storeId);
+    const siteName = store?.storeName;
 
-    if (!PROPERTY_ID) throw new Error("Missing Google Analytics Property ID.");
-    if (!dateFilter) throw new Error("Date filter is required.");
+    if (!PROPERTY_ID) throw new Error('Missing Google Analytics Property ID.');
+    if (!dateFilter) throw new Error('Date filter is required.');
 
-    const { startDate, endDate, timeDimension } =
-      calculateDateRange(dateFilter);
+    const { startDate, endDate, timeDimension } = calculateDateRange(dateFilter);
 
-    console.log(
-      `📊 Fetching analytics for "${siteName}" | Date Range: ${startDate} - ${endDate}`,
-    );
+    console.log(`📊 Fetching analytics for "${siteName}" | Date Range: ${startDate} - ${endDate}`);
 
     const [response] = await analyticsDataClient.runReport({
       property: `properties/${PROPERTY_ID}`,
       dateRanges: [{ startDate, endDate }],
-      dimensions: [
-        { name: "pageTitle" },
-        { name: "country" },
-        { name: "deviceCategory" },
-        { name: "newVsReturning" },
-        { name: timeDimension },
-      ],
+      dimensions: [{ name: 'pageTitle' }, { name: 'country' }, { name: 'deviceCategory' }, { name: 'newVsReturning' }, { name: timeDimension }],
       metrics: [
-        { name: "screenPageViews" },
-        { name: "activeUsers" },
-        { name: "sessions" },
-        { name: "bounceRate" },
-        { name: "averageSessionDuration" },
-        { name: "newUsers" },
-        { name: "totalUsers" },
-        { name: "userEngagementDuration" },
+        { name: 'screenPageViews' },
+        { name: 'activeUsers' },
+        { name: 'sessions' },
+        { name: 'bounceRate' },
+        { name: 'averageSessionDuration' },
+        { name: 'newUsers' },
+        { name: 'totalUsers' },
+        { name: 'userEngagementDuration' },
       ],
     });
 
@@ -125,8 +111,7 @@ const getAnalyticsData = async (req, res) => {
     };
 
     response.rows.forEach((row) => {
-      const [pageTitle, country, deviceType, userType, timeLabel] =
-        row.dimensionValues.map((d) => d.value);
+      const [pageTitle, country, deviceType, userType, timeLabel] = row.dimensionValues.map((d) => d.value);
       const views = parseInt(row.metricValues[0].value, 10);
 
       if (pageTitle === siteName) {
@@ -147,29 +132,68 @@ const getAnalyticsData = async (req, res) => {
 
         // 🕒 Format Time Labels (Month, Hour, Date)
         let formattedTimeLabel = timeLabel;
-        if (timeDimension === "month")
-          formattedTimeLabel = formatMonth(timeLabel);
-        else if (timeDimension === "hour")
-          formattedTimeLabel = formatHour(timeLabel);
-        else if (timeDimension === "date")
-          formattedTimeLabel = formatDate(timeLabel);
+        if (timeDimension === 'month') formattedTimeLabel = formatMonth(timeLabel);
+        else if (timeDimension === 'hour') formattedTimeLabel = formatHour(timeLabel);
+        else if (timeDimension === 'date') formattedTimeLabel = formatDate(timeLabel);
 
         stats.timeViews[formattedTimeLabel] ??= 0;
         stats.timeViews[formattedTimeLabel] += views;
 
-        userType === "new"
-          ? (stats.newViews += views)
-          : (stats.returningUsers += views);
+        userType === 'new' ? (stats.newViews += views) : (stats.returningUsers += views);
       }
     });
 
-    //   const avgEngagementPerUser = stats.activeUsers > 0
-    // ? (stats.engagementDuration / stats.activeUsers).toFixed(2)
-    // : "0";
+    const orders = await OrderModel.find({
+      storeRef: storeId,
+      createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+    });
 
-    // const avgEngagementPerUserSeconds = (avgEngagementPerUser > 1000)
-    // ? (avgEngagementPerUser / 1000).toFixed(2)
-    // : avgEngagementPerUser;
+    const totalOrders = orders.length;
+    const deliveredOrders = orders.filter((o) => o.orderStatus === 'delivered').length;
+    const cancelledOrders = orders.filter((o) => o.orderStatus === 'cancelled').length;
+    const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+
+    const totalProducts = await ProductModel.countDocuments({ storeRef: storeId });
+    const activeProducts = await ProductModel.countDocuments({ storeRef: storeId, status: 'active' });
+    const inactiveProducts = await ProductModel.countDocuments({ storeRef: storeId, status: 'inactive' });
+
+    const abandonedCarts = await CartModel.countDocuments({
+      storeRef: storeId,
+      createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+    });
+
+    const totalSubscribers = await SubscriberModel.countDocuments({ storeRef: storeId });
+    const newSubscribers = await SubscriberModel.countDocuments({
+      storeRef: storeId,
+      subscribedAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+    });
+
+    const uniqueCustomers = [...new Set(orders.map((o) => o.customerEmail || o.customerPhone).filter(Boolean))];
+    const totalCustomers = uniqueCustomers.length;
+
+    // 2. Revenue by Payment Method
+    const revenueByPaymentMethod = orders.reduce((acc, o) => {
+      const method = o.paymentInfo?.method || 'unknown';
+      acc[method] = (acc[method] || 0) + o.totalAmount;
+      return acc;
+    }, {});
+
+    const stockThreshold = 5;
+    const lowStockProducts = await ProductModel.find({
+      storeRef: storeId,
+      stock: { $lt: stockThreshold },
+    }).select('name stock');
+
+    const customerOrderCount = {};
+    orders.forEach((o) => {
+      const key = o.customerEmail || o.customerPhone;
+      if (key) {
+        customerOrderCount[key] = (customerOrderCount[key] || 0) + 1;
+      }
+    });
+    const repeatCustomers = Object.entries(customerOrderCount)
+      .filter(([_, count]) => count > 1)
+      .map(([customer]) => customer);
 
     const formattedStats = {
       store: siteName,
@@ -186,9 +210,24 @@ const getAnalyticsData = async (req, res) => {
       totalUsers: stats.totalUsers.toString(),
       deviceViews: stats.deviceViews,
       timeViews: stats.timeViews,
+      totalOrders,
+      deliveredOrders,
+      cancelledOrders,
+      totalRevenue,
+      totalProducts,
+      activeProducts,
+      inactiveProducts,
+      abandonedCarts,
+      totalSubscribers,
+      newSubscribers,
+      totalCustomers,
+      uniqueCustomers,
+      revenueByPaymentMethod,
+      lowStockProducts,
+      repeatCustomers,
     };
 
-    console.log("✅ Analytics Data:", formattedStats);
+    console.log('✅ Analytics Data:', formattedStats);
     res.status(200).json(formattedStats);
   } catch (error) {
     console.error(`❌ Error: ${error.message}`);

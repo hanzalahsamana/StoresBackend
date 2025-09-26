@@ -37,6 +37,20 @@ const userSchema = new Schema(
       default: "email",
     },
 
+    role: {
+      type: String,
+      enum: ["admin", "superAdmin"],
+      default: "admin",
+      required: true,
+    },
+
+    status: {
+      type: String,
+      required: true,
+      default: "active",
+      enum: ["active", "suspended"],
+    },
+
     lastOpenedStore: {
       type: Schema.Types.ObjectId,
       ref: "Store",
@@ -45,7 +59,7 @@ const userSchema = new Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 const UserModal = mongoose.model("User", userSchema);

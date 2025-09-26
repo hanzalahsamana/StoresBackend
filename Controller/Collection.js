@@ -1,35 +1,42 @@
 const { CollectionModel } = require("../Models/CollectionModel");
 const { mongoose } = require("mongoose");
 const { ProductModel } = require("../Models/ProductModel");
-const generateSlug = require("../Utils/generateSlug");
+const { generateSlug } = require("../Utils/generateSlug");
 const { paginate } = require("../Helpers/pagination");
+const { searchSuggestion } = require("../Helpers/searchSuggest");
 
 module.exports = {
   // add category
   addCollection: async (req, res) => {
     const { storeId } = req.params;
     const { name, image, products } = req.body;
+    const uniqueSlug = await generateSlug(name, CollectionModel);
 
     try {
       const newCollection = new CollectionModel({
         name,
         image,
-        slug: generateSlug(name),
+        slug: uniqueSlug,
         storeRef: storeId,
       });
 
       const savedCollection = await newCollection.save();
-
       if (products && products.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: products }, storeRef: storeId },
-          { $addToSet: { collections: savedCollection._id } },
+          { $addToSet: { collections: savedCollection._id } }
         );
       }
 
+      let savedProducts = [];
+      savedProducts = await ProductModel.find(
+        { _id: { $in: products } },
+        { _id: 1, name: 1 }
+      );
+
       return res.status(201).json({
         success: true,
-        data: savedCollection,
+        data: { ...savedCollection.toObject?.(), products: savedProducts },
       });
     } catch (error) {
       console.error("Error adding collection:", error);
@@ -50,43 +57,70 @@ module.exports = {
   // get category
   getCollections: async (req, res) => {
     const { storeId } = req.params;
-    const { collectionId, page = 1, limit = 10 } = req.query;
+    const { collectionIds, page = 1, limit = 10 } = req.query;
 
     try {
       const query = { storeRef: new mongoose.Types.ObjectId(storeId) };
 
-      if (collectionId) {
-        if (!mongoose.Types.ObjectId.isValid(collectionId)) {
-          return res.status(400).json({ message: "Invalid collection ID format" });
+      // Handle multiple collection IDs
+      if (collectionIds) {
+        const idArray = collectionIds
+          .split(",")
+          .map((id) => id.trim())
+          .filter(Boolean);
+
+        // Validate all IDs
+        const invalidIds = idArray.filter(
+          (id) => !mongoose.Types.ObjectId.isValid(id)
+        );
+        if (invalidIds.length > 0) {
+          return res.status(400).json({
+            message: `Invalid collection ID(s): ${invalidIds.join(", ")}`,
+          });
         }
-        query._id = new mongoose.Types.ObjectId(collectionId);
+
+        const objectIds = idArray.map((id) => new mongoose.Types.ObjectId(id));
+        query._id = { $in: objectIds };
       }
 
       const pipeline = [
         { $match: query },
         {
           $lookup: {
-            from: 'products',
-            localField: '_id',
-            foreignField: 'collections',
-            as: 'products',
+            from: "products",
+            localField: "_id",
+            foreignField: "collections",
+            as: "products",
+            pipeline: [
+              {
+                $project: {
+                  _id: 1,
+                  name: 1,
+                },
+              },
+            ],
           },
         },
       ];
 
-      const data = await paginate(CollectionModel, {}, {
-        page,
-        limit,
-        sort: { createdAt: -1 },
-      }, pipeline);
+      const { data, totalData } = await paginate(
+        CollectionModel,
+        query,
+        {
+          page,
+          limit,
+          sort: { createdAt: -1 },
+        },
+        pipeline
+      );
 
-      return res.status(200).json({ success: true, data });
+      return res.status(200).json({ success: true, data, totalData });
     } catch (e) {
-      return res.status(500).json({ message: e.message || "An error occurred" });
+      return res
+        .status(500)
+        .json({ message: e.message || "An error occurred" });
     }
   },
-
-
 
   // edit collection
   editCollection: async (req, res) => {
@@ -109,36 +143,41 @@ module.exports = {
       }).select("_id");
 
       const previouslyLinkedIds = previouslyLinkedProducts.map((p) =>
-        p._id.toString(),
+        p._id.toString()
       );
 
       const removedProductIds = previouslyLinkedIds.filter(
-        (id) => !updatedProductIds.includes(id),
+        (id) => !updatedProductIds.includes(id)
       );
       const newlyAddedProductIds = updatedProductIds.filter(
-        (id) => !previouslyLinkedIds.includes(id),
+        (id) => !previouslyLinkedIds.includes(id)
       );
 
       if (removedProductIds.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: removedProductIds }, storeRef: storeId },
-          { $pull: { collections: collectionId } },
+          { $pull: { collections: collectionId } }
         );
       }
 
       if (newlyAddedProductIds.length > 0) {
         await ProductModel.updateMany(
           { _id: { $in: newlyAddedProductIds }, storeRef: storeId },
-          { $addToSet: { collections: collectionId } },
+          { $addToSet: { collections: collectionId } }
         );
       }
+      let savedProducts = [];
+      savedProducts = await ProductModel.find(
+        { _id: { $in: [products] } },
+        { _id: 1, name: 1 }
+      );
 
       Object.assign(collection, { name, image, slug: generateSlug(name) });
       const savedCollection = await collection.save();
 
       res.status(200).json({
         success: true,
-        data: savedCollection,
+        data: { ...savedCollection.toObject?.(), products: savedProducts },
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -170,7 +209,7 @@ module.exports = {
       // Step 2: Remove collection ref from all products
       await ProductModel.updateMany(
         { storeRef: storeId, collections: collectionId },
-        { $pull: { collections: collectionId } },
+        { $pull: { collections: collectionId } }
       );
 
       return res
@@ -178,6 +217,27 @@ module.exports = {
         .json({ message: "Collection Deleted Successfully" });
     } catch (error) {
       return res.status(500).json({ message: error.message });
+    }
+  },
+
+  // search collection
+  collectionSearchSuggestion: async (req, res) => {
+    const { searchQuery } = req.query;
+    const { storeId } = req.params;
+
+    try {
+      const results = await searchSuggestion({
+        Model: CollectionModel,
+        searchTerm: searchQuery,
+        field: "name",
+        extraQuery: { storeRef: storeId },
+        projection: { _id: 1, name: 1 },
+      });
+
+      res.status(200).json({ success: true, data: results });
+    } catch (err) {
+      console.error("error fetching product suggestion:", err?.message || err);
+      res.status(500).json({ success: false, message: "Server error" });
     }
   },
 };

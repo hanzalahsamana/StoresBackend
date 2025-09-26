@@ -1,67 +1,57 @@
-const { default: mongoose } = require("mongoose");
-const { UserModal } = require("../Models/userModal");
 const {
   customerContactResponse,
   adminContactResponse,
 } = require("../Helpers/EmailsToSend");
-const { contactSchema } = require("../Models/ContactModel");
+const { ContactModel } = require("../Models/ContactModel");
+const { StoreModal } = require("../Models/StoreModal");
 
 const postConatctForm = async (req, res) => {
-  const type = req.collectionType;
+  const { storeId } = req.params;
   const { siteLogo, ...remain } = req.body;
 
   try {
-    const admin = await UserModal.findOne({ brandName: type });
-    const ContactModel = mongoose.model(
-      type + "_contactForm",
-      contactSchema,
-      type + "_contactForm",
-    );
 
-    const contactForm = new ContactModel(remain);
+    const admin = await StoreModal.findOne({ _id: storeId }).populate("userRef");
+    if (!admin) {
+      return res.status(404).json({ message: "Invalid storeId", success: false })
+    }
+    const data = { ...admin?.userRef, storeName: admin?.storeName }
+    const contactForm = new ContactModel({ ...remain, storeRef: storeId });
 
     await contactForm.save();
     await customerContactResponse(
-      admin.toObject(),
+      data,
       contactForm.email,
       siteLogo,
       contactForm,
     );
     await adminContactResponse(
-      admin.toObject(),
-      admin.email,
+      data,
+      admin?.userRef?.email,
       siteLogo,
       contactForm,
     );
 
-    return res.status(200).json({ message: "Contact Form Submitted" });
+    return res.status(200).json({ message: "Contact Form Submitted", success: true });
   } catch (e) {
-    console.log(e);
-    return res.status(500).json({ message: "Error occurred while submitting" });
+    console.log("Error adding contact", e.message || e);
+    return res.status(500).json({ message: "Something went wrong!", success: true });
   }
 };
 
-const getConatctForm = async (req, res) => {
-  const type = req.collectionType;
-
+const getContactedUsers = async (req, res) => {
   try {
-    const ContactModel = mongoose.model(
-      type + "_contactForm",
-      contactSchema,
-      type + "_contactForm",
-    );
-
-    const contactForms = await ContactModel.find();
+    const { storeId } = req.params
+    const contactForms = await ContactModel.find({ storeRef: storeId });
     return res
       .status(200)
-      .json({ message: "successfully Fetched", data: contactForms });
+      .json({ message: "successfully Fetched", data: contactForms, success: true });
   } catch (e) {
-    console.log(e);
-
+    console.log("Error getting contacts", e.message || e);
     return res
       .status(500)
-      .json({ message: "error occuring while fetching Forms" });
+      .json({ message: "error occuring while fetching Forms", success: false });
   }
 };
 
-module.exports = { postConatctForm, getConatctForm };
+module.exports = { postConatctForm, getContactedUsers };

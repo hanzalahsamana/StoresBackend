@@ -138,7 +138,7 @@ const applyCoupon = async (req, res) => {
 
     const configuration = await ConfigurationModel.findOne({ storeRef: storeId }).lean();
 
-    const result = await getValidCouponDiscount({
+    const discount = await getValidCouponDiscount({
       storeId,
       email,
       couponCode,
@@ -149,7 +149,7 @@ const applyCoupon = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Coupon applied successfully.',
-      discount: result.discount,
+      discount,
     });
   } catch (error) {
     console.error('applyCoupon error:', error);

@@ -1,11 +1,10 @@
 const express = require('express');
 const multer = require('multer');
 
-// File upload helpers
-const { uploadSingleImage, uploadMultipleImages } = require('../Helpers/ImageUpload');
-const importSiteData = require('../Helpers/ImportSite');
-
 // Validation middleware
+const { validateSection } = require('../Middleware/ValidationsMiddleware/sectionsValidation');
+const { editPasswordValidate } = require('../Middleware/ValidationsMiddleware/editPasswordValidate');
+const { generateStoreValidation, editStoreValidation } = require('../Middleware/ValidationsMiddleware/StoreValidation');
 const { userLoginValidate, userRegisterValidate } = require('../Middleware/ValidationsMiddleware/UserValidation');
 const validateProduct = require('../Middleware/ValidationsMiddleware/ProductValidation');
 const validateCollection = require('../Middleware/ValidationsMiddleware/CollectionValidation');
@@ -21,16 +20,16 @@ const validOwnerChecker = require('../Middleware/ValidOwnerChecker');
 const ValidStoreChecker = require('../Middleware/ValidStoreChecker');
 
 // Controllers - Auth
-const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle } = require('../Controller/user');
+const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle, editPassword, deleteAccount } = require('../Controller/user');
 
 // Controllers - Store
-const { generateStore, getAllStores, getStore } = require('../Controller/StoreDetail');
+const { generateStore, getAllStores, getStore, editStore, deleteStore, editStoreAppearance } = require('../Controller/StoreDetail');
 
 // Controllers - Product
-const { addProduct, deleteProduct, editProduct, getProducts } = require('../Controller/Product');
+const { addProduct, deleteProduct, editProduct, getProducts, productSearchSuggestion, getSingleProduct } = require('../Controller/Product');
 
 // Controllers - Collection
-const { addCollection, getCollections, deleteCollection, editCollection } = require('../Controller/Collection');
+const { addCollection, getCollections, deleteCollection, editCollection, collectionSearchSuggestion } = require('../Controller/Collection');
 
 // Controllers - Section
 const { addSection, getSections, deleteSection, editSection, changeSectionOrder } = require('../Controller/Sections');
@@ -46,9 +45,6 @@ const { addToCart, getCartdata, deleteCartData } = require('../Controller/Cart')
 
 // Controllers - Order
 const { placeOrder, getOrders, editOrderData } = require('../Controller/Order');
-
-// Controllers - Payment
-const { initiateJazzCashPayment } = require('../Controller/payment');
 
 // Controllers - Theme
 const { addTheme, updateTheme } = require('../Controller/StoreConfigurations/ThemeSetting');
@@ -71,13 +67,33 @@ const addSubscriber = require('../Controller/subscribe');
 // Controllers - Domain
 const { handleDomainRequest, automateDomainSetup, removeDomainFromDatabase, getStoreByDomain } = require('../Controller/domain');
 
-// Controllers - Upload / Migration
-const { uploadSingle, uploadMultiple } = require('../Controller/imageUpload');
-const { exportSite } = require('../Controller/migration');
+// Controllers - Migration
+const { exportSite, importSite } = require('../Controller/migration');
+
+// Controllers - Upload
+const { getImages, uploadImage, deleteImages } = require('../Controller/imageUpload');
+const { uploadSingle } = require('../Helpers/s3Uploader');
+
+// Controllers - Pages / homepage
+const { getHomePageData } = require('../Controller/pages/homePage');
 
 // Controllers - Analytics / Contact
+const { getDashboardData } = require('../Controller/pages/analytics');
+const superAdminChecker = require('../Middleware/superAdminChecker');
+const { getUsers, searchUsers, toggleUserStatus } = require('../Controller/pages/users');
+const { getStores, toggleStoreStatus, searchStores } = require('../Controller/pages/stores');
+const { getSubscriptions, toggleSubscriptionStatus, updateSubscription, updateReferralModal } = require('../Controller/pages/subscriptions');
+const { getInvoices, getStoreInvoices, toggleInvoiceStatus } = require('../Controller/pages/invoices');
+const { validateEmailTemplate } = require('../Middleware/ValidationsMiddleware/emailValidate');
+const { emailSender } = require('../Controller/pages/email');
+const { getSitemapData } = require('../Controller/SEO/sitemap');
+const { getRobotsTxt } = require('../Controller/SEO/robots');
 const { getAnalyticsData } = require('../Controller/analytics');
-const { postConatctForm } = require('../Controller/Contact');
+const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
+const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, createPage, discardDraft } = require('../Controller/Theme/Builder');
+const { getMenuLinks } = require('../Controller/Suggestions/menuLinks');
+const { addCustomDomain, checkDomainStatus, deleteCustomDomain } = require('../Controller/CustomDomain');
+const { startCheckout, verifyCheckoutSession } = require('../Controller/Checkout');
 
 // // Variations (commented for now)
 // const { deleteVariation, addVariation, editVariation } = require("../Controller/StoreConfigurations/variation");
@@ -88,6 +104,7 @@ const upload = multer({ dest: '/tmp' });
 // Routers
 const withParams = express.Router({ mergeParams: true });
 const withoutParams = express.Router();
+
 // --- AUTH ROUTES ---
 withoutParams.post('/login', userLoginValidate, loginUser);
 withoutParams.post('/sendOtp', sendOtp);
@@ -97,13 +114,16 @@ withoutParams.post('/authWithGoogle', authWithGoogle);
 withoutParams.get('/getUserFromToken', tokenChecker, getUserFromToken);
 
 // --- STORE ROUTES ---
-withoutParams.post('/generateStore', tokenChecker, generateStore);
-withParams.get('/getStore', ValidStoreChecker, getStore);
 withoutParams.get('/getAllStores', tokenChecker, getAllStores);
+withoutParams.post('/generateStore', tokenChecker, generateStoreValidation, generateStore);
+withParams.get('/getStore', ValidStoreChecker, getStore);
+withParams.put('/edit/store', tokenChecker, validOwnerChecker, editStoreValidation, editStore);
+withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
 
 // --- PRODUCT ROUTES ---
 withParams.post('/addProduct', tokenChecker, validOwnerChecker, validateProduct(false), addProduct);
 withParams.get('/getProducts', ValidStoreChecker, getProducts);
+withParams.get('/products/single-product', ValidStoreChecker, getSingleProduct);
 withParams.delete('/deleteProduct', tokenChecker, validOwnerChecker, deleteProduct);
 withParams.put('/editProduct', tokenChecker, validOwnerChecker, validateProduct(true), editProduct);
 
@@ -119,20 +139,31 @@ withParams.get('/getReviews', ValidStoreChecker, getReviews);
 withParams.delete('/deleteReview', tokenChecker, validOwnerChecker, deleteReview);
 
 // --- SECTION ROUTES ---
-withParams.post('/addSection', tokenChecker, validOwnerChecker, addSection);
+withParams.post('/addSection', tokenChecker, validOwnerChecker, validateSection, addSection);
 withParams.get('/getSections', ValidStoreChecker, getSections);
 withParams.delete('/deleteSection', tokenChecker, validOwnerChecker, deleteSection);
 withParams.patch('/editSection', tokenChecker, validOwnerChecker, editSection);
 withParams.patch('/changeSectionOrder', tokenChecker, validOwnerChecker, changeSectionOrder);
+
+// --- Builder ROUTES ---
+withParams.post('/saveDraft', tokenChecker, validOwnerChecker, saveDraft);
+withParams.post('/publishPage', tokenChecker, validOwnerChecker, publishPage);
+withParams.get('/getPublishPage', ValidStoreChecker, getPublishPage);
+withParams.get('/getDraftPage', tokenChecker, validOwnerChecker, getDraftPage);
+withParams.post('/discardDraft', tokenChecker, validOwnerChecker, discardDraft);
+withParams.get('/getAllPages', tokenChecker, validOwnerChecker, getAllPages);
+withParams.post('/createPage', tokenChecker, validOwnerChecker, createPage);
 
 // --- CONTENT ROUTES ---
 withParams.get('/getContents', ValidStoreChecker, getContents);
 withParams.patch('/editContent', tokenChecker, validOwnerChecker, ValidatContent, editContent);
 
 // --- ORDER ROUTES ---
-withParams.post('/placeOrder', ValidStoreChecker, validateOrder, placeOrder);
+withParams.post('/placeOrder/:checkoutToken', ValidStoreChecker, validateOrder, placeOrder);
 withParams.get('/getOrders', ValidStoreChecker, getOrders);
 withParams.put('/editOrder', editOrderData);
+withParams.post('/startCheckout', ValidStoreChecker, startCheckout);
+withParams.get('/verifyCheckoutSession/:checkoutToken', ValidStoreChecker, verifyCheckoutSession);
 
 // --- CART ROUTES ---
 withParams.post('/addToCart', ValidStoreChecker, addToCart);
@@ -149,19 +180,26 @@ withParams.get('/getHashedPaymentCredential', ValidStoreChecker, getHashedPaymen
 
 // --- THEME / ANALYTICS ROUTES ---
 withoutParams.post('/setTheme', tokenChecker, updateTheme);
-withParams.get('/getAnalytics', ValidStoreChecker, getAnalyticsData);
+withParams.get('/getAnalytics', tokenChecker, validOwnerChecker, getAnalyticsData);
 
 // --- UPLOAD ROUTES ---
-withParams.post('/uploadSingle', tokenChecker, validOwnerChecker, uploadSingle, uploadSingleImage);
-withParams.post('/uploadMultiple', tokenChecker, validOwnerChecker, uploadMultiple, uploadMultipleImages);
-withoutParams.post('/importSiteData', tokenChecker, upload.single('file'), importSiteData);
-withoutParams.get('/exportSiteData', tokenChecker, exportSite);
+withParams.post('/uploadImage', tokenChecker, validOwnerChecker, uploadSingle, uploadImage);
+withParams.get('/getImages', tokenChecker, validOwnerChecker, getImages);
+withParams.delete('/deleteImages', tokenChecker, validOwnerChecker, deleteImages);
+
+// --- MIGERATION ROUTES ---
+withParams.post('/importSiteData', tokenChecker, validOwnerChecker, upload.single('file'), importSite);
+withParams.get('/exportSiteData', tokenChecker, validOwnerChecker, exportSite);
 
 // --- DOMAIN ROUTES ---
 withParams.post('/addDomainDns', handleDomainRequest);
 withParams.post('/genrateSSl', automateDomainSetup);
 withParams.delete('/deleteDomain', removeDomainFromDatabase);
 withoutParams.get('/getStoreByDomain', getStoreByDomain);
+
+withParams.post('/addCustomDomain', tokenChecker, validOwnerChecker, addCustomDomain);
+withParams.get('/checkDomainStatus', tokenChecker, validOwnerChecker, checkDomainStatus);
+withParams.delete('/deleteCustomDomain', tokenChecker, validOwnerChecker, deleteCustomDomain);
 
 // --- DISCOUNT ROUTES ---
 withParams.post('/addDiscount', tokenChecker, validOwnerChecker, validateDiscount(false), addDiscount);
@@ -173,8 +211,24 @@ withParams.post('/applyCoupon', ValidStoreChecker, applyCoupon);
 withoutParams.post('/addAnnouncement', tokenChecker, addAnnouncement);
 withoutParams.delete('/deleteAnnouncement', tokenChecker, deleteAnnouncement);
 
+// --- SEARCH SUGGESTION ROUTES ---
+withParams.get('/search/products', ValidStoreChecker, productSearchSuggestion);
+withParams.get('/search/collections', ValidStoreChecker, collectionSearchSuggestion);
+withParams.get('/search/getMenuLinks', tokenChecker, validOwnerChecker, getMenuLinks);
+
+// --- Home Page ROUTES ---
+withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
+
+// --- Profile Page ROUTES ---
+withParams.delete('/delete/account', tokenChecker, deleteAccount);
+withParams.put('/edit/password', tokenChecker, editPasswordValidate, editPassword);
+
 // --- SUBSCRIBER ROUTES ---
-withParams.post('/addSubscriber', addSubscriber);
+withParams.post('/addSubscriber', ValidStoreChecker, addSubscriber);
+
+// --- Contact ROUTES ---
+withParams.post('/contact-us', ValidStoreChecker, postConatctForm);
+withParams.get('/contacted-users', ValidStoreChecker, getContactedUsers);
 
 // --- MISC / UTILITIES ---
 withParams.get('/ping', async (req, res) => {
@@ -197,8 +251,23 @@ withoutParams.post('/jazzcash', async (req, res) => {
   }
 });
 
-withoutParams.post('/jazzcash-initiate', initiateJazzCashPayment);
-
+withoutParams.get('/get/analytics/data', tokenChecker, superAdminChecker, getDashboardData);
+withoutParams.get('/get/users', tokenChecker, superAdminChecker, getUsers);
+withoutParams.get('/get/stores', tokenChecker, superAdminChecker, getStores);
+withoutParams.get('/search/users', tokenChecker, superAdminChecker, searchUsers);
+withoutParams.put('/users/status-toggle', tokenChecker, superAdminChecker, toggleUserStatus);
+withoutParams.put('/stores/status-toggle', tokenChecker, superAdminChecker, toggleStoreStatus);
+withoutParams.get('/search/stores', tokenChecker, superAdminChecker, searchStores);
+withoutParams.get('/get/subscriptions', tokenChecker, superAdminChecker, getSubscriptions);
+withoutParams.put('/subscriptions/status-toggle', tokenChecker, superAdminChecker, toggleSubscriptionStatus);
+withParams.put('/update/subscription', tokenChecker, validOwnerChecker, updateSubscription);
+withParams.get('/store/invoices', tokenChecker, validOwnerChecker, getStoreInvoices);
+withoutParams.get('/get/invoices', tokenChecker, superAdminChecker, getInvoices);
+withoutParams.put('/invoice/status-toggle', tokenChecker, superAdminChecker, toggleInvoiceStatus);
+withoutParams.post('/send/email', tokenChecker, superAdminChecker, validateEmailTemplate, emailSender);
+withParams.put('/referral/:id/modal-shown', tokenChecker, validOwnerChecker, updateReferralModal);
+withParams.get('/data/sitemap/xml', getSitemapData);
+withParams.get('/data/robots/txt', getRobotsTxt);
 module.exports = {
   withParams,
   withoutParams,

@@ -1,3 +1,4 @@
+const { baseTemplate } = require("../Emails/baseTemplate");
 const {
   generateOrderDetailsTemplate,
   generateAdminContactTemplate,
@@ -5,19 +6,19 @@ const {
   generateOrderConfirmTemplate,
   generateOTPVerificationTemplate,
 } = require("./EmailHtmlTemplate");
-const sendEmail = require("./EmailSender");
+const { sendEmail } = require("./EmailSender");
 
 const AdminPanel = {
   email: "hanzalahsamana789@gmail.com",
-  brandName: "Admin Panel",
+  storeName: "Admin Panel",
 };
 
 const adminContactResponse = async (admin, to, logo, data) => {
   await sendEmail(
     admin,
     to,
-    `Contact Form Submitted from ${admin.brandName}`,
-    generateAdminContactTemplate({ ...admin, logo }, data),
+    `Contact Form Submitted from ${admin.storeName}`,
+    generateAdminContactTemplate({ ...admin, logo }, data)
   );
 };
 
@@ -25,8 +26,8 @@ const customerContactResponse = async (admin, to, logo, data) => {
   await sendEmail(
     admin,
     to,
-    `Contact To ${admin.brandName}`,
-    generateCustomerContactTemplate({ ...admin, logo }, data),
+    `Contact To ${admin.storeName}`,
+    generateCustomerContactTemplate({ ...admin, logo }, data)
   );
 };
 
@@ -34,8 +35,8 @@ const adminOrderDetail = async (admin, to, orderDetails) => {
   await sendEmail(
     admin,
     to,
-    `Order Summary of ${admin.brandName}`,
-    generateOrderDetailsTemplate(admin, orderDetails),
+    `Order Summary of ${admin.storeName}`,
+    generateOrderDetailsTemplate(admin, orderDetails)
   );
 };
 
@@ -43,8 +44,8 @@ const customerOrderDetail = async (admin, to, orderDetails) => {
   await sendEmail(
     admin,
     to,
-    `Order Summary of ${admin.brandName}`,
-    generateOrderConfirmTemplate(admin, orderDetails),
+    `Order Summary of ${admin.storeName}`,
+    generateOrderConfirmTemplate(admin, orderDetails)
   );
 };
 
@@ -53,7 +54,7 @@ const OTPVerificationEmail = async (user, otp) => {
     AdminPanel,
     user.email,
     `OTP Verification`,
-    generateOTPVerificationTemplate(user, otp),
+    generateOTPVerificationTemplate(user, otp)
   );
 };
 

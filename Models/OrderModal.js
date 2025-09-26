@@ -13,7 +13,7 @@ const orderItemSchema = new mongoose.Schema(
     image: { type: String },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    selectedVariant: { type: Object }, // Add if variants exist (e.g. size, color)
+    selectedVariant: { type: Object },
   },
   { _id: false }
 );
@@ -22,8 +22,8 @@ const addressSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String, required: true },
+    email: { type: String, required: false },
+    phone: { type: String, required: false },
     country: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String },
@@ -38,16 +38,21 @@ const paymentInfoSchema = new mongoose.Schema(
     method: {
       type: String,
       required: true,
+      enum: ['cod', 'account'],
     },
     status: {
       type: String,
-      enum: ['unpaid', 'paid', 'failed', 'refunded'],
+      enum: ['unpaid', 'paid', 'pending', 'failed'],
       default: 'unpaid',
     },
     transactionId: {
       type: String,
       required: true,
       default: uuidv4,
+    },
+    recipt: {
+      type: String,
+      default: '',
     },
   },
   { _id: false }
@@ -73,20 +78,18 @@ const OrderSchema = new mongoose.Schema(
     tax: { type: Number, default: 0 },
     shipping: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },
+    globalDiscount: { type: Object, default: null },
+    couponDiscount: { type: Object, default: null },
     totalAmount: { type: Number, required: true },
 
-    trackingInfo: {
-      carrier: { type: String },
-      trackingNumber: { type: String },
-      estimatedDelivery: { type: Date },
-    },
-
     notes: { type: String },
+
     orderNumber: {
       type: String,
       required: true,
       unique: true,
     },
+
     storeRef: {
       type: Schema.Types.ObjectId,
       ref: 'Store',

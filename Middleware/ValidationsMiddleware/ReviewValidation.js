@@ -10,12 +10,10 @@ const reviewValidationSchema = Joi.object({
 });
 
 const validateReview = (req, res, next) => {
-  const { productId } = req.query;
+  const { productSlug } = req.query;
 
-  if (!productId || joiObjectid().validate(productId).error) {
-    return res
-      .status(400)
-      .json({ message: "Invalid or missing product ID in query" });
+  if (!productSlug) {
+    return res.status(400).json({ message: "product slug is required!" });
   }
 
   const { error } = reviewValidationSchema.validate(req.body);

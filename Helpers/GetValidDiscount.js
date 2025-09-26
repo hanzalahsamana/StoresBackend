@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
-const subscriberSchema = require('../Models/SubscriberModal');
 const { OrderModel } = require('../Models/OrderModal');
 const { ConfigurationModel } = require('../Models/ConfigurationModel');
+const { SubscriberModel } = require('../Models/SubscriberModal');
 
-const getValidCouponDiscount = async ({ storeId, email, couponCode, totalAmount, allDiscounts, SubscriberModel }) => {
+const getValidCouponDiscount = async ({ storeId, email, couponCode, totalAmount, allDiscounts }) => {
   if (!couponCode) throw { status: 400, message: 'Coupon code is required.' };
   if (totalAmount === undefined || isNaN(Number(totalAmount))) {
     throw { status: 400, message: 'Total amount must be a valid number.' };
@@ -31,7 +31,6 @@ const getValidCouponDiscount = async ({ storeId, email, couponCode, totalAmount,
     if (!email) {
       throw { status: 400, message: 'Email is required for this coupon.' };
     }
-    const SubscriberModel = mongoose.model(`abcd_subscribers`, subscriberSchema, `abcd_subscribers`);
     const existingUser = await SubscriberModel.findOne({ email: email.toLowerCase() });
     if (!existingUser) {
       throw { status: 400, message: 'Coupon valid only for subscribed users.' };
@@ -62,16 +61,14 @@ const getValidCouponDiscount = async ({ storeId, email, couponCode, totalAmount,
 
   return {
     success: true,
-    discount: {
-      amountType: discount.amountType,
-      amount: discount.amount,
-      discountAmount,
-      name: discount.name,
-    },
+    amountType: discount.amountType,
+    amount: discount.amount,
+    discountAmount,
+    name: discount.name,
   };
 };
 
-const getValidGlobalDiscount = ({discounts, totalAmount}) => {
+const getValidGlobalDiscount = ({ discounts, totalAmount }) => {
   const globalDiscount = discounts?.find((d) => d.discountType === 'global');
 
   if (globalDiscount) {
