@@ -1,5 +1,5 @@
-const { required } = require("joi");
-const mongoose = require("mongoose");
+const { required } = require('joi');
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const variantSchema = new mongoose.Schema(
@@ -42,20 +42,19 @@ const ProductSchema = new Schema(
     trackInventory: { type: Boolean, default: false, required: true },
     stock: { type: Number },
     showStock: { type: Boolean },
-    pronouce: { type: String, default: "piece" },
-    status: { type: String, enum: ["active", "inactive"], default: "active" },
+    pronouce: { type: String, default: 'piece' },
+    status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     slug: { type: String, required: true },
     totalSold: { type: Number, default: 0 },
-    description: { type: String },
-    metaTitle: { type: String },
-    metaDescription: { type: String },
-    metaImage: { type: String },
+    description: { type: String, default: '' },
+    metaTitle: { type: String, default: '' },
+    metaDescription: { type: String, default: '' },
     wantsCustomerReview: { type: Boolean, default: true, required: true },
     note: { type: String },
     collections: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Collection",
+        ref: 'Collection',
       },
     ],
     ratings: {
@@ -83,18 +82,18 @@ const ProductSchema = new Schema(
     relatedProducts: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: 'Product',
       },
     ],
     storeRef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Store",
+      ref: 'Store',
       required: true,
     },
   },
   { timestamps: true }
 );
 
-const ProductModel = mongoose.model("Product", ProductSchema);
+const ProductModel = mongoose.model('Product', ProductSchema);
 
 module.exports = { ProductModel };
