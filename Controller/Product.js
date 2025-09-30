@@ -1,9 +1,9 @@
-const { ProductModel } = require("../Models/ProductModel");
-const { mongoose } = require("mongoose");
-const { ReviewModel } = require("../Models/ReviewModel");
-const { paginate } = require("../Helpers/pagination");
-const { searchSuggestion } = require("../Helpers/searchSuggest");
-const { generateSlug } = require("../Utils/generateSlug");
+const { ProductModel } = require('../Models/ProductModel');
+const { mongoose } = require('mongoose');
+const { ReviewModel } = require('../Models/ReviewModel');
+const { paginate } = require('../Helpers/pagination');
+const { searchSuggestion } = require('../Helpers/searchSuggest');
+const { generateSlug } = require('../Utils/generateSlug');
 
 module.exports = {
   // add product
@@ -23,10 +23,10 @@ module.exports = {
         data: savedProduct,
       });
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error('Error adding product:', error);
       return res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: 'Internal server error',
         error: error.message,
       });
     }
@@ -51,10 +51,8 @@ module.exports = {
 
       // ✅ Filter: Collection IDs
       if (collectionIds) {
-        const ids = collectionIds.split(",").map((id) => id.trim());
-        const validIds = ids.filter((id) =>
-          mongoose.Types.ObjectId.isValid(id)
-        );
+        const ids = collectionIds.split(',').map((id) => id.trim());
+        const validIds = ids.filter((id) => mongoose.Types.ObjectId.isValid(id));
         if (validIds.length > 0) {
           query.collections = {
             $in: validIds.map((id) => new mongoose.Types.ObjectId(id)),
@@ -64,10 +62,8 @@ module.exports = {
 
       // ✅ Filter: Product IDs
       if (productIds) {
-        const ids = productIds.split(",").map((id) => id.trim());
-        const validIds = ids.filter((id) =>
-          mongoose.Types.ObjectId.isValid(id)
-        );
+        const ids = productIds.split(',').map((id) => id.trim());
+        const validIds = ids.filter((id) => mongoose.Types.ObjectId.isValid(id));
         if (validIds.length > 0) {
           query._id = {
             $in: validIds.map((id) => new mongoose.Types.ObjectId(id)),
@@ -83,18 +79,10 @@ module.exports = {
       }
 
       // ✅ Dynamic Variant Filters: Detect keys NOT in standard filters
-      const standardKeys = [
-        "collections",
-        "productId",
-        "page",
-        "limit",
-        "sortBy",
-        "minPrice",
-        "maxPrice",
-      ];
+      const standardKeys = ['collections', 'productId', 'page', 'limit', 'sortBy', 'minPrice', 'maxPrice'];
       Object.entries(restFilters).forEach(([key, value]) => {
         if (!standardKeys.includes(key)) {
-          const valuesArray = value.split(",");
+          const valuesArray = value.split(',');
           query[`variants.options.${key}`] = { $in: valuesArray };
         }
       });
@@ -102,21 +90,21 @@ module.exports = {
       // ✅ Sort Handling
       let sort = { createdAt: -1 };
 
-      if (sortBy === "priceLowToHigh") {
+      if (sortBy === 'priceLowToHigh') {
         sort = { price: 1 };
-      } else if (sortBy === "priceHighToLow") {
+      } else if (sortBy === 'priceHighToLow') {
         sort = { price: -1 };
-      } else if (sortBy === "topRated") {
+      } else if (sortBy === 'topRated') {
         sort = {
           wantsCustomerReview: -1,
-          "ratings.average": -1,
-          "ratings.count": -1,
+          'ratings.average': -1,
+          'ratings.count': -1,
         };
-      } else if (sortBy === "inStock") {
+      } else if (sortBy === 'inStock') {
         query.stock = { $gt: 0 };
-      } else if (sortBy === "outOfStock") {
+      } else if (sortBy === 'outOfStock') {
         query.stock = { $lte: 0 };
-      } else if (sortBy === "newest") {
+      } else if (sortBy === 'newest') {
         sort = { createdAt: -1 }; // Newest first
       }
 
@@ -133,10 +121,10 @@ module.exports = {
         totalData,
       });
     } catch (error) {
-      console.error("Error fetching product data:", error);
+      console.error('Error fetching product data:', error);
       return res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: 'Internal server error',
         error: error.message,
       });
     }
@@ -148,17 +136,11 @@ module.exports = {
     const { slug } = req.query;
     try {
       if (!slug) {
-        return res
-          .status(400)
-          .json({ message: "slug is required!", success: false });
+        return res.status(400).json({ message: 'slug is required!', success: false });
       }
-      const product = await ProductModel.findOne({ slug }).populate(
-        "relatedProducts"
-      );
+      const product = await ProductModel.findOne({ slug }).populate('relatedProducts');
       if (!product) {
-        return res
-          .status(400)
-          .json({ message: "Invalid slug!", success: false });
+        return res.status(400).json({ message: 'Invalid slug!', success: false });
       }
       const reviews = await ReviewModel.find({ productId: product?._id });
 
@@ -167,10 +149,8 @@ module.exports = {
         success: true,
       });
     } catch (error) {
-      console.error("Error fetching single product!", error?.message || error);
-      return res
-        .status(500)
-        .json({ message: "Something went wrong!", success: false });
+      console.error('Error fetching single product!', error?.message || error);
+      return res.status(500).json({ message: 'Something went wrong!', success: false });
     }
   },
 
@@ -179,19 +159,15 @@ module.exports = {
     const { storeId } = req.params;
     const productID = req.query.id;
 
-    console.log("req?.body", req?.body);
+    console.log('req?.body', req?.body);
 
     try {
-      const product = await ProductModel.findOneAndUpdate(
-        { _id: productID, storeRef: storeId },
-        { $set: req.body },
-        { new: true }
-      );
+      const product = await ProductModel.findOneAndUpdate({ _id: productID, storeRef: storeId }, { $set: req.body }, { new: true });
 
       if (!product) {
         return res.status(404).json({
           success: false,
-          message: "Product not found for this store",
+          message: 'Product not found for this store',
         });
       }
 
@@ -200,10 +176,10 @@ module.exports = {
         data: product,
       });
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error('Error updating product:', error);
       return res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: 'Internal server error',
         error: error.message,
       });
     }
@@ -211,33 +187,44 @@ module.exports = {
 
   // delete product
   deleteProduct: async (req, res) => {
-    const productID = req.query.id;
+    let { id: productID } = req.query;
     const { storeId } = req.params;
 
-    if (!mongoose.isValidObjectId(productID) || !productID) {
-      return res
-        .status(400)
-        .json({ message: "Invalid product ID or ID is not defined" });
-    }
-
     try {
-      const product = await ProductModel.deleteOne({
-        _id: productID,
+      if (typeof productID === 'string' && productID.includes(',')) {
+        productID = productID.split(',').map((id) => id.trim());
+      }
+
+      if (!Array.isArray(productID)) {
+        productID = [productID];
+      }
+
+      const invalidIds = productID.filter((id) => !mongoose.isValidObjectId(id));
+      if (invalidIds.length > 0) {
+        return res.status(400).json({
+          message: 'One or more product IDs are invalid',
+          invalidIds,
+        });
+      }
+
+      const productDeleteResult = await ProductModel.deleteMany({
+        _id: { $in: productID },
         storeRef: storeId,
       });
 
-      if (product.deletedCount === 0) {
-        return res
-          .status(404)
-          .json({ message: "Product not found or unauthorized" });
+      if (productDeleteResult.deletedCount === 0) {
+        return res.status(404).json({ message: 'No products found or unauthorized' });
       }
 
       await ReviewModel.deleteMany({
-        productId: productID,
+        productId: { $in: productID },
         storeRef: storeId,
       });
 
-      res.status(200).json({ message: "Product deleted successfully" });
+      res.status(200).json({
+        message: 'Products deleted successfully',
+        deletedCount: productDeleteResult.deletedCount,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -252,15 +239,15 @@ module.exports = {
       const results = await searchSuggestion({
         Model: ProductModel,
         searchTerm: searchQuery,
-        field: "name",
+        field: 'name',
         extraQuery: { storeRef: storeId },
         projection: { _id: 1, name: 1, displayImage: 1, price: 1 },
       });
 
       res.status(200).json({ success: true, data: results });
     } catch (err) {
-      console.error("error fetching product suggestion:", err?.message || err);
-      res.status(500).json({ success: false, message: "Server error" });
+      console.error('error fetching product suggestion:', err?.message || err);
+      res.status(500).json({ success: false, message: 'Server error' });
     }
   },
 };
