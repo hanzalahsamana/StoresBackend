@@ -70,7 +70,7 @@ const startCheckout = async (req, res) => {
     });
 
     if (!cleanedProducts?.length || !checkoutItems.length) {
-      throw new Error('No valid items available for checkout.');
+      return res.status(400).json({ success: false, message: 'No valid items available for checkout' , errors});
     }
     const checkout = await createCheckoutSession({
       cartItems: checkoutItems,

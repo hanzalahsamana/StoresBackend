@@ -117,6 +117,7 @@ withoutParams.get('/getUserFromToken', tokenChecker, getUserFromToken);
 withoutParams.get('/getAllStores', tokenChecker, getAllStores);
 withoutParams.post('/generateStore', tokenChecker, generateStoreValidation, generateStore);
 withParams.get('/getStore', ValidStoreChecker, getStore);
+withParams.put('/editStoreAppearance', ValidStoreChecker, editStoreAppearance);
 withParams.put('/edit/store', tokenChecker, validOwnerChecker, editStoreValidation, editStore);
 withParams.delete('/delete/store', tokenChecker, validOwnerChecker, deleteStore);
 

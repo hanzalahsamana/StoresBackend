@@ -7,6 +7,7 @@ const { SubscriberModel } = require("../Models/SubscriberModal");
 const { SubscriptionModel } = require("../Models/subscriptionmodel");
 const { generateUniquePromoCode } = require("../Helpers/generatePromoCode");
 const { generateSlug } = require("../Utils/generateSlug");
+const { Allowed_Themes } = require("../Enums/Enums");
 
 const addReferralSubscriptionTime = async (referredStore) => {
   if (!referredStore?.subscriptionId) return;

@@ -8,7 +8,7 @@ const enrichedAndValidateProducts = async (products) => {
       const product = await ProductModel.findById(item.productId).lean();
 
       if (!product || product.status !== 'active') {
-        return { success: false, code: 'Product_Not_Found', message: 'Product not available' };
+        return { success: false, code: 'Product_Not_Found', message: `Product with this id ${item.productId} is not available` };
       }
 
       let finalPrice = product.price;
