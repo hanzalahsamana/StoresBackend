@@ -29,7 +29,7 @@ const { generateStore, getAllStores, getStore, editStore, deleteStore, editStore
 const { addProduct, deleteProduct, editProduct, getProducts, productSearchSuggestion, getSingleProduct } = require('../Controller/Product');
 
 // Controllers - Collection
-const { addCollection, getCollections, deleteCollection, editCollection, collectionSearchSuggestion } = require('../Controller/Collection');
+const { addCollection, getCollections, deleteCollection, editCollection, collectionSearchSuggestion, getSingleCollection } = require('../Controller/Collection');
 
 // Controllers - Section
 const { addSection, getSections, deleteSection, editSection, changeSectionOrder } = require('../Controller/Sections');
@@ -131,6 +131,7 @@ withParams.put('/editProduct', tokenChecker, validOwnerChecker, validateProduct(
 // --- COLLECTION ROUTES ---
 withParams.post('/addCollection', tokenChecker, validOwnerChecker, validateCollection(false), addCollection);
 withParams.get('/getCollections', ValidStoreChecker, getCollections);
+withParams.get('/getSingleCollection', ValidStoreChecker, getSingleCollection);
 withParams.delete('/deleteCollection', tokenChecker, validOwnerChecker, deleteCollection);
 withParams.put('/editCollection', tokenChecker, validOwnerChecker, validateCollection(true), editCollection);
 
