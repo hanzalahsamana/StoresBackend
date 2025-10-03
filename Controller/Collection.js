@@ -9,7 +9,7 @@ module.exports = {
   // add category
   addCollection: async (req, res) => {
     const { storeId } = req.params;
-    const { name, image, products } = req.body;
+    const { name, image, products, metaDescription, metaTitle } = req.body;
     const uniqueSlug = await generateSlug(name, CollectionModel);
 
     try {
@@ -18,6 +18,8 @@ module.exports = {
         image,
         slug: uniqueSlug,
         storeRef: storeId,
+        metaDescription,
+        metaTitle,
       });
 
       const savedCollection = await newCollection.save();
@@ -155,7 +157,7 @@ module.exports = {
   editCollection: async (req, res) => {
     const { storeId } = req.params;
     const collectionId = req.query.collectionId;
-    const { name, image, products } = req.body;
+    const { name, image, products, metaDescription, metaTitle } = req.body;
 
     try {
       const collection = await CollectionModel.findById(collectionId);
@@ -188,7 +190,7 @@ module.exports = {
 
       const uniqueSlug = await generateSlug(name);
 
-      Object.assign(collection, { name, image, slug: uniqueSlug });
+      Object.assign(collection, { name, image, slug: uniqueSlug, metaDescription, metaTitle });
       const savedCollection = await collection.save();
 
       res.status(200).json({
@@ -204,27 +206,34 @@ module.exports = {
   // delete category
   deleteCollection: async (req, res) => {
     const { storeId } = req.params;
-    const collectionId = req.query.collectionId;
-
-    if (!mongoose.isValidObjectId(collectionId) || !collectionId) {
-      return res.status(400).json({ message: 'Invalid id OR id is not defined' });
-    }
-
+    let { collectionId } = req.query;
+    collectionId = [collectionId];
     try {
-      // Step 1: Delete the collection by ID and storeRef
-      const deleted = await CollectionModel.deleteOne({
-        _id: collectionId,
+      // ✅ Normalize collectionId into an array
+      if (!collectionId || collectionId.length === 0) {
+        return res.status(400).json({ message: 'collectionId is required' });
+      }
+
+      // ✅ Validate all IDs
+      const validIds = collectionId.filter((id) => mongoose.isValidObjectId(id));
+      if (validIds.length === 0) {
+        return res.status(400).json({ message: 'Invalid collectionId(s)' });
+      }
+
+      // Step 1: Delete multiple collections
+      const deleted = await CollectionModel.deleteMany({
+        _id: { $in: validIds },
         storeRef: storeId,
       });
 
       if (deleted.deletedCount === 0) {
-        return res.status(404).json({ message: 'Collection not found' });
+        return res.status(404).json({ message: 'Collection(s) not found' });
       }
 
-      // Step 2: Remove collection ref from all products
-      await ProductModel.updateMany({ storeRef: storeId, collections: collectionId }, { $pull: { collections: collectionId } });
+      // Step 2: Remove collection refs from all products
+      await ProductModel.updateMany({ storeRef: storeId }, { $pull: { collections: { $in: validIds } } });
 
-      return res.status(200).json({ message: 'Collection Deleted Successfully' });
+      return res.status(200).json({ message: 'Collection(s) Deleted Successfully' });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
