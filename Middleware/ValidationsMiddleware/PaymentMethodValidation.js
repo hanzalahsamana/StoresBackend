@@ -1,4 +1,4 @@
-const Joi = require("joi");
+const Joi = require('joi');
 
 const paymentMethodSchema = {
   cod: Joi.object({
@@ -8,55 +8,64 @@ const paymentMethodSchema = {
 
   jazzcash: Joi.object({
     isEnabled: Joi.boolean().required(),
-    isTest: Joi.boolean().required().label("Is Test Mode"),
+    isTest: Joi.boolean().required().label('Is Test Mode'),
     credentials: Joi.object({
-      merchantId: Joi.string().required().label("Merchant ID"),
-      pp_Password: Joi.string().required().label("Password"),
-      integritySalt: Joi.string().required().label("Integrity Salt"),
+      merchantId: Joi.string().required().label('Merchant ID'),
+      pp_Password: Joi.string().required().label('Password'),
+      integritySalt: Joi.string().required().label('Integrity Salt'),
     }).required(),
   }),
 
   easypaisa: Joi.object({
     isEnabled: Joi.boolean().required(),
-    isTest: Joi.boolean().required().label("Is Test Mode"),
+    isTest: Joi.boolean().required().label('Is Test Mode'),
     credentials: Joi.object({
-      merchantId: Joi.string().required().label("Merchant ID"),
-      apiKey: Joi.string().required().label("API Key"),
+      merchantId: Joi.string().required().label('Merchant ID'),
+      apiKey: Joi.string().required().label('API Key'),
     }).required(),
   }),
 
   alfalah: Joi.object({
     isEnabled: Joi.boolean().required(),
-    isTest: Joi.boolean().required().label("Is Test Mode"),
+    isTest: Joi.boolean().required().label('Is Test Mode'),
     credentials: Joi.object({
-      merchantId: Joi.string().required().label("Merchant ID"),
-      storeId: Joi.string().required().label("Store ID"),
-      merchantHash: Joi.string().required().label("Merchant Hash"),
-      merchantUsername: Joi.string().required().label("Merchant Username"),
-      merchantPassword: Joi.string().required().label("Merchant Password"),
-      secretKey: Joi.string().required().label("Secret Key"),
-    }).required()
+      merchantId: Joi.string().required().label('Merchant ID'),
+      storeId: Joi.string().required().label('Store ID'),
+      merchantHash: Joi.string().required().label('Merchant Hash'),
+      merchantUsername: Joi.string().required().label('Merchant Username'),
+      merchantPassword: Joi.string().required().label('Merchant Password'),
+      secretKey: Joi.string().required().label('Secret Key'),
+    }).required(),
   }),
 
+  account: Joi.object({
+    isEnabled: Joi.boolean().required(),
+    credentials: Joi.object({
+      Account_Name: Joi.string().required().label('Account Name'),
+      Account_No: Joi.string().required().label('Account No'),
+      Bank_Name: Joi.string().required().label('Bank Name'),
+      IBAN: Joi.string().required().label('IBAN'),
+    }).required(),
+  }),
 };
 
 const validatePaymentMethod = (req, res, next) => {
   const { method, data } = req.body;
 
-  if (!method || typeof method !== "string") {
-    return res.status(400).json({ message: "Payment method name is required" });
+  if (!method || typeof method !== 'string') {
+    return res.status(400).json({ message: 'Payment method name is required' });
   }
 
   const schema = paymentMethodSchema[method];
 
   if (!schema) {
-    return res.status(400).json({ message: "Unsupported payment method" });
+    return res.status(400).json({ message: 'Unsupported payment method' });
   }
 
   const { error } = schema.validate(data, { abortEarly: false });
 
   if (error) {
-    const errorMessage = error.details.map((e) => e.message).join(", ");
+    const errorMessage = error.details.map((e) => e.message).join(', ');
     return res.status(400).json({ message: errorMessage });
   }
 

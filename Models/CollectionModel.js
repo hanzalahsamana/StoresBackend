@@ -8,7 +8,6 @@ const collectionSchema = new Schema(
     slug: { type: String, required: true },
     metaTitle: { type: String },
     metaDescription: { type: String },
-    metaImage: { type: String },
     storeRef: { type: Schema.Types.ObjectId, ref: "Store", required: true },
   },
   { timestamps: true }
