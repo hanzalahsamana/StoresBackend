@@ -198,7 +198,7 @@ module.exports = {
         data: { ...savedCollection.toObject?.(), products: savedProducts },
       });
     } catch (error) {
-      console.log('Error updating collection!', error?.message || error);
+      console.error('Error updating collection!', error?.message || error);
       res.status(500).json({ message: error.message });
     }
   },

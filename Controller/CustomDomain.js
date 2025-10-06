@@ -28,7 +28,6 @@ const addCustomDomain = async (req, res) => {
     }
 
     const response = await addDomainToVercel(domain);
-    console.log('Vercel response: 🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺🥺', response);
     let addedDomain = response;
 
     if (addedDomain?.error && addedDomain?.error?.code === 'invalid_domain') {
@@ -128,8 +127,6 @@ const checkDomainStatus = async (req, res) => {
 
 const deleteCustomDomain = async (req, res) => {
   const { storeId } = req.params;
-  console.log(storeId, 'ddd');
-
   try {
     await updateDomainToDatabase(storeId, null, false);
     return res.status(200).json({ message: 'Domain deleted successfully' });

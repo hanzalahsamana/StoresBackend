@@ -75,8 +75,6 @@ const getAnalyticsData = async (req, res) => {
 
     const { startDate, endDate, timeDimension } = calculateDateRange(dateFilter);
 
-    console.log(`📊 Fetching analytics for "${siteName}" | Date Range: ${startDate} - ${endDate}`);
-
     const [response] = await analyticsDataClient.runReport({
       property: `properties/${PROPERTY_ID}`,
       dateRanges: [{ startDate, endDate }],
@@ -227,7 +225,6 @@ const getAnalyticsData = async (req, res) => {
       repeatCustomers,
     };
 
-    console.log('✅ Analytics Data:', formattedStats);
     res.status(200).json(formattedStats);
   } catch (error) {
     console.error(`❌ Error: ${error.message}`);

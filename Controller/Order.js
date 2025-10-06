@@ -122,8 +122,6 @@ const cancelOrder = async (req, res) => {
     let totalProductCost = 0;
 
     for (const product of cart.products) {
-      console.log(cart, 'Cart Data😂😂😂😂');
-
       const productData = await ProductModel.findOne({ storeRef: storeId, _id: product.productId }).lean();
 
       if (!productData) {
@@ -250,19 +248,19 @@ const getOrders = async (req, res) => {
     }
   }
   try {
-
     if (!orderId) {
-      const orderData = await OrderModel.find({});
-      return res.status(201).json(orderData);
+      const orderData = await OrderModel.find({ storeRef: storeId });
+      return res.status(201).json({ data: orderData, success: true });
     }
-    const orderData = await OrderModel.findById(orderId);
+    const orderData = await OrderModel.findOne({ storeRef: storeId, _id: orderId });
     if (!orderData) {
-      return res.status(404).json({ message: 'Order Data not found' });
+      return res.status(404).json({ message: 'Order Data not found', success: false });
     }
 
-    return res.status(201).json(orderData);
+    return res.status(201).json({ data: orderData, success: true });
   } catch (e) {
-    return res.status(500).json({ message: Object.values(e.errors)[0] });
+    console.log('Error fetching order data!', e?.message || e);
+    return res.status(500).json({ message: 'Something went wrong!', error: e?.message || e, success: false });
   }
 };
 

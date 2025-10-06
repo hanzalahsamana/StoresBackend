@@ -3,11 +3,9 @@ const httpClient = require('../Utils/HttpClient');
 
 const addDomainToVercel = async (domain) => {
   try {
-    console.log(domain);
-    
     const { data } = await httpClient.post(
       `${vercel.baseURL}${vercel.endPoints.addDomain(vercel.projectId)}`,
-      { name:domain },
+      { name: domain },
       {
         headers: {
           Authorization: vercel.token,
@@ -22,14 +20,11 @@ const addDomainToVercel = async (domain) => {
 };
 const checkVercelDomainStatus = async (domain) => {
   try {
-    const { data } = await httpClient.get(
-      `${vercel.baseURL}${vercel.endPoints.checkStatus(vercel.projectId, domain)}`,
-      {
-        headers: {
-          Authorization: vercel.token,
-        },
-      }
-    );
+    const { data } = await httpClient.get(`${vercel.baseURL}${vercel.endPoints.checkStatus(vercel.projectId, domain)}`, {
+      headers: {
+        Authorization: vercel.token,
+      },
+    });
     return data;
   } catch (error) {
     console.error('Vercel API request failed:', error);

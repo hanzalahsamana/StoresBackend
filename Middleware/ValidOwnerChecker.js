@@ -5,10 +5,8 @@ const { UserModal } = require('../Models/userModal');
 
 const validOwnerChecker = async (req, res, next) => {
   try {
-    
     const { userId } = req.query;
     const { storeId } = req.params;
-    console.log(storeId , "📬📬");
 
     if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(storeId)) {
       return res.status(400).json({
@@ -18,7 +16,7 @@ const validOwnerChecker = async (req, res, next) => {
     }
 
     const userExists = await UserModal.exists({ _id: userId });
-    
+
     if (!userExists) {
       return res.status(404).json({
         success: false,

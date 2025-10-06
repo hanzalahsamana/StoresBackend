@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const url = process.env.MONGO_URL;
 
 mongoose
@@ -7,8 +7,8 @@ mongoose
     socketTimeoutMS: 45000,
   })
   .then(async () => {
-    console.log("Mongo DB connected");
+    console.log('Mongo DB connected');
   })
   .catch((err) => {
-    console.log("not connected", "error:", err);
+    console.error('not connected', 'error:', err);
   });

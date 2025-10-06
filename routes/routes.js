@@ -90,7 +90,7 @@ const { getSitemapData } = require('../Controller/SEO/sitemap');
 const { getRobotsTxt } = require('../Controller/SEO/robots');
 const { getAnalyticsData } = require('../Controller/analytics');
 const { postConatctForm, getContactedUsers } = require('../Controller/Contact');
-const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, createPage, discardDraft } = require('../Controller/Theme/Builder');
+const { saveDraft, publishPage, getDraftPage, getPublishPage, getAllPages, createPage, discardDraft, deletePage } = require('../Controller/Theme/Builder');
 const { getMenuLinks } = require('../Controller/Suggestions/menuLinks');
 const { addCustomDomain, checkDomainStatus, deleteCustomDomain } = require('../Controller/CustomDomain');
 const { startCheckout, verifyCheckoutSession } = require('../Controller/Checkout');
@@ -155,6 +155,7 @@ withParams.get('/getDraftPage', tokenChecker, validOwnerChecker, getDraftPage);
 withParams.post('/discardDraft', tokenChecker, validOwnerChecker, discardDraft);
 withParams.get('/getAllPages', tokenChecker, validOwnerChecker, getAllPages);
 withParams.post('/createPage', tokenChecker, validOwnerChecker, createPage);
+withParams.delete('/delete/page', tokenChecker, validOwnerChecker, deletePage);
 
 // --- CONTENT ROUTES ---
 withParams.get('/getContents', ValidStoreChecker, getContents);
@@ -162,7 +163,7 @@ withParams.patch('/editContent', tokenChecker, validOwnerChecker, ValidatContent
 
 // --- ORDER ROUTES ---
 withParams.post('/placeOrder/:checkoutToken', ValidStoreChecker, validateOrder, placeOrder);
-withParams.get('/getOrders', ValidStoreChecker, getOrders);
+withParams.get('/getOrders', tokenChecker, validOwnerChecker, getOrders);
 withParams.put('/editOrder', editOrderData);
 withParams.post('/startCheckout', ValidStoreChecker, startCheckout);
 withParams.get('/verifyCheckoutSession/:checkoutToken', ValidStoreChecker, verifyCheckoutSession);
@@ -244,8 +245,6 @@ withParams.get('/ping', async (req, res) => {
 
 withoutParams.post('/jazzcash', async (req, res) => {
   try {
-    console.log('JazzCash endpoint hit');
-    console.log('request body😰', req.body);
     res.status(200).send('OK');
   } catch (err) {
     console.error('MongoDB connection error:', err.message);

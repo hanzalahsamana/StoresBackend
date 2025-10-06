@@ -23,8 +23,6 @@ const verifyCheckoutSessionUtil = async (checkoutToken) => {
       checkoutId: null,
     };
   }
-  console.log(checkout);
-
   const validatedProducts = await enrichedAndValidateProducts(checkout.cartItems);
 
   const errors = [];

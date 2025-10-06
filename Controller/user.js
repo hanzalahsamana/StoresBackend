@@ -92,8 +92,6 @@ module.exports = {
       await user.save();
       await OTPVerificationEmail(user, otp);
 
-      console.log(`OTP sent to ${email}: ${otp}`); // For debugging purposes, remove in production
-
       return res.status(200).json({
         message: 'OTP sent successfully to your email!',
         remainingTime: COOLDOWN_PERIOD / 1000,
@@ -200,8 +198,6 @@ module.exports = {
   authWithGoogle: async (req, res) => {
     const { googleToken: accessToken } = req.body;
 
-    console.log('Google Token:', accessToken);
-
     try {
       if (!accessToken) {
         return res.status(400).json({ message: 'Google access token required' });
@@ -260,8 +256,6 @@ module.exports = {
       savedUser.password = undefined;
 
       const token = await generateJwtToken({ _id: savedUser._id });
-      console.log(token, savedUser?._id);
-
       // const storeDetail = new StoreDetailModal({
       //   brand_Id: savedUser.brand_Id,
       //   brandName: savedUser.brandName,
@@ -306,7 +300,7 @@ module.exports = {
 
       return res.status(200).json({ message: 'Password updated successfully', success: true });
     } catch (e) {
-      console.log('Error editing password', e?.message || e);
+      console.error('Error editing password', e?.message || e);
       return res.status(500).json({ message: 'Something went wrong!', success: false });
     }
   },
