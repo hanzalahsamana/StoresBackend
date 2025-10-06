@@ -57,7 +57,6 @@ const removeDomainFromDatabase = async (req, res) => {
     user.isDomainVerified = false; // Remove the domain
     await user.save(); // Save the update
 
-    console.log(`Domain removed successfully for ${siteName}`);
     return res.status(200).json({
       message: `Domain removed successfully`,
       StatusCode: 'success',
@@ -230,7 +229,6 @@ ENDSSH`;
           error: stderr,
         });
       }
-      console.log(`🎉 Success: ${stdout} ${stderr}`);
       return res.status(200).json({
         message: `✅ SSL setup complete for ${userDomain}!`,
         output: stdout,

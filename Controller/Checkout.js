@@ -62,15 +62,13 @@ const startCheckout = async (req, res) => {
           });
         }
       } else {
-        console.log(originalProduct);
-
         cleanedProducts.push(p);
         checkoutItems.push(originalProduct);
       }
     });
 
     if (!cleanedProducts?.length || !checkoutItems.length) {
-      return res.status(400).json({ success: false, message: 'No valid items available for checkout' , errors});
+      return res.status(400).json({ success: false, message: 'No valid items available for checkout', errors });
     }
     const checkout = await createCheckoutSession({
       cartItems: checkoutItems,

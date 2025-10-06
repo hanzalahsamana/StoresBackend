@@ -159,8 +159,6 @@ module.exports = {
     const { storeId } = req.params;
     const productID = req.query.id;
 
-    console.log('req?.body', req?.body);
-
     try {
       const product = await ProductModel.findOneAndUpdate({ _id: productID, storeRef: storeId }, { $set: req.body }, { new: true });
 

@@ -3,7 +3,7 @@
 const { enrichSections } = require('../../Helpers/EnrichSections');
 const { PageModel } = require('../../Models/PageModel');
 const { ThemeLayoutModel } = require('../../Models/ThemeLayoutModel');
-const generateSlug = require('../../Utils/generateSlug');
+const { generateSlug } = require('../../Utils/generateSlug');
 
 const saveDraft = async (req, res) => {
   try {
@@ -197,7 +197,7 @@ const getPublishPage = async (req, res) => {
 
     const enrichedSections = await enrichSections(page.sections, storeId);
     page.sections = enrichedSections;
-    
+
     // Send merged response
     return res.status(200).json({
       success: true,
@@ -342,13 +342,49 @@ const createPage = async (req, res) => {
     console.error('Error creating page:', error);
     return res.status(500).json({
       success: false,
-      message: 'Failed to create page',
+      message: 'Something went wrong!',
       error: error.message,
     });
   }
 };
 
-module.exports = { saveDraft, publishPage, getDraftPage, getPublishPage, discardDraft, getAllPages, createPage };
+const deletePage = async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    const { slug } = req.query;
+
+    if (!slug) {
+      return res.status(400).json({
+        success: false,
+        message: 'Slug is required!',
+      });
+    }
+
+    // Delete all pages matching the slug for the given store
+    const result = await PageModel.deleteMany({ storeRef: storeId, slug });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No pages found with the given slug.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Page deleted successfully!`,
+    });
+  } catch (error) {
+    console.error('Error deleting page:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong while deleting the page.',
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { saveDraft, publishPage, getDraftPage, getPublishPage, discardDraft, getAllPages, createPage, deletePage };
 
 // module.exports = publishPage;
 
