@@ -1,3 +1,4 @@
+const { boolean } = require('joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -73,6 +74,20 @@ const PaymentMethodSchema = new Schema({
   },
 });
 
+/* ========== Payment Method Schema ========== */
+const AnnouncementSchema = new Schema({
+  discountBar: {
+    isActive: { type: Boolean, default: false },
+    description: { type: String, default: '' },
+    timer: { type: Date, default: null },
+  },
+  popup: {
+    discountRef: { type: Schema.Types.ObjectId || null },
+    isActive: { type: Boolean, default: false },
+    showType: { type: String, default: 'reload', enum: ['reload', 'firstVisit'] },
+  },
+});
+
 /* ========== Configuration Schema ========== */
 const ConfigurationSchema = new Schema(
   {
@@ -104,6 +119,10 @@ const ConfigurationSchema = new Schema(
     paymentMethods: {
       type: [PaymentMethodSchema],
       default: [],
+    },
+    announcements: {
+      type: AnnouncementSchema,
+      default: {},
     },
   },
   {

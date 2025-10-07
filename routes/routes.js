@@ -211,8 +211,8 @@ withParams.patch('/editDiscount', tokenChecker, validOwnerChecker, validateDisco
 withParams.post('/applyCoupon', ValidStoreChecker, applyCoupon);
 
 // --- ANNOUNCEMENT ROUTES ---
-withoutParams.post('/addAnnouncement', tokenChecker, addAnnouncement);
-withoutParams.delete('/deleteAnnouncement', tokenChecker, deleteAnnouncement);
+withParams.post('/addAnnouncement', tokenChecker, validOwnerChecker, addAnnouncement);
+withParams.delete('/deleteAnnouncement', tokenChecker, validOwnerChecker, deleteAnnouncement);
 
 // --- SEARCH SUGGESTION ROUTES ---
 withParams.get('/search/products', ValidStoreChecker, productSearchSuggestion);
