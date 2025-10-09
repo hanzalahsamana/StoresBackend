@@ -65,7 +65,7 @@ const StoreSchema = new Schema(
       font: { type: String, default: "Arial, sans-serif" },
       theme: {
         type: String,
-        default: "",
+        default: "Light",
         enum: ["Light", "Modern Dark", "Milt Blue", "Soft Breeze"],
       },
     },

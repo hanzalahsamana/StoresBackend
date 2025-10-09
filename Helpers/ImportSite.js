@@ -6,7 +6,6 @@
 // const { SectionSchema } = require("../Models/SectionsModel");
 // const getModel = require("../Utils/GetModel");
 // const { StoreModal } = require("../Models/StoreModal");
-// const { ContentModel } = require("../Models/ContentModel");
 
 // const importSiteData = async (req, res) => {
 //   try {
@@ -82,21 +81,6 @@
 //       if (categoryInsertion) importActions.push(categoryInsertion);
 //     }
 
-//     // Handle Sections - Override (Delete & Replace All)
-//     if (selectedKeys.includes("sections") && jsonData.sections?.length) {
-//       const SectionModel = getModel(siteName, "section", SectionSchema);
-
-//       await SectionModel.deleteMany({});
-
-//       importActions.push(
-//         SectionModel.insertMany(
-//           jsonData.sections.map((section) => ({
-//             ...section,
-//           })),
-//         ),
-//       );
-//     }
-
 //     // Handle Orders
 //     if (selectedKeys.includes("orders") && jsonData.orders?.length) {
 //       const OrderModel = getModel(siteName, "Orders", orderSchema);
@@ -110,19 +94,6 @@
 //         existingOrderIds,
 //       );
 //       if (orderInsertion) importActions.push(orderInsertion);
-//     }
-
-//     // Handle Pages/Contents
-//     if (selectedKeys.includes("contents") && jsonData.contents?.length) {
-//       await jsonData.contents.forEach(({ type, ...rest }) => {
-//         importActions.push(
-//           ContentModel.updateOne(
-//             { storeRef: storeId, type },
-//             { $set: { ...rest, storeRef: storeId } },
-//             { upsert: true }
-//           )
-//         );
-//       });
 //     }
 
 //     // Execute all import actions
