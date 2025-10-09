@@ -15,17 +15,15 @@ const variantSchema = new mongoose.Schema(
     },
     stock: {
       type: Number || null,
-      required: true,
       default: null,
     },
     price: {
       type: Number || null,
-      required: true,
       default: null,
     },
     image: {
-      type: String,
-      required: true,
+      type: String || null,
+      default: null,
     },
   },
   { _id: false }
@@ -62,21 +60,22 @@ const ProductSchema = new Schema(
       count: { type: Number, default: 0 },
     },
     variations: {
-      type: [
-        new mongoose.Schema(
-          {
-            id: { type: String, required: true },
-            name: { type: String, required: true },
-            options: { type: [String], required: true },
-          },
-          { _id: false }
-        ),
-      ],
+      type:
+        [
+          new mongoose.Schema(
+            {
+              id: { type: String, required: true },
+              name: { type: String, required: true },
+              options: { type: [String], required: true },
+            },
+            { _id: false }
+          ),
+        ] || [],
       default: [],
     },
 
     variants: {
-      type: [variantSchema],
+      type: [variantSchema] || [],
       default: [],
     },
     relatedProducts: [

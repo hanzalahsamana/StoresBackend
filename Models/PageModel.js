@@ -12,7 +12,7 @@ const SectionSchema = new mongoose.Schema({
 const PageSchema = new mongoose.Schema({
   storeRef: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Store' },
   type: { type: String, enum: ['system', 'custom'], default: 'custom' },
-  mode: { type: String, enum: ['draft', 'published'], default: 'draft' },
+  mode: { type: String, enum: ['draft', 'published'], default: 'published' },
   isHeaderFooter: { type: Boolean, default: true },
   slug: { type: String, required: true }, // "/about", "/"
   name: { type: String, required: true }, // "About Us"

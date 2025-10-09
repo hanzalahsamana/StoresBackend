@@ -84,13 +84,13 @@ const generateStore = async (req, res) => {
     const savedSubscription = await newSubscription.save();
     savedStore.subscriptionId = savedSubscription._id;
     await savedStore.save();
-    // await SeedDefaultData(savedStore?._id);
+    await SeedDefaultData(savedStore?._id);
     return res.status(201).json({
       success: true,
       data: savedStore,
     });
   } catch (error) {
-    console.error('Error adding store details:', error);
+    console.error('Error generating store:', error?.message || error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',

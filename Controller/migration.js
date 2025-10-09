@@ -3,16 +3,12 @@ const csv = require("csv-parser");
 const multer = require("multer");
 const path = require("path");
 const { CollectionModel } = require("../Models/CollectionModel");
-const { ContentModel } = require("../Models/ContentModel");
 const { ProductModel } = require("../Models/ProductModel");
-const { SectionModel } = require("../Models/SectionsModel");
 const { parse } = require("json2csv");
 
 const modelMap = {
   products: ProductModel,
   collections: CollectionModel,
-  sections: SectionModel,
-  contents: ContentModel,
 };
 const exportSite = async (req, res) => {
   const { storeId } = req.params;
