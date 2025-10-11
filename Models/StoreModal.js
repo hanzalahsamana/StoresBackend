@@ -59,8 +59,8 @@ const StoreSchema = new Schema(
       default: 0,
     },
     branding: {
-      logo: { type: String, default: null },
-      favicon: { type: String, default: null },
+      logo: { type: String, default: 'https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp' },
+      favicon: { type: String, default: 'https://res.cloudinary.com/duaxitxph/image/upload/v1736247980/cjzl4ivq2lduxqbtnfj1.webp' },
       description: { type: String, default: '' },
       font: { type: String, default: 'Arial, sans-serif' },
       theme: {
