@@ -94,7 +94,7 @@ module.exports = {
         { _id: { $in: ids } },
         {
           $set: {
-            storeStatus: status.toLowerCase(),
+            status: status.toLowerCase(),
             ...(status === 'suspended' ? { suspendedReason: reason } : {}),
           },
         }
