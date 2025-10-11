@@ -104,12 +104,13 @@ const getStore = async (req, res) => {
   const { isAdmin } = req.query;
 
   try {
-    const storeData = await StoreModal.findById(storeId).populate('subscriptionId');
+    const storeData = await StoreModal.findById(storeId).populate('subscriptionId').populate('userRef'); // plain JS object banane ke liye
+
     const user = await UserModal.findById(storeData?.userRef);
     if (!storeData) {
       return res.status(400).json({ message: 'Invalid Store Id!', success: false });
     }
-    let header = null; 
+    let header = null;
     let footer = null;
 
     const layouts = await ThemeLayoutModel.find({
