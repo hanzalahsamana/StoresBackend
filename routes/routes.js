@@ -20,7 +20,7 @@ const validOwnerChecker = require('../Middleware/ValidOwnerChecker');
 const ValidStoreChecker = require('../Middleware/ValidStoreChecker');
 
 // Controllers - Auth
-const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle, editPassword, deleteAccount } = require('../Controller/user');
+const { loginUser, sendOtp, verifyOtp, getUserFromToken, registerUser, authWithGoogle, editPassword, deleteAccount, updateProfile } = require('../Controller/user');
 
 // Controllers - Store
 const { generateStore, getAllStores, getStore, editStore, deleteStore, editStoreAppearance } = require('../Controller/StoreDetail');
@@ -106,6 +106,11 @@ withoutParams.post('/verifyOtp', verifyOtp);
 withoutParams.post('/register', userRegisterValidate, registerUser);
 withoutParams.post('/authWithGoogle', authWithGoogle);
 withoutParams.get('/getUserFromToken', tokenChecker, getUserFromToken);
+
+// --- Profile Page ROUTES ---
+withoutParams.put('/edit/password', tokenChecker, editPasswordValidate, editPassword);
+withoutParams.delete('/delete/account', tokenChecker, deleteAccount);
+withoutParams.post('/updateProfile', tokenChecker, updateProfile);
 
 // --- STORE ROUTES ---
 withoutParams.get('/getAllStores', tokenChecker, getAllStores);
@@ -203,10 +208,6 @@ withParams.get('/search/getMenuLinks', tokenChecker, validOwnerChecker, getMenuL
 
 // --- Home Page ROUTES ---
 // withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
-
-// --- Profile Page ROUTES ---
-withParams.delete('/delete/account', tokenChecker, deleteAccount);
-withParams.put('/edit/password', tokenChecker, editPasswordValidate, editPassword);
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post('/addSubscriber', ValidStoreChecker, addSubscriber);

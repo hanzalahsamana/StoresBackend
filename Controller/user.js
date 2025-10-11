@@ -340,4 +340,35 @@ module.exports = {
       return res.status(500).json({ message: 'Something went wrong!', success: false });
     }
   },
+
+  updateProfile: async (req, res) => {
+    try {
+      const { userId } = req.query || {};
+      const { firstName, lastName } = req.body || {};
+
+      let user = await UserModal.findById(userId);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found.' });
+      }
+
+      if (firstName) user.firstName = firstName;
+      if (lastName) user.lastName = lastName;
+
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Profile updated successfully.',
+        user,
+      });
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Something went wrong while updating your profile.',
+        error: error,
+      });
+    }
+  },
 };

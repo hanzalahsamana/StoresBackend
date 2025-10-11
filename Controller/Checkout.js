@@ -90,8 +90,8 @@ const startCheckout = async (req, res) => {
 
 const verifyCheckoutSession = async (req, res) => {
   try {
-    const { checkoutToken } = req.params;
-    const result = await verifyCheckoutSessionUtil(checkoutToken);
+    const { checkoutToken, storeId } = req.params;
+    const result = await verifyCheckoutSessionUtil(checkoutToken, storeId);
 
     return res.status(result.statusCode).json(result);
   } catch (err) {

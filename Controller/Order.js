@@ -18,7 +18,7 @@ const placeOrder = async (req, res) => {
       storeRef: storeId,
     }).lean();
 
-    const result = await verifyCheckoutSessionUtil(checkoutToken);
+    const result = await verifyCheckoutSessionUtil(checkoutToken , storeId);
     if (!result?.success) {
       return res.status(result.statusCode).json(result);
     }
