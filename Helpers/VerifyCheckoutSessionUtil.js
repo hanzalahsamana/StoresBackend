@@ -3,7 +3,7 @@
 const { CheckoutModel } = require('../Models/CheckoutModel');
 const { enrichedAndValidateProducts } = require('./EnrichedAndValidateProducts');
 
-const verifyCheckoutSessionUtil = async (checkoutToken) => {
+const verifyCheckoutSessionUtil = async (checkoutToken , storeId) => {
   if (!checkoutToken) {
     return {
       success: false,
@@ -14,7 +14,7 @@ const verifyCheckoutSessionUtil = async (checkoutToken) => {
   }
 
   // 1️⃣ Find Checkout Session
-  const checkout = await CheckoutModel.findOne({ token: checkoutToken, status: 'active' });
+  const checkout = await CheckoutModel.findOne({ token: checkoutToken, status: 'active',storeRef:storeId });
   if (!checkout) {
     return {
       success: false,

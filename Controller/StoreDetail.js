@@ -235,7 +235,7 @@ const deleteStore = async (req, res) => {
     const { storeId } = req.params;
     const { password } = req.body;
 
-    if (!storeId || !password) {
+    if (!storeId) {
       return res.status(400).json({
         message: 'Store ID and password are required',
         success: false,
@@ -247,17 +247,7 @@ const deleteStore = async (req, res) => {
       return res.status(404).json({ message: 'Store not found', success: false });
     }
 
-    const user = await UserModal.findById(store.userRef).select('+password');
-    if (!user) {
-      return res.status(404).json({ message: 'User not found', success: false });
-    }
-
-    const isPasswordCorrect = await compareHash(password, user.password);
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ message: 'Invalid password', success: false });
-    }
-
-    deleteAllData([storeId]);
+    await deleteAllData([storeId]);
 
     await StoreModal.findByIdAndDelete(storeId);
 

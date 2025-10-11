@@ -2,7 +2,6 @@ const { CartModel } = require("../Models/CartModel");
 const { CollectionModel } = require("../Models/CollectionModel");
 const { ConfigurationModel } = require("../Models/ConfigurationModel");
 const { ContactModel } = require("../Models/ContactModel");
-const { ContentModel } = require("../Models/ContentModel");
 const { OrderModel } = require("../Models/OrderModal");
 const { ProductModel } = require("../Models/ProductModel");
 const { ReviewModel } = require("../Models/ReviewModel");
@@ -19,7 +18,6 @@ const deleteAllData = async (storeIds) => {
             CartModel.deleteMany({ storeRef: { $in: storeIds } }),
             ConfigurationModel.deleteMany({ storeRef: { $in: storeIds } }),
             ContactModel.deleteMany({ storeRef: { $in: storeIds } }),
-            ContentModel.deleteMany({ storeRef: { $in: storeIds } }),
             OrderModel.deleteMany({ storeRef: { $in: storeIds } }),
             ReviewModel.deleteMany({ storeRef: { $in: storeIds } }),
             SubscriberModel.deleteMany({ storeRef: { $in: storeIds } }),
