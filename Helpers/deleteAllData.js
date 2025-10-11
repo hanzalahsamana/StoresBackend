@@ -6,6 +6,7 @@ const { OrderModel } = require('../Models/OrderModal');
 const { ProductModel } = require('../Models/ProductModel');
 const { ReviewModel } = require('../Models/ReviewModel');
 const { SubscriberModel } = require('../Models/SubscriberModal');
+const { SubscriptionModel } = require('../Models/subscriptionmodel');
 
 const deleteAllData = async (storeIds) => {
   try {
@@ -19,6 +20,7 @@ const deleteAllData = async (storeIds) => {
       OrderModel.deleteMany({ storeRef: { $in: storeIds } }),
       ReviewModel.deleteMany({ storeRef: { $in: storeIds } }),
       SubscriberModel.deleteMany({ storeRef: { $in: storeIds } }),
+      SubscriptionModel.deleteMany({ storeRef: { $in: storeIds } }),
     ]);
   } catch (err) {
     throw new Error(err);
