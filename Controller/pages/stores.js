@@ -102,7 +102,7 @@ module.exports = {
         {
           $set: {
             storeStatus: status.toLowerCase(),
-            ...(status === 'suspended' ? { suspendedReason: reason } : {}),
+            suspendedReason: status === 'suspended' ? reason : '',
           },
         }
       );
