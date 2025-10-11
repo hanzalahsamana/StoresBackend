@@ -1,84 +1,64 @@
-const { StoreModal } = require("../Models/StoreModal");
-const { UserModal } = require("../Models/userModal");
+const { ConfigurationModel } = require('../Models/ConfigurationModel');
+const { StoreModal } = require('../Models/StoreModal');
+const { UserModal } = require('../Models/userModal');
 
-// Add Announcement
 const addAnnouncement = async (req, res) => {
-  const { userId } = req.query;
-  const { announcement } = req.body;
-
-  if (!userId || !announcement || !announcement.title) {
-    return res.status(400).json({
-      error: "Missing required fields or announcement format is invalid.",
-    });
-  }
-
   try {
-    const user = await UserModal.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ error: "User not found." });
+    const { storeId } = req.params;
+    const { announcementName } = req.query;
+    const data = req.body;
+
+    if (!announcementName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Announcement name is required!',
+      });
     }
 
-    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
-    if (!store) {
-      return res.status(404).json({ error: "Store not found." });
+    if (!data || typeof data !== 'object') {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid announcement data is required!',
+      });
     }
 
-    store.announcements.push(announcement);
-    const savedStore = await store.save();
+    if (announcementName === 'discountBar' && !data?.description) {
+      return res.status(400).json({
+        success: false,
+        message: 'Text is required!',
+      });
+    }
+
+    let config = await ConfigurationModel.findOne({ storeRef: storeId });
+
+    if (!config) {
+      config = new ConfigurationModel({
+        storeRef: storeId,
+        announcements: {},
+      });
+    }
+
+    if (!config.announcements) {
+      config.announcements = {};
+    }
+
+    config.announcements[announcementName] = data;
+    console.log('config.announcements[announcementName]', (config.announcements[announcementName] = data));
+
+    await config.save();
 
     return res.status(200).json({
-      message: "Announcement added successfully.",
-      data: savedStore.announcements,
+      success: true,
+      message: 'Announcement saved successfully.',
+      data: config.announcements,
     });
   } catch (error) {
-    console.error("Error adding announcement:", error);
-    return res.status(500).json({ message: error?.message });
+    console.error('Error adding announcement:', error);
+    return res.status(500).json({
+      success: false,
+      message: error?.message || 'Internal server error.',
+    });
   }
 };
 
-// Delete Announcement
-const deleteAnnouncement = async (req, res) => {
-  const { userId, announcementId } = req.query;
-
-  if (!userId || !announcementId) {
-    return res.status(400).json({ error: "Missing required fields." });
-  }
-
-  try {
-    const user = await UserModal.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ error: "User not found." });
-    }
-
-    const store = await StoreModal.findOne({ brand_Id: user.brand_Id });
-    if (!store) {
-      return res.status(404).json({ error: "Store not found." });
-    }
-
-    const announcement = store.announcements.id(announcementId);
-    if (!announcement) {
-      return res.status(404).json({ error: "Announcement not found." });
-    }
-
-    announcement.deleteOne();
-    const savedStore = await store.save();
-
-    return res.status(200).json({
-      message: "Announcement deleted successfully.",
-      data: savedStore.announcements,
-    });
-  } catch (error) {
-    console.error("Error deleting announcement:", error);
-    return res.status(500).json({ message: error?.message });
-  }
-};
-
-module.exports = { addAnnouncement, deleteAnnouncement };
-
-
-
-
-
-
-
-
+module.exports = { addAnnouncement };

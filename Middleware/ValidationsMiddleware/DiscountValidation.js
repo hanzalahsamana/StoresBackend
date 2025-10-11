@@ -5,7 +5,7 @@ const joiObjectid = require('joi-objectid')(Joi);
 const discountValidationSchema = Joi.object({
   name: Joi.string().required(),
   discountType: Joi.string().valid('coupon', 'global').required(),
-  access: Joi.string().valid('all', 'subscription').default('all'),
+  access: Joi.string().valid('all', 'subscription').default('all').optional(),
   amountType: Joi.string().valid('fixed', 'percent').required(),
   amount: Joi.number().positive().required(),
   minOrderAmount: Joi.number().min(0).default(0),

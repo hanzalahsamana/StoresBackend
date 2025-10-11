@@ -90,7 +90,15 @@ module.exports = {
         return res.status(400).json({ message: 'Invalid users Id!', success: false });
       }
 
-      await UserModal.updateMany({ _id: { $in: ids } }, { $set: { status: status.toLowerCase() } });
+      await UserModal.updateMany(
+        { _id: { $in: ids } },
+        {
+          $set: {
+            status: status.toLowerCase(),
+            suspendedReason: status === 'suspended' ? reason : '',
+          },
+        }
+      );
 
       const updatedUsers = await UserModal.find({ _id: { $in: ids } });
 

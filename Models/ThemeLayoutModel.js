@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const ThemeLayoutSchema = new mongoose.Schema({
   storeRef: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Store' },
-  mode: { type: String, enum: ['draft', 'published'], default: 'draft' },
+  mode: { type: String, enum: ['draft', 'published'], default: 'published' },
   name: { type: String, required: true }, //header , footter
   data: mongoose.Schema.Types.Mixed,
   updatedAt: { type: Date, default: Date.now },

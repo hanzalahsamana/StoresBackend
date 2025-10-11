@@ -84,13 +84,13 @@ const generateStore = async (req, res) => {
     const savedSubscription = await newSubscription.save();
     savedStore.subscriptionId = savedSubscription._id;
     await savedStore.save();
-    // await SeedDefaultData(savedStore?._id);
+    await SeedDefaultData(savedStore?._id);
     return res.status(201).json({
       success: true,
       data: savedStore,
     });
   } catch (error) {
-    console.error('Error adding store details:', error);
+    console.error('Error generating store:', error?.message || error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -101,9 +101,12 @@ const generateStore = async (req, res) => {
 
 const getStore = async (req, res) => {
   const { storeId } = req.params;
+  const { isAdmin } = req.query;
 
   try {
-    const storeData = await StoreModal.findById(storeId).populate('subscriptionId');
+    const storeData = await StoreModal.findById(storeId).populate('subscriptionId').populate('userRef'); // plain JS object banane ke liye
+
+    const user = await UserModal.findById(storeData?.userRef);
     if (!storeData) {
       return res.status(400).json({ message: 'Invalid Store Id!', success: false });
     }
@@ -118,6 +121,12 @@ const getStore = async (req, res) => {
 
     header = layouts.find((l) => l.name === 'header')?.data || null;
     footer = layouts.find((l) => l.name === 'footer')?.data || null;
+    if (isAdmin) {
+      storeData.updatedAt = new Date();
+      await storeData.save();
+      user.lastOpenedStore = storeData?._id;
+      await user.save();
+    }
     return res.status(200).json({
       success: true,
       data: storeData,
@@ -149,7 +158,7 @@ const getAllStores = async (req, res) => {
 
     const storeData = await StoreModal.find({
       userRef: userId,
-    });
+    }).sort({ updatedAt: -1 });
 
     return res.status(200).json({
       success: true,
@@ -233,7 +242,7 @@ const editStoreAppearance = async (req, res) => {
 const deleteStore = async (req, res) => {
   try {
     const { storeId } = req.params;
-    const { password } = req.body;
+    const { password } = req.query;
 
     if (!storeId) {
       return res.status(400).json({

@@ -65,6 +65,10 @@ const userSchema = new Schema(
       ref: 'Store',
       default: null,
     },
+    suspendedReason: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

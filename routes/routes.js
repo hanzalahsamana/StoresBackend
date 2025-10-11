@@ -31,14 +31,8 @@ const { addProduct, deleteProduct, editProduct, getProducts, productSearchSugges
 // Controllers - Collection
 const { addCollection, getCollections, deleteCollection, editCollection, collectionSearchSuggestion, getSingleCollection } = require('../Controller/Collection');
 
-// Controllers - Section
-const { addSection, getSections, deleteSection, editSection, changeSectionOrder } = require('../Controller/Sections');
-
 // Controllers - Review
 const { addReview, getReviews, deleteReview } = require('../Controller/Reviews');
-
-// Controllers - Content
-const { getContents, editContent } = require('../Controller/Content');
 
 // Controllers - Cart
 const { addToCart, getCartdata, deleteCartData } = require('../Controller/Cart');
@@ -59,7 +53,7 @@ const { getAdminConfiguration, getPublicConfiguration } = require('../Controller
 const { addDiscount, deleteDiscount, editDiscount, applyCoupon } = require('../Controller/StoreConfigurations/discounts');
 
 // Controllers - Announcement
-const { addAnnouncement, deleteAnnouncement } = require('../Controller/announcement');
+const { addAnnouncement } = require('../Controller/announcement');
 
 // Controllers - Subscriber
 const addSubscriber = require('../Controller/subscribe');
@@ -75,7 +69,7 @@ const { getImages, uploadImage, deleteImages } = require('../Controller/imageUpl
 const { uploadSingle } = require('../Helpers/s3Uploader');
 
 // Controllers - Pages / homepage
-const { getHomePageData } = require('../Controller/pages/homePage');
+// const { getHomePageData } = require('../Controller/pages/homePage');
 
 // Controllers - Analytics / Contact
 const { getDashboardData } = require('../Controller/pages/analytics');
@@ -145,13 +139,6 @@ withParams.post('/addReview', ValidStoreChecker, validateReview, addReview);
 withParams.get('/getReviews', ValidStoreChecker, getReviews);
 withParams.delete('/deleteReview', tokenChecker, validOwnerChecker, deleteReview);
 
-// --- SECTION ROUTES ---
-withParams.post('/addSection', tokenChecker, validOwnerChecker, validateSection, addSection);
-withParams.get('/getSections', ValidStoreChecker, getSections);
-withParams.delete('/deleteSection', tokenChecker, validOwnerChecker, deleteSection);
-withParams.patch('/editSection', tokenChecker, validOwnerChecker, editSection);
-withParams.patch('/changeSectionOrder', tokenChecker, validOwnerChecker, changeSectionOrder);
-
 // --- Builder ROUTES ---
 withParams.post('/saveDraft', tokenChecker, validOwnerChecker, saveDraft);
 withParams.post('/publishPage', tokenChecker, validOwnerChecker, publishPage);
@@ -161,10 +148,6 @@ withParams.post('/discardDraft', tokenChecker, validOwnerChecker, discardDraft);
 withParams.get('/getAllPages', tokenChecker, validOwnerChecker, getAllPages);
 withParams.post('/createPage', tokenChecker, validOwnerChecker, createPage);
 withParams.delete('/delete/page', tokenChecker, validOwnerChecker, deletePage);
-
-// --- CONTENT ROUTES ---
-withParams.get('/getContents', ValidStoreChecker, getContents);
-withParams.patch('/editContent', tokenChecker, validOwnerChecker, ValidatContent, editContent);
 
 // --- ORDER ROUTES ---
 withParams.post('/placeOrder/:checkoutToken', ValidStoreChecker, validateOrder, placeOrder);
@@ -216,8 +199,7 @@ withParams.patch('/editDiscount', tokenChecker, validOwnerChecker, validateDisco
 withParams.post('/applyCoupon', ValidStoreChecker, applyCoupon);
 
 // --- ANNOUNCEMENT ROUTES ---
-withoutParams.post('/addAnnouncement', tokenChecker, addAnnouncement);
-withoutParams.delete('/deleteAnnouncement', tokenChecker, deleteAnnouncement);
+withParams.post('/addAnnouncement', tokenChecker, validOwnerChecker, addAnnouncement);
 
 // --- SEARCH SUGGESTION ROUTES ---
 withParams.get('/search/products', ValidStoreChecker, productSearchSuggestion);
@@ -225,7 +207,7 @@ withParams.get('/search/collections', ValidStoreChecker, collectionSearchSuggest
 withParams.get('/search/getMenuLinks', tokenChecker, validOwnerChecker, getMenuLinks);
 
 // --- Home Page ROUTES ---
-withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
+// withParams.get('/pages/home', ValidStoreChecker, getHomePageData);
 
 // --- SUBSCRIBER ROUTES ---
 withParams.post('/addSubscriber', ValidStoreChecker, addSubscriber);
