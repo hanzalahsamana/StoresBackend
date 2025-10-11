@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const StoreSchema = new Schema(
   {
     userRef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     storeName: {
@@ -36,12 +36,12 @@ const StoreSchema = new Schema(
     storeStatus: {
       type: String,
       required: true,
-      default: "active",
-      enum: ["active", "suspended"],
+      default: 'active',
+      enum: ['active', 'suspended'],
     },
     subscriptionId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Subscriptions",
+      ref: 'Subscriptions',
     },
     promoCode: {
       type: String,
@@ -61,13 +61,17 @@ const StoreSchema = new Schema(
     branding: {
       logo: { type: String, default: null },
       favicon: { type: String, default: null },
-      description: { type: String, default: "" },
-      font: { type: String, default: "Arial, sans-serif" },
+      description: { type: String, default: '' },
+      font: { type: String, default: 'Arial, sans-serif' },
       theme: {
         type: String,
-        default: "Light",
-        enum: ["Light", "Modern Dark", "Milt Blue", "Soft Breeze"],
+        default: 'Light',
+        enum: ['Light', 'Modern Dark', 'Milt Blue', 'Soft Breeze'],
       },
+    },
+    suspendedReason: {
+      type: String,
+      default: null,
     },
   },
   {
@@ -97,6 +101,6 @@ const StoreSchema = new Schema(
 //   next();
 // });
 
-const StoreModal = mongoose.model("Store", StoreSchema);
+const StoreModal = mongoose.model('Store', StoreSchema);
 
 module.exports = { StoreModal };
